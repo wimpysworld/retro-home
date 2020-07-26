@@ -1,0 +1,309 @@
+#!/usr/bin/env bash
+
+# Display help usage
+function usage () {
+  echo
+  echo "Usage"
+  echo "  $0 --remix <targetdevice> --img ubuntu-20.04-preinstalled-server-armhf+raspi.img"
+  echo
+  echo "Available supported devices are:"
+  echo "  raspi"
+  echo "  megapi"
+  echo "  nespi"
+  echo "  superpi"
+}
+
+function nspawn() {
+    # Create basic resolv.conf for bind mounting inside the container
+    echo "nameserver 1.1.1.1" > "${TMP_DIR}/resolv.conf"
+
+    # Make sure the container has a machine-id
+    systemd-machine-id-setup --root "${R}" --print
+
+    # Bind mount resolv.conf and the firmware, set the hostname and spawn
+    systemd-nspawn \
+      --resolv-conf=off \
+      --bind-ro=${TMP_DIR}/resolv.conf:/etc/resolv.conf \
+      --bind=${B}:/boot/firmware \
+      --hostname="${REMIX}" \
+      -D "${R}" "$@"
+}
+
+function stage_00_tools() {
+    # Required tools on the host
+    apt-get -y install binfmt-support debootstrap \
+    qemu-user-static rsync systemd-container \
+    ubuntu-keyring whois xz-utils
+}
+
+function stage_01_unpack() {
+    # Capture the patition details.
+    BOOT_PARTITION=`fdisk -l "${IMG}" | grep "c W95 FAT32 (LBA)"`
+    ROOT_PARTITION=`fdisk -l "${IMG}" | grep "83 Linux"`
+    echo "${BOOT_PARTITION}"
+    echo "${ROOT_PARTITION}"
+
+    # Grab the starting sector of the partitions.
+    BOOT_START_SECTOR=`echo "${BOOT_PARTITION}" | sed -e 's/\*//g' | awk '{print $2}'`
+    ROOT_START_SECTOR=`echo "${ROOT_PARTITION}" | sed -e 's/\*//g' | awk '{print $2}'`
+
+    # Calculate the start byte of the partitions.
+    ((BOOT_START_BYTE=${BOOT_START_SECTOR} * 512))
+    ((ROOT_START_BYTE=${ROOT_START_SECTOR} * 512))
+
+    BOOT_SECTOR_LENGTH=`echo "${BOOT_PARTITION}" | sed -e 's/\*//g' | awk '{print $4}'`
+    ROOT_SECTOR_LENGTH=`echo "${ROOT_PARTITION}" | sed -e 's/\*//g' | awk '{print $4}'`
+
+    # Calculate the byte length of the partitions.
+    ((BOOT_BYTE_LENGTH=${BOOT_SECTOR_LENGTH} * 512))
+    ((ROOT_BYTE_LENGTH=${ROOT_SECTOR_LENGTH} * 512))
+
+    mkdir -p "${TMP_DIR}"/{boot,root}
+    mkdir -p "${B}"
+    mkdir -p "${R}"
+    # Mount the partitions to the mount points.
+    BOOT_MOUNT=$(mount -v -o offset=${BOOT_START_BYTE},sizelimit=${BOOT_BYTE_LENGTH} -t vfat "${IMG}" "${TMP_DIR}/boot")
+    ROOT_MOUNT=$(mount -v -o offset=${ROOT_START_BYTE},sizelimit=${ROOT_BYTE_LENGTH} -t ext4 "${IMG}" "${TMP_DIR}/root")
+    BOOT_DEV=$(echo "${BOOT_MOUNT}" | cut -d' ' -f2)
+    ROOT_DEV=$(echo "${ROOT_MOUNT}" | cut -d' ' -f2)
+    rsync -aHAXx --delete "${TMP_DIR}/boot/" "${B}/"
+    rsync -aHAXx --delete "${TMP_DIR}/root/" "${R}/"
+    umount -l "${TMP_DIR}/boot"
+    umount -l "${TMP_DIR}/root"
+    rm -rf "${TMP_DIR}/boot"
+    rm -rf "${TMP_DIR}/root"
+}
+
+function stage_02_apt() {
+    # Remove old kernel
+    #local OLD_KERNEL=$(ls -1 ${R}/lib/modules/ | head -n1)
+    #local OLD_KERNEL_SHORT=$(echo ${OLD_KERNEL} | sed s'/-raspi//')
+    #nspawn apt -y remove linux-image-${OLD_KERNEL} linux-modules-${OLD_KERNEL} linux-raspi-headers-${OLD_KERNEL_SHORT}
+    #rm -v ${B}/vmlinuz
+    #rm -v ${B}/initrd.img
+    #rm -rfv ${R}/lib/modules/${OLD_KERNEL}
+
+    # Remove most of the server components
+    nspawn apt -y purge --autoremove bcache-tools btrfs-progs byobu \
+    cloud-initramfs-copymods cloud-initramfs-dyn-netconf curl \
+    eatmydata ethtool finalrd htop landscape-common lvm2 \
+    lxd-agent-loader mdadm multipath-tools open-iscsi \
+    overlayroot screen sosreport tmux vim xfsprogs
+
+    # Install new kernel
+    #wget -c https://launchpad.net/ubuntu/+archive/primary/+files/linux-headers-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb -O ${R}/usr/local/share/linux-headers-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb
+    #wget -c https://launchpad.net/ubuntu/+archive/primary/+files/linux-image-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb -O ${R}/usr/local/share/linux-image-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb
+    #wget -c https://launchpad.net/ubuntu/+archive/primary/+files/linux-modules-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb -O ${R}/usr/local/share/linux-modules-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb
+    #wget -c https://launchpad.net/ubuntu/+archive/primary/+files/linux-raspi-headers-5.4.0-1015_5.4.0-1015.15_${IMG_ARCH}.deb -O ${R}/usr/local/share/linux-raspi-headers-5.4.0-1015_5.4.0-1015.15_${IMG_ARCH}.deb
+    #nspawn apt-get -y install /usr/local/share/linux-headers-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb /usr/local/share/linux-image-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb /usr/local/share/linux-modules-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb /usr/local/share/linux-raspi-headers-5.4.0-1015_5.4.0-1015.15_${IMG_ARCH}.deb
+    #rm -f ${R}/usr/local/share/*.deb
+
+    # Copy new devicetree, overlays and kernel to /boot/firmware
+    #local NEW_KERNEL=$(ls -1r ${R}/lib/modules/ | head -n1)
+    #cp -v ${R}/lib/firmware/${NEW_KERNEL}/device-tree/broadcom/* ${B}/
+    #cp -v ${R}/lib/firmware/${NEW_KERNEL}/device-tree/overlays/* ${B}/overlays/
+    #cp -v ${R}/boot/vmlinuz-${NEW_KERNEL} ${B}/vmlinuz
+    #cp -v ${R}/boot/initrd.img-${NEW_KERNEL} ${B}/initrd.img
+    
+    nspawn apt -y install ${REMIX_PACKAGES}
+    nspawn apt -y install pi-bluetooth
+    nspawn apt -y dist-upgrade
+}
+
+function stage_03_build() {
+    return
+}
+
+function stage_04_config() {
+    echo                            >> ${B}/config.txt
+    echo "disable_overscan=1"       >> ${B}/config.txt
+    echo "dtoverlay=vc4-fkms-v3d"   >> ${B}/config.txt
+    echo "hdmi_drive=2"             >> ${B}/config.txt
+    echo "gpu_mem=128"              >> ${B}/config.txt
+
+    echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc quiet splash plymouth.ignore-serial-consoles" > "${B}/cmdline.txt"
+}
+
+function stage_05_clean() {
+    nspawn apt-get -y autoremove
+    nspawn apt-get -y autoclean
+    nspawn apt-get -y clean
+
+    rm -f $R/boot/{*.bak,*.old}
+    rm -f $B/{*.bak,*.old}
+    rm -f $R/etc/apt/*.save
+    rm -f $R/etc/apt/sources.list.d/*.save
+    rm -f $R/var/log/apt/*
+    rm -f $R/var/log/alternatives.log
+    rm -f $R/var/log/dpkg.log
+    rm -f $R/var/log/fontconfig.log
+    rm -rf $R/tmp/*
+    rm -f $R/var/crash/*
+    rm -f $R/var/cache/debconf/*-old
+    rm -f $R/var/lib/dpkg/*-old
+    [ -L $R/var/lib/dbus/machine-id ] || rm -f $R/var/lib/dbus/machine-id
+    echo '' > $R/etc/machine-id
+}
+
+function stage_06_image() {
+    # Build the image file
+    local SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'.' -f1)
+    ((SIZE_IMG+=2))
+    local SIZE_BOOT="256MiB"
+
+    # Remove old images.
+    rm -fv "${TMP_DIR}/${IMG_OUT}"
+
+    # Create an empty file file.
+    dd if=/dev/zero of="${TMP_DIR}/${IMG_OUT}" bs=1MB count=1
+    dd if=/dev/zero of="${TMP_DIR}/${IMG_OUT}" bs=1MB count=0 seek=$(( ${SIZE_IMG} * 1000 ))
+
+    # Initialising: msdos
+    parted -s ${TMP_DIR}/${IMG_OUT} mktable msdos
+    echo "Creating /boot/firmware partition"
+    parted -a optimal -s ${TMP_DIR}/${IMG_OUT} mkpart primary fat32 1 "${SIZE_BOOT}"
+    echo "Creating / partition"
+    parted -a optimal -s ${TMP_DIR}/${IMG_OUT} mkpart primary ext4 "${SIZE_BOOT}" 100%
+    echo "Making partition 1 bootable"
+    parted -s ${TMP_DIR}/${IMG_OUT} set 1 boot on
+
+    PARTED_OUT=$(parted -s ${TMP_DIR}/${IMG_OUT} unit b print)
+    BOOT_OFFSET=$(echo "${PARTED_OUT}" | grep -e '^ 1'| xargs echo -n \
+    | cut -d" " -f 2 | tr -d B)
+    BOOT_LENGTH=$(echo "${PARTED_OUT}" | grep -e '^ 1'| xargs echo -n \
+    | cut -d" " -f 4 | tr -d B)
+
+    ROOT_OFFSET=$(echo "${PARTED_OUT}" | grep -e '^ 2'| xargs echo -n \
+    | cut -d" " -f 2 | tr -d B)
+    ROOT_LENGTH=$(echo "${PARTED_OUT}" | grep -e '^ 2'| xargs echo -n \
+    | cut -d" " -f 4 | tr -d B)
+
+    BOOT_LOOP=$(losetup --show -f -o ${BOOT_OFFSET} --sizelimit ${BOOT_LENGTH} ${TMP_DIR}/${IMG_OUT})
+    ROOT_LOOP=$(losetup --show -f -o ${ROOT_OFFSET} --sizelimit ${ROOT_LENGTH} ${TMP_DIR}/${IMG_OUT})
+    echo "/boot/firmware: offset ${BOOT_OFFSET}, length ${BOOT_LENGTH}"
+    echo "/:              offset ${ROOT_OFFSET}, length ${ROOT_LENGTH}"
+
+    mkfs.vfat -n system-boot -S 512 -s 16 -v "${BOOT_LOOP}"
+    mkfs.ext4 -L writable -m 0 "${ROOT_LOOP}"
+
+    MOUNTDIR="${TMP_DIR}/image"
+    mkdir -p "${MOUNTDIR}"
+    mount -v "${ROOT_LOOP}" "${MOUNTDIR}" -t ext4
+    mkdir -p "${MOUNTDIR}/boot/firmware"
+    mount -v "${BOOT_LOOP}" "${MOUNTDIR}/boot/firmware" -t vfat
+    echo "Syncing root..."
+    rsync -aHAXx --delete ${R}/ "${MOUNTDIR}/"
+    echo "Syncing boot..."
+    rsync -aHAXx --delete ${B}/ "${MOUNTDIR}/boot/firmware/"
+    date +"%Y%m%d" > "${MOUNTDIR}/.disk/info"
+    sync
+    umount -l "${MOUNTDIR}/boot/firmware"
+    umount -l "${MOUNTDIR}"
+    losetup -d "${ROOT_LOOP}"
+    losetup -d "${BOOT_LOOP}"
+    ls -lh "${TMP_DIR}/${IMG_OUT}"
+    rm -rf "${MOUNTDIR}"
+
+    # NOTE! Disabled while iterating
+    echo "Compressing ${IMG_OUT}.xz"
+    #rm "${TMP_DIR}/${IMG_OUT}.xz" 2>/dev/null
+    #xz --keep -T 0 "${TMP_DIR}/${IMG_OUT}"
+    #ls -lh "${TMP_DIR}/${IMG_OUT}.xz"
+}
+
+function stage_07_hash() {
+    local HASH="sha256"
+    local OUT_HASH="${TMP_DIR}/${IMG_OUT}.xz.${HASH}"
+
+    rm -f "${OUT_HASH}"
+
+    if [ -e "${TMP_DIR}/${IMG_OUT}.xz" ]; then
+        echo "Hashing ${IMG_OUT}.xz"
+        ${HASH}sum "${TMP_DIR}/${IMG_OUT}.xz" > "${OUT_HASH}"
+        sed -i -r "s/ .*\/(.+)/  \1/g" "${OUT_HASH}"
+    else
+        echo "WARNING! Didn't find ${TMP_DIR}/${IMG_OUT} to hash."
+    fi
+}
+
+if [ $(id -u) -ne 0 ]; then
+    echo "ERROR! Root permissions required."
+    exit 1
+fi
+
+# Take command line arguments
+while [ $# -gt 0 ]; do
+    case "${1}" in
+        -remix|--remix)
+            REMIX="${2}"
+            shift
+            shift;;
+        -img|--img)
+            IMG="${2}"
+            if [ ! -e "${IMG}" ]; then
+                echo "[!] ERROR: ${IMG} was not found."
+                exit 1
+            fi
+            shift
+            shift;;
+        *)
+            echo "[!] ERROR: \"${1}\" is not a supported parameter."
+            usage
+            exit 1;;
+    esac
+done
+
+# Set variables based on chosen desktop environment
+case "${REMIX}" in
+    raspi)
+        echo "[+] Specified Raspi"
+        REMIX_PACKAGES="tree"
+        shift;;
+    nespi)
+        echo "[+] Specified NESPi"
+        REMIX_PACKAGES="tree"
+        shift;;
+    superpi)
+        echo "[+] Specified SUPERPi"
+        REMIX_PACKAGES="tree"
+        shift;;
+    megapi)
+        echo "[+] Specified MEGA Pi"
+        REMIX_PACKAGES="tree"
+        shift;;
+    *)
+        if [ -z "${REMIX}" ]; then
+        echo "[!] ERROR: Please specifiy an retro remix"
+        else
+        echo "[!] ERROR: ${REMIX} is not a valid retro remix"
+        fi
+        usage
+        exit 1;;
+esac
+
+TMP_DIR=$(pwd)
+IMG_QUALITY="-alpha1"
+IMG_VER=$(echo "${IMG}" | cut -d'-' -f2)
+IMG_ARCH=$(echo "${IMG}" | cut -d'+' -f1 | cut -d'-' -f5)
+IMG_OUT=$(echo "${IMG}" | sed "s/ubuntu-/ubuntu-retro-${REMIX}-remix-/" | sed "s/preinstalled-server-//" | sed "s/${IMG_VER}/${IMG_VER}${IMG_QUALITY}/")
+IMG_TEST=$(file -b "${IMG}" | cut -d';' -f1)
+B="${TMP_DIR}/${IMG_ARCH}/${REMIX}/boot"
+R="${TMP_DIR}/${IMG_ARCH}/${REMIX}/root"
+
+if [ "${IMG_TEST}" == "DOS/MBR boot sector" ]; then
+    stage_00_tools
+    stage_01_unpack
+    stage_02_apt
+    stage_03_build
+    stage_04_config
+    stage_05_clean
+    stage_06_image
+    stage_07_hash
+else
+    echo "[!] ERROR: ${IMG} is not a valid disk image."
+    if [ "${IMG_TEST}" == "XZ compressed data" ]; then
+        echo "           Try decompressing ${IMG} first using:"
+        echo "           unxz --decompress --keep ${IMG}"
+    fi
+    exit 1
+fi
