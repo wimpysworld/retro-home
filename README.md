@@ -1,2 +1,36 @@
-# ubuntu-retro-remix
-Ubuntu remix for retro gaming on Raspberry Pi
+<h1 align="center">
+<!-- <img src=".github/logo.jpg" alt="Ubuntu Retro Remix Logo" width="256" /> -->
+  <br />
+  Ubuntu Retro Remix Image Builder
+</h1>
+
+<p align="center"><b>Build Raspberry Pi images of Ubuntu for retro gaming</b></p>
+<!-- <div align="center"><img src=".github/screenshot.jpg" alt="Ubuntu Retro Remix Screenshot" /></div> -->
+<p align="center">Made with 💝 for <img src=".github/ubuntu.png" align="top" width="18" /></p>
+
+## Introduction
+
+A script that build Raspberry Pi images of Ubuntu for retro gaming.
+
+## Installation
+
+  * Clone this project to an Intel 64-bit Ubuntu workstation.
+    * `git clone https://github.com/wimpysworld/ubuntu-retro-remix.git`
+  * Download the armhf [Ubuntu Server 20.04 pre-installed image for Raspberry Pi](https://ubuntu.com/download/raspberry-pi) into the project directory.
+
+### Usage
+
+```
+Usage
+  sudo ./ubuntu-retro-remix-image --remix <targetdevice> --img ubuntu-20.04-preinstalled-server-armhf+raspi.img
+
+Available supported devices are:
+  raspi
+  megapi
+  nespi
+  superpi
+```
+
+## TODO
+
+Pretty much everything.
