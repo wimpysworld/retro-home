@@ -286,6 +286,14 @@ Icon=/usr/share/libretro/assets/ozone/png/retroarch.png
 Type=Application
 EOM
 
+    # Enable auto-login for lightdm. ubuntu user autologin to the "retroremix" session
+    cat <<'EOM' > ${R}/etc/lightdm/lightdm.conf
+[SeatDefaults]
+autologin-user=ubuntu
+autologin-user-timeout=0
+autologin-session=retroremix
+EOM
+
     echo                            >> ${B}/config.txt
     echo "disable_overscan=1"       >> ${B}/config.txt
     echo "dtoverlay=vc4-fkms-v3d"   >> ${B}/config.txt
