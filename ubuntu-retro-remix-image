@@ -100,9 +100,10 @@ function stage_02_apt_prepare() {
 }
 
 function stage_03_apt_install() {
+    nspawn apt -y install pi-bluetooth xserver-xorg
+    nspawn apt -y install --no-install-recommends lightdm slick-greeter
+    nspawn add-apt-repository -y ppa:libretro/stable
     nspawn apt -y install ${REMIX_PACKAGES}
-    nspawn apt -y install pi-bluetooth
-    nspawn apt -y dist-upgrade
 }
 
 function stage_04_snap() {
