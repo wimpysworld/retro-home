@@ -196,6 +196,12 @@ system_info:
       upstart_dir: /etc/init/
    ssh_svcname: ssh
 EOM
+
+    # Install joypad-autoconfig
+    nspawn apt -y install make
+    git clone https://github.com/libretro/retroarch-joypad-autoconfig.git ${R}/usr/local/src/retroarch-joypad-autoconfig
+    nspawn bash -c "cd /usr/local/src/retroarch-joypad-autoconfig && ./configure && make install"
+    rm -rf ${R}/usr/local/src/retroarch-joypad-autoconfig
     echo                            >> ${B}/config.txt
     echo "disable_overscan=1"       >> ${B}/config.txt
     echo "dtoverlay=vc4-fkms-v3d"   >> ${B}/config.txt
