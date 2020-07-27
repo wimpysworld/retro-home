@@ -74,7 +74,7 @@ function stage_01_unpack() {
     rm -rf "${TMP_DIR}/root"
 }
 
-function stage_02_apt() {
+function stage_02_apt_prepare() {
     # Remove old kernel
     #local OLD_KERNEL=$(ls -1 ${R}/lib/modules/ | head -n1)
     #local OLD_KERNEL_SHORT=$(echo ${OLD_KERNEL} | sed s'/-raspi//')
@@ -105,16 +105,17 @@ function stage_02_apt() {
     #cp -v ${R}/boot/vmlinuz-${NEW_KERNEL} ${B}/vmlinuz
     #cp -v ${R}/boot/initrd.img-${NEW_KERNEL} ${B}/initrd.img
     
+function stage_03_apt_install() {
     nspawn apt -y install ${REMIX_PACKAGES}
     nspawn apt -y install pi-bluetooth
     nspawn apt -y dist-upgrade
 }
 
-function stage_03_build() {
+function stage_04_snap() {
     return
 }
 
-function stage_04_config() {
+function stage_05_config() {
     echo                            >> ${B}/config.txt
     echo "disable_overscan=1"       >> ${B}/config.txt
     echo "dtoverlay=vc4-fkms-v3d"   >> ${B}/config.txt
@@ -124,7 +125,7 @@ function stage_04_config() {
     echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc quiet splash plymouth.ignore-serial-consoles" > "${B}/cmdline.txt"
 }
 
-function stage_05_clean() {
+function stage_06_clean() {
     nspawn apt-get -y autoremove
     nspawn apt-get -y autoclean
     nspawn apt-get -y clean
@@ -145,7 +146,7 @@ function stage_05_clean() {
     echo '' > $R/etc/machine-id
 }
 
-function stage_06_image() {
+function stage_07_image() {
     # Build the image file
     local SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'.' -f1)
     ((SIZE_IMG+=2))
@@ -211,7 +212,7 @@ function stage_06_image() {
     #ls -lh "${TMP_DIR}/${IMG_OUT}.xz"
 }
 
-function stage_07_hash() {
+function stage_08_hash() {
     local HASH="sha256"
     local OUT_HASH="${TMP_DIR}/${IMG_OUT}.xz.${HASH}"
 
@@ -293,12 +294,13 @@ R="${TMP_DIR}/${IMG_ARCH}/${REMIX}/root"
 if [ "${IMG_TEST}" == "DOS/MBR boot sector" ]; then
     stage_00_tools
     stage_01_unpack
-    stage_02_apt
-    stage_03_build
-    stage_04_config
-    stage_05_clean
-    stage_06_image
-    stage_07_hash
+    stage_02_apt_prepare
+    stage_03_apt_install
+    stage_04_snap
+    stage_05_config
+    stage_06_clean
+    stage_07_image
+    stage_08_hash
 else
     echo "[!] ERROR: ${IMG} is not a valid disk image."
     if [ "${IMG_TEST}" == "XZ compressed data" ]; then
