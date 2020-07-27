@@ -112,7 +112,7 @@ function stage_03_apt_install() {
 }
 
 function stage_04_snap() {
-    return
+    rm -rf ${R}/var/lib/snapd/seed/*
 }
 
 function stage_05_config() {
