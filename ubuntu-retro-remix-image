@@ -257,19 +257,19 @@ done
 case "${REMIX}" in
     raspi)
         echo "[+] Specified Raspi"
-        REMIX_PACKAGES="tree"
+        REMIX_PACKAGES="retroarch libretro-genesisplusgx libretro-nestopia libretro-snes9x"
         shift;;
     nespi)
         echo "[+] Specified NESPi"
-        REMIX_PACKAGES="tree"
+        REMIX_PACKAGES="retroarch libretro-nestopia"
         shift;;
     superpi)
         echo "[+] Specified SUPERPi"
-        REMIX_PACKAGES="tree"
+        REMIX_PACKAGES="retroarch libretro-snes9x"
         shift;;
     megapi)
         echo "[+] Specified MEGA Pi"
-        REMIX_PACKAGES="tree"
+        REMIX_PACKAGES="retroarch libretro-genesisplusgx"
         shift;;
     *)
         if [ -z "${REMIX}" ]; then
