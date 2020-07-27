@@ -216,6 +216,30 @@ EOM
     # Make ozone the default menu interface using the GruvBox Dark theme
     sed -i 's|menu_driver = "xmb"|menu_driver = "ozone"|' ${R}/etc/retroarch.cfg
     echo 'ozone_menu_color_theme = "3"' >> ${R}/etc/retroarch.cfg
+
+    # Install matching gruvbox-dark GTK and Icon themes
+    if [ ! -d "${R}/usr/share/themes/gruvbox-dark-gtk" ]; then
+        git clone https://github.com/jmattheis/gruvbox-dark-gtk.git ${R}/usr/share/themes/gruvbox-dark-gtk
+    else
+        cd ${R}/usr/share/themes/gruvbox-dark-gtk
+        git pull -r
+        cd -
+    fi
+
+    if [ ! -d "${R}/usr/share/icons/gruvbox-dark-icons-gtk" ]; then
+        git clone https://github.com/jmattheis/gruvbox-dark-icons-gtk.git ${R}/usr/share/icons/gruvbox-dark-icons-gtk
+    else
+        cd ${R}/usr/share/icons/gruvbox-dark-icons-gtk
+        git pull -r
+        cd -
+    fi
+
+    # Update the icon cache
+    nspawn apt -y install gtk-update-icon-cache libglib2.0-bin
+    nspawn gtk-update-icon-cache /usr/share/icons/gruvbox-dark-icons-gtk
+
+    # The GruvBox theme in RetroArch uses the Inter font-family, so install that.
+    nspawn apt -y install fonts-inter 
     echo                            >> ${B}/config.txt
     echo "disable_overscan=1"       >> ${B}/config.txt
     echo "dtoverlay=vc4-fkms-v3d"   >> ${B}/config.txt
