@@ -275,6 +275,17 @@ icon-theme='gruvbox-dark-icons-gtk'
 EOM
     nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
 
+    # Create xsession entry for "retroremix"
+    mkdir -p ${R}/usr/share/xsessions
+    cat <<'EOM' > ${R}/usr/share/xsessions/retroremix.desktop
+[Desktop Entry]
+Name=RetroRemix
+Exec=/usr/bin/retroarch
+TryExec=/usr/bin/retroarch
+Icon=/usr/share/libretro/assets/ozone/png/retroarch.png
+Type=Application
+EOM
+
     echo                            >> ${B}/config.txt
     echo "disable_overscan=1"       >> ${B}/config.txt
     echo "dtoverlay=vc4-fkms-v3d"   >> ${B}/config.txt
