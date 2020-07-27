@@ -32,7 +32,7 @@ function nspawn() {
 function stage_00_tools() {
     # Required tools on the host
     apt-get -y install binfmt-support debootstrap \
-    qemu-user-static rsync systemd-container \
+    git qemu-user-static rsync systemd-container \
     ubuntu-keyring whois xz-utils
 }
 
