@@ -76,12 +76,8 @@ function stage_01_unpack() {
 
 function stage_02_apt_prepare() {
     # Remove old kernel
-    #local OLD_KERNEL=$(ls -1 ${R}/lib/modules/ | head -n1)
-    #local OLD_KERNEL_SHORT=$(echo ${OLD_KERNEL} | sed s'/-raspi//')
-    #nspawn apt -y remove linux-image-${OLD_KERNEL} linux-modules-${OLD_KERNEL} linux-raspi-headers-${OLD_KERNEL_SHORT}
-    #rm -v ${B}/vmlinuz
-    #rm -v ${B}/initrd.img
-    #rm -rfv ${R}/lib/modules/${OLD_KERNEL}
+    local OLD_KERNEL=$(ls -1 ${R}/lib/modules/ | head -n1)
+    local OLD_KERNEL_SHORT=$(echo ${OLD_KERNEL} | sed s'/-raspi//')
 
     # Remove most of the server components
     nspawn apt -y purge --autoremove bcache-tools btrfs-progs byobu \
@@ -90,21 +86,18 @@ function stage_02_apt_prepare() {
     lxd-agent-loader mdadm multipath-tools open-iscsi \
     overlayroot screen sosreport tmux vim xfsprogs
 
-    # Install new kernel
-    #wget -c https://launchpad.net/ubuntu/+archive/primary/+files/linux-headers-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb -O ${R}/usr/local/share/linux-headers-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb
-    #wget -c https://launchpad.net/ubuntu/+archive/primary/+files/linux-image-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb -O ${R}/usr/local/share/linux-image-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb
-    #wget -c https://launchpad.net/ubuntu/+archive/primary/+files/linux-modules-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb -O ${R}/usr/local/share/linux-modules-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb
-    #wget -c https://launchpad.net/ubuntu/+archive/primary/+files/linux-raspi-headers-5.4.0-1015_5.4.0-1015.15_${IMG_ARCH}.deb -O ${R}/usr/local/share/linux-raspi-headers-5.4.0-1015_5.4.0-1015.15_${IMG_ARCH}.deb
-    #nspawn apt-get -y install /usr/local/share/linux-headers-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb /usr/local/share/linux-image-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb /usr/local/share/linux-modules-5.4.0-1015-raspi_5.4.0-1015.15_${IMG_ARCH}.deb /usr/local/share/linux-raspi-headers-5.4.0-1015_5.4.0-1015.15_${IMG_ARCH}.deb
-    #rm -f ${R}/usr/local/share/*.deb
+    nspawn apt -y update
+    nspawn apt -y dist-upgrade
+    nspawn apt -y remove linux-image-${OLD_KERNEL} linux-modules-${OLD_KERNEL} linux-raspi-headers-${OLD_KERNEL_SHORT}
 
     # Copy new devicetree, overlays and kernel to /boot/firmware
-    #local NEW_KERNEL=$(ls -1r ${R}/lib/modules/ | head -n1)
-    #cp -v ${R}/lib/firmware/${NEW_KERNEL}/device-tree/broadcom/* ${B}/
-    #cp -v ${R}/lib/firmware/${NEW_KERNEL}/device-tree/overlays/* ${B}/overlays/
-    #cp -v ${R}/boot/vmlinuz-${NEW_KERNEL} ${B}/vmlinuz
-    #cp -v ${R}/boot/initrd.img-${NEW_KERNEL} ${B}/initrd.img
-    
+    local NEW_KERNEL=$(ls -1 ${IMG_ARCH}/${REMIX}/root/boot/vmlinuz-* | head -n 1 | cut -d'-' -f2-4)
+    cp -v ${R}/lib/firmware/${NEW_KERNEL}/device-tree/*.dtb ${B}/
+    cp -v ${R}/lib/firmware/${NEW_KERNEL}/device-tree/overlays/* ${B}/overlays/
+    cp -v ${R}/boot/vmlinuz-${NEW_KERNEL} ${B}/vmlinuz
+    cp -v ${R}/boot/initrd.img-${NEW_KERNEL} ${B}/initrd.img
+}
+
 function stage_03_apt_install() {
     nspawn apt -y install ${REMIX_PACKAGES}
     nspawn apt -y install pi-bluetooth
