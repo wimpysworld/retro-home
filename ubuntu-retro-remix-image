@@ -300,6 +300,7 @@ Icon=/opt/ludo/assets/icon.svg
 Type=Application
 EOM
 
+    # Enable auto-login for lightdm. ubuntu user autologin to the session
     cat <<'EOM' > ${R}/etc/lightdm/lightdm.conf
 [SeatDefaults]
 autologin-user=ubuntu
