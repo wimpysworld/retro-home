@@ -130,13 +130,11 @@ preserve_hostname: false
 
 # The modules that run in the 'init' stage
 cloud_init_modules:
- - migrator
  - seed_random
  - bootcmd
  - write-files
  - growpart
  - resizefs
- - disk_setup
  - mounts
  - set_hostname
  - update_hostname
@@ -170,7 +168,6 @@ cloud_final_modules:
  - scripts-user
  - ssh-authkey-fingerprints
  - final-message
- - power-state-change
 
 # System and/or distro specific settings
 # (not accessible to handlers/transforms)
