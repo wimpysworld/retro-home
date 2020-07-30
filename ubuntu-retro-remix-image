@@ -104,6 +104,14 @@ function stage_03_apt_install() {
     nspawn apt -y install --no-install-recommends lightdm slick-greeter
     nspawn add-apt-repository -y ppa:libretro/stable
     nspawn apt -y install ${REMIX_PACKAGES}
+
+    nspawn apt -y install connman connman-gtk connman-ui
+    rm -rf ${R}/opt/ludo
+    local LUDO_VER="0.11.2"
+    wget -c https://github.com/libretro/ludo/releases/download/v${LUDO_VER}/Ludo-Linux-arm-${LUDO_VER}.tar.gz -O ${R}/opt/Ludo-Linux-arm-${LUDO_VER}.tar.gz
+    nspawn bash -c "cd /opt && tar zxvf Ludo-Linux-arm-${LUDO_VER}.tar.gz"
+    nspawn mv /opt/Ludo-Linux-arm-${LUDO_VER} /opt/ludo
+    nspawn chown -R root: /opt/ludo
 }
 
 function stage_04_snap() {
