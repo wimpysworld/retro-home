@@ -274,9 +274,9 @@ EOM
 
     # Create xsession entry for "retroremix"
     mkdir -p ${R}/usr/share/xsessions
-    cat <<'EOM' > ${R}/usr/share/xsessions/retroremix.desktop
+    cat <<'EOM' > ${R}/usr/share/xsessions/retroarch.desktop
 [Desktop Entry]
-Name=RetroRemix
+Name=RetroArch
 Exec=/usr/bin/retroarch
 TryExec=/usr/bin/retroarch
 Icon=/usr/share/libretro/assets/ozone/png/retroarch.png
