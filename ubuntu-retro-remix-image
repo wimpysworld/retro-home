@@ -211,9 +211,10 @@ EOM
 
     # Install C64 Roms
     if [ "${REMIX}" == "c64pi" ]; then
-    nspawn wget https://sourceforge.net/projects/vice-emu/files/releases/vice-3.4.tar.gz/download -O /tmp/vice-3.4.tar.gz
-    nspawn tar -zxvf /tmp/vice-3.4.tar.gz -C /tmp/
-    nspawn find /tmp/vice-*/data -mindepth 1 -type d -exec sudo cp -rnv {} /usr/lib/vice/ \;
+    wget https://sourceforge.net/projects/vice-emu/files/releases/vice-3.4.tar.gz/download -O /tmp/vice-3.4.tar.gz
+    tar -zxvf /tmp/vice-3.4.tar.gz -C /tmp/
+    find /tmp/vice-*/data -mindepth 1 -type d -exec sudo cp -rnv {} ${R}/usr/lib/vice/ \;
+    rm -rf /tmp/vice-3.4*
     fi
 
     # Install joypad-autoconfig
