@@ -210,7 +210,7 @@ system_info:
 EOM
 
     # Install C64 Roms
-    if [${REMIX} = "c64pi"]; then
+    if [${REMIX} == "c64pi"]; then
     nspawn wget https://sourceforge.net/projects/vice-emu/files/releases/vice-3.4.tar.gz/download -O /tmp/vice-3.4.tar.gz
     nspawn tar -zxvf /tmp/vice-3.4.tar.gz -C /tmp/
     nspawn find /tmp/vice-*/data -mindepth 1 -type d -exec sudo cp -rnv {} /usr/lib/vice/ \;
@@ -297,7 +297,6 @@ EOM
     # Create xsession entry for "retroremix"
     mkdir -p ${R}/usr/share/xsessions
     cat <<'EOM' > ${R}/usr/share/xsessions/retroarch.desktop
->>>>>>> initial c64 install
 [Desktop Entry]
 Name=RetroArch
 Exec=/usr/bin/retroarch
