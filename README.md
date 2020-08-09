@@ -1,5 +1,5 @@
 <h1 align="center">
-<!-- <img src=".github/logo.jpg" alt="Ubuntu Retro Remix Logo" width="256" /> -->
+ <img src=".github/logo.png" alt="Ubuntu Retro Remix Logo" width="256" />
   <br />
   Ubuntu Retro Remix Image Builder
 </h1>
@@ -34,3 +34,14 @@ Available supported devices are:
 ## TODO
 
 Pretty much everything.
+
+## Notes
+
+While researching RetrArch this useful information was discovered.
+
+  * https://gist.github.com/AlexMax/32e5d038a66ce57253e740ea75736805
+
+## Cores
+
+  * nestopia
+  * zsnes or bsnes, but not zsnes next
