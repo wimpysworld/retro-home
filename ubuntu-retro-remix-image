@@ -83,10 +83,10 @@ function stage_02_apt_prepare() {
 
     # Remove most of the server components
     nspawn apt -y purge --autoremove bcache-tools btrfs-progs byobu \
-    cloud-initramfs-copymods cloud-initramfs-dyn-netconf curl \
-    eatmydata ethtool finalrd htop landscape-common lvm2 \
-    lxd-agent-loader mdadm multipath-tools open-iscsi \
-    overlayroot screen sosreport tmux vim xfsprogs
+    cloud-initramfs-copymods cloud-initramfs-dyn-netconf curl eatmydata \
+    ethtool finalrd htop landscape-common lvm2 lxd-agent-loader mdadm \
+    multipath-tools open-iscsi overlayroot screen sosreport tmux vim \
+    xfsprogs
 
     nspawn apt -y update
     nspawn apt -y dist-upgrade
