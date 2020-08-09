@@ -27,6 +27,7 @@ function nspawn() {
       --bind-ro=${TMP_DIR}/resolv.conf:/etc/resolv.conf \
       --bind=${B}:/boot/firmware \
       --hostname="${REMIX}" \
+      --machine="${REMIX}" \
       -D "${R}" "$@"
 }
 
