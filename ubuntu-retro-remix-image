@@ -431,26 +431,31 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 # Take command line arguments
-while [ $# -gt 0 ]; do
-    case "${1}" in
-        -remix|--remix)
-            REMIX="${2}"
-            shift
-            shift;;
-        -img|--img)
-            IMG="${2}"
-            if [ ! -e "${IMG}" ]; then
-                echo "[!] ERROR: ${IMG} was not found."
-                exit 1
-            fi
-            shift
-            shift;;
-        *)
-            echo "[!] ERROR: \"${1}\" is not a supported parameter."
-            usage
-            exit 1;;
-    esac
-done
+if [ $# -lt 1 ]; then
+    usage
+    exit 0
+else
+    while [ $# -gt 0 ]; do
+        case "${1}" in
+            -remix|--remix)
+                REMIX="${2}"
+                shift
+                shift;;
+            -img|--img)
+                IMG="${2}"
+                if [ ! -e "${IMG}" ]; then
+                    echo "[!] ERROR: ${IMG} was not found."
+                    exit 1
+                fi
+                shift
+                shift;;
+            *)
+                echo "[!] ERROR: \"${1}\" is not a supported parameter."
+                usage
+                exit 1;;
+        esac
+    done
+fi
 
 # Set variables based on chosen desktop environment
 case "${REMIX}" in
