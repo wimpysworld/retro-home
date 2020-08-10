@@ -12,6 +12,12 @@
 
 A script that build Raspberry Pi images of Ubuntu for retro gaming.
 
+We have a Discord for this project:
+
+  * <https://discord.gg/GeHJGD9>
+
+[![Ubuntu Retro Remix - Working hardware acceleration!](https://img.youtube.com/vi/aEUt5s4127c/0.jpg)](https://www.youtube.com/watch?v=aEUt5s4127c)
+
 ## Installation
 
   * Clone this project to an Intel 64-bit Ubuntu workstation.
