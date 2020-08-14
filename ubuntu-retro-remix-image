@@ -504,7 +504,7 @@ case "${REMIX}" in
         shift;;
     c64pi)
         echo "[+] Specified C64 Pi"
-        REMIX_PACKAGES="vice"
+        REMIX_PACKAGES="vice pulseaudio"
         shift;;
     *)
         if [ -z "${REMIX}" ]; then
