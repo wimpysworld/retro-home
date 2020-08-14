@@ -318,7 +318,7 @@ EOM
     cat <<'EOM' > ${R}/usr/share/xsessions/c64.desktop
 [Desktop Entry]
 Name=C64
-Exec=x64 -fullscreen
+Exec=/usr/share/xsessions/runC64.sh
 Icon=/usr/lib/vice/common/icon.png
 Type=Application
 EOM
@@ -331,6 +331,19 @@ if ["${REMIX}" == "c64pi" ]; then
 autologin-user=ubuntu
 autologin-user-timeout=0
 autologin-session=c64
+EOM
+    cat <<'EOM' > ${R}/home/ubuntu/.ratpoisonrc
+unbind c
+unbind C-c
+unbind exclam
+unbind C-exclam
+unbind period
+EOM
+    cat <<'EOM' > ${R}/usr/share/xsessions/runC64.sh
+#!/bin/bash
+ratpoison &
+xscreensaver -nosplash &
+while true; do x64 -fullscreen; sleep 2s; done
 EOM
 else
     cat <<'EOM' > ${R}/etc/lightdm/lightdm.conf
@@ -504,7 +517,7 @@ case "${REMIX}" in
         shift;;
     c64pi)
         echo "[+] Specified C64 Pi"
-        REMIX_PACKAGES="vice pulseaudio"
+        REMIX_PACKAGES="vice pulseaudio ratpoison"
         shift;;
     *)
         if [ -z "${REMIX}" ]; then
