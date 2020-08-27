@@ -41,7 +41,7 @@ Pretty much everything.
 
 ## Notes
 
-While researching RetrArch this useful information was discovered.
+While researching RetroArch this useful information was discovered.
 
   * https://gist.github.com/AlexMax/32e5d038a66ce57253e740ea75736805
 
