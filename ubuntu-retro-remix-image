@@ -321,7 +321,7 @@ function stage_06_clean() {
     # Remove old kernel
     local OLD_KERNEL=$(ls -1 ${R}/lib/modules/ | head -n1)
     local OLD_KERNEL_SHORT=$(echo ${OLD_KERNEL} | sed s'/-raspi//')
-    local NEW_KERNEL=$(ls -1 ${R_STAGE_4}/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
+    local NEW_KERNEL=$(ls -1 ${R}/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
     echo "Old: ${OLD_KERNEL} (${OLD_KERNEL_SHORT})"
     echo "New: ${NEW_KERNEL}"
     if [ "${OLD_KERNEL}" == "${NEW_KERNEL}" ]; then
