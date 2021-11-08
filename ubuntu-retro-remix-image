@@ -5,7 +5,7 @@ LC_ALL=C
 function usage () {
   echo
   echo "Usage"
-  echo "  $0 --remix <targetdevice> --img ubuntu-20.04-preinstalled-server-armhf+raspi.img"
+  echo "  $0 --remix <targetdevice> --img ubuntu-21.10-preinstalled-server-armhf+raspi.img"
   echo
   echo "Available supported devices are:"
   echo "  raspi"
