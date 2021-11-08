@@ -77,10 +77,6 @@ function stage_01_unpack() {
 }
 
 function stage_02_apt_prepare() {
-    # Remove old kernel
-    local OLD_KERNEL=$(ls -1 ${R}/lib/modules/ | head -n1)
-    local OLD_KERNEL_SHORT=$(echo ${OLD_KERNEL} | sed s'/-raspi//')
-
     # Remove most of the server components
     nspawn apt -y purge --autoremove bcache-tools btrfs-progs byobu \
     cloud-initramfs-copymods cloud-initramfs-dyn-netconf curl eatmydata \
@@ -90,25 +86,14 @@ function stage_02_apt_prepare() {
 
     nspawn apt -y update
     nspawn apt -y dist-upgrade
-    nspawn apt -y remove linux-image-${OLD_KERNEL} linux-modules-${OLD_KERNEL} linux-raspi-headers-${OLD_KERNEL_SHORT}
-
-    # Copy new devicetree, overlays and kernel to /boot/firmware
-    local NEW_KERNEL=$(ls -1 ${IMG_ARCH}/${REMIX}/root/boot/vmlinuz-* | head -n 1 | cut -d'-' -f2-4)
-    cp -v ${R}/lib/firmware/${NEW_KERNEL}/device-tree/*.dtb ${B}/
-    cp -v ${R}/lib/firmware/${NEW_KERNEL}/device-tree/overlays/* ${B}/overlays/
-    cp -v ${R}/boot/vmlinuz-${NEW_KERNEL} ${B}/vmlinuz
-    cp -v ${R}/boot/initrd.img-${NEW_KERNEL} ${B}/initrd.img
 }
 
 function stage_03_apt_install() {
     nspawn apt -y install pi-bluetooth xserver-xorg
     nspawn apt -y install --no-install-recommends lightdm slick-greeter
-    nspawn add-apt-repository -y ppa:libretro/stable
-    nspawn apt -y install ${REMIX_PACKAGES}
-
     nspawn apt -y install connman connman-gtk connman-ui
     rm -rf ${R}/opt/ludo
-    local LUDO_VER="0.11.2"
+    local LUDO_VER="0.16.9"
     wget -c https://github.com/libretro/ludo/releases/download/v${LUDO_VER}/Ludo-Linux-arm-${LUDO_VER}.tar.gz -O ${R}/opt/Ludo-Linux-arm-${LUDO_VER}.tar.gz
     nspawn bash -c "cd /opt && tar zxvf Ludo-Linux-arm-${LUDO_VER}.tar.gz"
     nspawn mv /opt/Ludo-Linux-arm-${LUDO_VER} /opt/ludo
@@ -327,6 +312,30 @@ function stage_06_clean() {
     nspawn apt-get -y autoremove
     nspawn apt-get -y autoclean
     nspawn apt-get -y clean
+
+    # Remove old kernel
+    local OLD_KERNEL=$(ls -1 ${R}/lib/modules/ | head -n1)
+    local OLD_KERNEL_SHORT=$(echo ${OLD_KERNEL} | sed s'/-raspi//')
+    local NEW_KERNEL=$(ls -1 ${R_STAGE_4}/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
+    echo "Old: ${OLD_KERNEL} (${OLD_KERNEL_SHORT})"
+    echo "New: ${NEW_KERNEL}"
+    if [ "${OLD_KERNEL}" == "${NEW_KERNEL}" ]; then
+        echo "No old kernel to remove."
+    else
+        nspawn apt -y remove linux-image-${OLD_KERNEL} linux-modules-${OLD_KERNEL} linux-raspi-headers-${OLD_KERNEL_SHORT}
+        # linux-modules-extra-raspi was introduce in 21.10 (Impish)
+        case ${REL_VER} in
+            21.10) nspawn apt -y remove linux-modules-extra-${OLD_KERNEL};;
+        esac
+    fi
+
+    # Copy new devicetree, overlays and kernel to /boot/firmware
+    cp ${R}/lib/firmware/${NEW_KERNEL}/device-tree/*.dtb ${B}/
+    cp ${R}/lib/firmware/${NEW_KERNEL}/device-tree/broadcom/*.dtb ${B}/
+    cp ${R}/lib/firmware/${NEW_KERNEL}/device-tree/overlays/* ${B}/overlays/
+    cp -av ${R}/boot/vmlinuz-${NEW_KERNEL} ${B}/vmlinuz
+    cp -av ${R}/boot/initrd.img-${NEW_KERNEL} ${B}/initrd.img
+
     rm -f $R/etc/ssh/ssh_host_*_key*
     rm -f $R/boot/{*.bak,*.old}
     rm -f $B/{*.bak,*.old}
