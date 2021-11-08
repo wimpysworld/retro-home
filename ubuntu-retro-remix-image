@@ -201,94 +201,45 @@ system_info:
    ssh_svcname: ssh
 EOM
 
-    # Install joypad-autoconfig
-    nspawn apt -y install make
-    git clone https://github.com/libretro/retroarch-joypad-autoconfig.git ${R}/usr/local/src/retroarch-joypad-autoconfig
-    nspawn bash -c "cd /usr/local/src/retroarch-joypad-autoconfig && ./configure && make install"
-    rm -rf ${R}/usr/local/src/retroarch-joypad-autoconfig
-
-    # Set sane defaults for RetroArch
-    sed -i 's|#assets_directory = |assets_directory = |' ${R}/etc/retroarch.cfg
-    sed -i 's|# video_fullscreen = false|video_fullscreen = true|' ${R}/etc/retroarch.cfg
-    sed -i 's|# video_windowed_fullscreen = true|video_windowed_fullscreen = false|' ${R}/etc/retroarch.cfg
-    sed -i 's|# joypad_autoconfig_dir =|joypad_autoconfig_dir = /usr/share/libretro/autoconfig|' ${R}/etc/retroarch.cfg
-
-    # Disable pictures, music and video menus
-    sed -i 's|#xmb_show_|xmb_show_|' ${R}/etc/retroarch.cfg
-    sed -i 's|#content_show_|content_show_|' ${R}/etc/retroarch.cfg
-
-    # Make ozone the default menu interface using the GruvBox Dark theme
-    sed -i 's|menu_driver = "xmb"|menu_driver = "ozone"|' ${R}/etc/retroarch.cfg
-    echo 'ozone_menu_color_theme = "3"' >> ${R}/etc/retroarch.cfg
-
-    # Install matching gruvbox-dark GTK and Icon themes
-    if [ ! -d "${R}/usr/share/themes/gruvbox-dark-gtk" ]; then
-        git clone https://github.com/jmattheis/gruvbox-dark-gtk.git ${R}/usr/share/themes/gruvbox-dark-gtk
-    else
-        cd ${R}/usr/share/themes/gruvbox-dark-gtk
-        git pull -r
-        cd -
-    fi
-
-    if [ ! -d "${R}/usr/share/icons/gruvbox-dark-icons-gtk" ]; then
-        git clone https://github.com/jmattheis/gruvbox-dark-icons-gtk.git ${R}/usr/share/icons/gruvbox-dark-icons-gtk
-    else
-        cd ${R}/usr/share/icons/gruvbox-dark-icons-gtk
-        git pull -r
-        cd -
-    fi
-
     # Update the icon cache
     nspawn apt -y install gtk-update-icon-cache libglib2.0-bin
-    nspawn gtk-update-icon-cache /usr/share/icons/gruvbox-dark-icons-gtk
 
-    # The GruvBox theme in RetroArch uses the Inter font-family, so install that.
-    nspawn apt -y install fonts-inter 
+#     # Create gschema override to set GruvBox as the system default theme
+#     cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_ubuntu-retro-remix.gschema.override"
+# [x.dm.slick-greeter]
+# background=''
+# background-color='#393939'
+# draw-grid=true
+# draw-user-backgrounds=false
+# enable-hidpi='auto'
+# font-name='Inter 11'
+# icon-theme-name='gruvbox-dark-icons-gtk'
+# high-contrast=false
+# show-hostname=true
+# logo='/usr/share/libretro/assets/ozone/png/retroarch.png'
+# onscreen-keyboard=false
+# #other-monitors-logo=Logo file to use for other monitors
+# play-ready-sound='/usr/share/libretro/assets/sounds/launch.ogg'
+# screen-reader=false
+# show-power=true
+# show-a11y=true
+# show-keyboard=true
+# show-clock=true
+# show-quit=true
+# theme-name='gruvbox-dark-gtk'
+# xft-antialias=true
+# xft-dpi=96
+# xft-hintstyle='hintslight'
+# xft-rgba='rgb'
 
-    # Create gschema override to set GruvBox as the system default theme
-    cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_ubuntu-retro-remix.gschema.override"
-[x.dm.slick-greeter]
-background=''
-background-color='#393939'
-draw-grid=true
-draw-user-backgrounds=false
-enable-hidpi='auto'
-font-name='Inter 11'
-icon-theme-name='gruvbox-dark-icons-gtk'
-high-contrast=false
-show-hostname=true
-logo='/usr/share/libretro/assets/ozone/png/retroarch.png'
-onscreen-keyboard=false
-#other-monitors-logo=Logo file to use for other monitors
-play-ready-sound='/usr/share/libretro/assets/sounds/launch.ogg'
-screen-reader=false
-show-power=true
-show-a11y=true
-show-keyboard=true
-show-clock=true
-show-quit=true
-theme-name='gruvbox-dark-gtk'
-xft-antialias=true
-xft-dpi=96
-xft-hintstyle='hintslight'
-xft-rgba='rgb'
-
-[org.gnome.desktop.interface]
-gtk-theme='gruvbox-dark-gtk'
-icon-theme='gruvbox-dark-icons-gtk'
-EOM
-    nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
+# [org.gnome.desktop.interface]
+# gtk-theme='gruvbox-dark-gtk'
+# icon-theme='gruvbox-dark-icons-gtk'
+# EOM
+#     nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
 
     # Create xsession entry for "retroremix"
     mkdir -p ${R}/usr/share/xsessions
-    cat <<'EOM' > ${R}/usr/share/xsessions/retroarch.desktop
-[Desktop Entry]
-Name=RetroArch
-Exec=/usr/bin/retroarch
-TryExec=/usr/bin/retroarch
-Icon=/usr/share/libretro/assets/ozone/png/retroarch.png
-Type=Application
-EOM
 
     cat <<'EOM' > ${R}/usr/share/xsessions/ludo.desktop
 [Desktop Entry]
@@ -478,19 +429,15 @@ fi
 case "${REMIX}" in
     raspi)
         echo "[+] Specified Raspi"
-        REMIX_PACKAGES="retroarch retroarch-assets libretro-core-info"
         shift;;
     nespi)
         echo "[+] Specified NESPi"
-        REMIX_PACKAGES="retroarch retroarch-assets libretro-core-info"
         shift;;
     superpi)
         echo "[+] Specified SUPERPi"
-        REMIX_PACKAGES="retroarch retroarch-assets libretro-core-info"
         shift;;
     megapi)
         echo "[+] Specified MEGA Pi"
-        REMIX_PACKAGES="retroarch retroarch-assets libretro-core-info"
         shift;;
     *)
         if [ -z "${REMIX}" ]; then
