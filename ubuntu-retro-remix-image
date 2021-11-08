@@ -416,9 +416,9 @@ function stage_07_image() {
 
     # NOTE! Disabled while iterating
     echo "Compressing ${IMG_OUT}.xz"
-    #rm "${TMP_DIR}/${IMG_OUT}.xz" 2>/dev/null
-    #xz --keep -T 0 "${TMP_DIR}/${IMG_OUT}"
-    #ls -lh "${TMP_DIR}/${IMG_OUT}.xz"
+    rm "${TMP_DIR}/${IMG_OUT}.xz" 2>/dev/null
+    xz --keep -T 0 "${TMP_DIR}/${IMG_OUT}"
+    ls -lh "${TMP_DIR}/${IMG_OUT}.xz"
 }
 
 function stage_08_hash() {
