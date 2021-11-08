@@ -255,16 +255,59 @@ EOM
 [SeatDefaults]
 autologin-user=ubuntu
 autologin-user-timeout=0
-autologin-session=retroremix
+autologin-session=ludo
 EOM
 
-    echo                            >> ${B}/config.txt
-    echo "disable_overscan=1"       >> ${B}/config.txt
-    echo "dtoverlay=vc4-fkms-v3d"   >> ${B}/config.txt
-    echo "hdmi_drive=2"             >> ${B}/config.txt
-    echo "gpu_mem=128"              >> ${B}/config.txt
+    cat <<EOM > "${B}/README"
+An overview of the files on the /boot/firmware partition (the 1st partition
+on the SD card) used by the Ubuntu boot process (roughly in order) is as
+follows:
 
-    echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=serial0,115200 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc quiet splash plymouth.ignore-serial-consoles" > "${B}/cmdline.txt"
+* bootcode.bin   - this is the second stage bootloader loaded by all pis with
+                   the exception of the pi4 (where this is replaced by flash
+                   memory)
+* config.txt     - the configuration file read by the boot process
+* start*.elf     - the third stage bootloader, which handles device-tree
+                   modification and which loads...
+* vmlinuz        - the Linux kernel
+* cmdline.txt    - the Linux kernel command line
+* initrd.img     - the initramfs
+EOM
+
+    cat <<EOM > "${B}/config.txt"
+[pi4]
+max_framebuffers=2
+
+[all]
+kernel=vmlinuz
+cmdline=cmdline.txt
+initramfs initrd.img followkernel
+
+# Enable the audio output, I2C and SPI interfaces on the GPIO header
+dtparam=audio=on
+dtparam=i2c_arm=on
+dtparam=spi=on
+
+# Enable the full KMS graphics overlay, as recommended by Ludo
+dtoverlay=vc4-kms-v3d
+gpu_mem=128
+start_x=1
+
+# Comment out the following line if the edges of the desktop appear outside
+# the edges of your display
+disable_overscan=1
+
+# If you have issues with audio, you may try uncommenting the following line
+# which forces the HDMI output into HDMI mode instead of DVI (which doesn't
+# support audio output)
+hdmi_drive=2
+
+# If you have a CM4, uncomment the following line to enable the USB2 outputs
+# on the IO board (assuming your CM4 is plugged into such a board)
+#dtoverlay=dwc2,dr_mode=host
+EOM
+
+    echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc quiet splash" > "${B}/cmdline.txt"
 }
 
 function stage_06_clean() {
