@@ -311,6 +311,9 @@ EOM
 }
 
 function stage_06_clean() {
+    nspawn apt-get -y update
+    nspawn apt-get -y upgrade
+    nspawn apt-get -y dist-upgrade
     nspawn apt-get -y autoremove
     nspawn apt-get -y autoclean
     nspawn apt-get -y clean
