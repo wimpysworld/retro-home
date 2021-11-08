@@ -101,7 +101,15 @@ function stage_03_apt_install() {
 }
 
 function stage_04_snap() {
-    rm -rf ${R}/var/lib/snapd/seed/*
+    # Remove existing seeded snaps.
+    rm -v ${R}/etc/systemd/system/snap-*.mount
+    rm -v ${R}/etc/systemd/system/snap.lxd.*
+    rm -v ${R}/etc/systemd/system/multi-user.target.wants/snap-*.mount
+    rm -rfv ${R}/snap/*
+    rm -rfv ${R}/var/lib/snapd/seed/*
+    rm -fv ${R}/var/lib/snapd/snaps/*.snap
+    rm -fv ${R}/var/lib/snapd/state.json
+    rm -fv ${R}/var/lib/snapd/system-key
 }
 
 function stage_05_config() {
