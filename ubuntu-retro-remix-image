@@ -195,6 +195,8 @@ EOM
     # Display manager
     nspawn apt -y install --no-install-recommends lightdm slick-greeter
 
+    #TODO!
+    # Root login for the LudOS session - https://gist.github.com/intrd/12c12f6c863b3367f8c2249edd78b26c
     # Enable auto-login for 'ludo' user
     cat <<'EOM' > "${R}/etc/lightdm/lightdm.conf"
 [SeatDefaults]
