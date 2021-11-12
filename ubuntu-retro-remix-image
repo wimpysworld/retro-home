@@ -15,7 +15,6 @@ function usage () {
 }
 
 function nspawn() {
-    # Create basic resolv.conf for bind mounting inside the container
     echo "nameserver 1.1.1.1" > "${TMP_DIR}/resolv.conf"
 
     # Make sure the container has a machine-id
@@ -94,19 +93,7 @@ function stage_02_apt_remove() {
     nspawn apt -y dist-upgrade
 }
 
-function stage_03_apt_install() {
-    nspawn apt -y install pi-bluetooth xserver-xorg
-    nspawn apt -y install --no-install-recommends lightdm slick-greeter
-    nspawn apt -y install connman connman-gtk connman-ui
-    rm -rf ${R}/opt/ludo
-    local LUDO_VER="0.16.9"
-    wget -c https://github.com/libretro/ludo/releases/download/v${LUDO_VER}/Ludo-Linux-arm-${LUDO_VER}.tar.gz -O ${R}/opt/Ludo-Linux-arm-${LUDO_VER}.tar.gz
-    nspawn bash -c "cd /opt && tar zxvf Ludo-Linux-arm-${LUDO_VER}.tar.gz"
-    nspawn mv /opt/Ludo-Linux-arm-${LUDO_VER} /opt/ludo
-    nspawn chown -R root: /opt/ludo
-}
-
-function stage_04_snap() {
+function stage_03_snap_remove() {
     # Remove existing seeded snaps.
     rm -v "${R}"/etc/systemd/system/snap-*.mount
     rm -v "${R}"/etc/systemd/system/snap.lxd.*
@@ -118,150 +105,398 @@ function stage_04_snap() {
     rm -fv "${R}"/var/lib/snapd/system-key
 }
 
-function stage_05_config() {
-    rm ${B}/network-config
+function stage_04_network() {
+    # nspawn systemctl stop \
+    #     systemd-networkd.socket \
+    #     systemd-networkd \
+    #     networkd-dispatcher \
+    #     systemd-networkd-wait-online
+
+    # nspawn systemctl disable \
+    #     systemd-networkd.socket \
+    #     systemd-networkd \
+    #     networkd-dispatcher \
+    #     systemd-networkd-wait-online
+
+    # nspawn systemctl disable systemd-resolved.service
+    # nspawn systemctl stop systemd-resolved
+    #nspawn apt -y purge --autoremove networkd-dispatcher
+    #rm "${R}/etc/dhcp/dhclient-enter-hooks.d/resolved"
+
+    nspawn apt -y purge --autoremove netplan.io
 
     # Disable cloud-init from managing the network
     echo "network: {config: disabled}" > "${R}/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg"
 
-    cat <<'EOM' > ${R}/etc/cloud/cloud.cfg
-# The top level settings are used as module
-# and system configuration.
-
-# A set of users which may be applied and/or used by various modules
-# when a 'default' entry is found it will reference the 'default_user'
-# from the distro configuration specified below
-users:
-   - default
-
-# If this is set, 'root' will not be able to ssh in and they
-# will get a message to login instead as the default $user
-disable_root: true
-
-# This will cause the set+update hostname module to not operate (if true)
-preserve_hostname: false
-
-# The modules that run in the 'init' stage
-cloud_init_modules:
- - seed_random
- - bootcmd
- - write-files
- - growpart
- - resizefs
- - mounts
- - set_hostname
- - update_hostname
- - update_etc_hosts
- - ca-certs
- - rsyslog
- - users-groups
- - ssh
-
-# The modules that run in the 'config' stage
-cloud_config_modules:
-# Emit the cloud config ready event
-# this can be used by upstart jobs for 'start on cloud-config'.
- - emit_upstart
- - ssh-import-id
- - locale
- - set-passwords
- - grub-dpkg
- - apt-pipelining
- - apt-configure
- - ntp
- - timezone
- - runcmd
-
-# The modules that run in the 'final' stage
-cloud_final_modules:
- - scripts-vendor
- - scripts-per-once
- - scripts-per-boot
- - scripts-per-instance
- - scripts-user
- - ssh-authkey-fingerprints
- - final-message
-
-# System and/or distro specific settings
-# (not accessible to handlers/transforms)
-system_info:
-   # This will affect which distro class gets used
-   distro: ubuntu
-   # Default user name + that default users groups (if added/used)
-   default_user:
-     name: ubuntu
-     lock_passwd: True
-     gecos: Ubuntu
-     groups: [adm, audio, cdrom, dialout, dip, floppy, netdev, plugdev, sudo, video]
-     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-     shell: /bin/bash
-   network:
-     renderers: ['netplan', 'eni', 'sysconfig']
-   # Automatically discover the best ntp_client
-   ntp_client: auto
-   # Other config here will be given to the distro class and/or path classes
-   paths:
-      cloud_dir: /var/lib/cloud/
-      templates_dir: /etc/cloud/templates/
-      upstart_dir: /etc/init/
-   ssh_svcname: ssh
+    mkdir -p ${R}/etc/systemd/resolved.conf.d
+    cat <<'EOM' > "${R}/etc/systemd/resolved.conf.d/resolved.conf"
+# Create basic resolv.conf for bind mounting inside the container
+[Resolve]
+# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
+# Cloudflare: 1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001
+# Google:     8.8.8.8 8.8.4.4 2001:4860:4860::8888 2001:4860:4860::8844
+# Quad9:      9.9.9.9 149.112.112.112 2620:fe::fe 2620:fe::9
+DNS=1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001
+FallbackDNS=9.9.9.9 149.112.112.112 2620:fe::fe 2620:fe::9
 EOM
 
-    # Update the icon cache
-    nspawn apt -y install gtk-update-icon-cache libglib2.0-bin
+#     cat <<"EOM" > "${R}/etc/hosts"
+# 127.0.0.1 localhost ubuntu
 
-#     # Create gschema override to set GruvBox as the system default theme
-#     cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_ubuntu-retro-remix.gschema.override"
-# [x.dm.slick-greeter]
-# background=''
-# background-color='#393939'
-# draw-grid=true
-# draw-user-backgrounds=false
-# enable-hidpi='auto'
-# font-name='Inter 11'
-# icon-theme-name='gruvbox-dark-icons-gtk'
-# high-contrast=false
-# show-hostname=true
-# logo='/usr/share/libretro/assets/ozone/png/retroarch.png'
-# onscreen-keyboard=false
-# #other-monitors-logo=Logo file to use for other monitors
-# play-ready-sound='/usr/share/libretro/assets/sounds/launch.ogg'
-# screen-reader=false
-# show-power=true
-# show-a11y=true
-# show-keyboard=true
-# show-clock=true
-# show-quit=true
-# theme-name='gruvbox-dark-gtk'
-# xft-antialias=true
-# xft-dpi=96
-# xft-hintstyle='hintslight'
-# xft-rgba='rgb'
-
-# [org.gnome.desktop.interface]
-# gtk-theme='gruvbox-dark-gtk'
-# icon-theme='gruvbox-dark-icons-gtk'
+# # The following lines are desirable for IPv6 capable hosts
+# ::1 ip6-localhost ip6-loopback
+# fe00::0 ip6-localnet
+# ff00::0 ip6-mcastprefix
+# ff02::1 ip6-allnodes
+# ff02::2 ip6-allrouters
+# ff02::3 ip6-allhosts
 # EOM
-#     nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
+}
 
-    # Create xsession entry for "retroremix"
-    mkdir -p ${R}/usr/share/xsessions
+function stage_05_install_ludo() {
+    nspawn apt -y install cloud-guest-utils cloud-initramfs-growroot \
+    libraspberrypi0 libraspberrypi-bin pi-bluetooth raspi-config rpi-eeprom
 
-    cat <<'EOM' > ${R}/usr/share/xsessions/ludo.desktop
-[Desktop Entry]
-Name=Ludo
-Exec=/opt/ludo/ludo --ludos
-TryExec=/opt/ludo/ludo --ludos
-Icon=/opt/ludo/assets/icon.svg
-Type=Application
+    # linux-modules-extra-raspi was introduce in 21.10 (Impish)
+    case ${REL_VER} in
+        21.10) nspawn apt -y install linux-modules-extra-raspi;;
+    esac
+
+    # X11 and graphics stack
+    nspawn apt -y install libegl1 libgles1 libgles2 libglfw3 libglvnd0 \
+    libosmesa6 libvulkan1 libxvmc1 xserver-xorg
+
+    # LudOS requirements
+    nspawn apt -y install bluez connman samba
+
+    local LUDO_VER="0.16.9"
+    wget -qc "https://github.com/libretro/ludo/releases/download/v${LUDO_VER}/ludo_${LUDO_VER}-1_armhf.deb" -O "${R}/ludo.deb"
+    nspawn apt -y install /ludo.deb
+    rm -f "${R}/ludo.deb"
+
+    sed -i s'|Icon=ludo|Icon=/usr/share/icons/hicolor/1024x1024/apps/ludo\.png|' "${R}/usr/share/applications/ludo.desktop"
+
+    # Create LudOS xsession
+    cat <<'EOM' > "${R}/usr/local/bin/ludos"
+#!/usr/bin/env bash
+export __GL_YIELD=USLEEP
+export SDL_MOUSE_RELATIVE=0
+#export DISPLAY=:0.0
+#export WAYLAND_DISPLAY=wayland-0
+exec /usr/bin/ludo -ludos
+EOM
+    chmod 755 "${R}/usr/local/bin/ludos"
+
+    mkdir -p "${R}/usr/share/xsessions"
+    cp -a "${R}/usr/share/applications/ludo.desktop" "${R}/usr/share/xsessions/ludos.desktop"
+    sed -i 's|Exec=ludo|Exec=ludos|' "${R}/usr/share/xsessions/ludos.desktop"
+    sed -i 's|Name=Ludo|Name=LudOS|' "${R}/usr/share/xsessions/ludos.desktop"
+
+    # Display manager
+    nspawn apt -y install --no-install-recommends lightdm slick-greeter
+
+    # Enable auto-login for 'ludo' user
+    cat <<'EOM' > "${R}/etc/lightdm/lightdm.conf"
+[SeatDefaults]
+autologin-user=ludo
+autologin-user-timeout=0
+autologin-session=ludos
 EOM
 
-    # Enable auto-login for lightdm. ubuntu user autologin to the session
-    cat <<'EOM' > ${R}/etc/lightdm/lightdm.conf
-[SeatDefaults]
-autologin-user=ubuntu
-autologin-user-timeout=0
-autologin-session=ludo
+    # Create directories Ludo requires
+    for DOT_DIR in .cache/connman .cache/services .config/ludo .local/ludo .ludo .update; do
+        mkdir -p "${R}/storage/${DOT_DIR}"
+    done
+
+    for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf; do
+        touch "${R}/storage/${CONF_FILE}"
+    done
+
+    for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
+        mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
+    done
+
+    chown -Rv 1000:1000 "${R}/storage"
+
+    cat <<'EOM' > "${R}/etc/ludo.toml"
+video_fullscreen = true
+cores_dir = "/usr/lib/ludo"
+assets_dir = "/usr/share/ludo/assets"
+database_dir = "/usr/share/ludo/database"
+playlists_dir = "/storage/Retro/playlists"
+savefiles_dir = "/storage/Retro/savefiles"
+savestates_dir = "/storage/Retro/savestates"
+screenshots_dir = "/storage/Retro/screenshots"
+system_dir = "/storage/Retro/system"
+thumbnail_dir = "/storage/Retro/thumbnails"
+bluetooth_service = true
+samba_service = true
+ssh_service = true
+EOM
+}
+
+function stage_06_install_desktop() {
+    # Desktop
+    #  - mutter-common provide gschema that prevent g-c-c from crashing
+    nspawn apt -y install --no-install-recommends connman-gtk dconf-editor \
+    gnome-control-center gnome-session-flashback file-roller fonts-mplus \
+    indicator-applet indicator-application indicator-session \
+    language-selector-gnome librsvg2-2 librsvg2-bin librsvg2-common \
+    mutter-common pulseaudio sakura yaru-theme-sound
+
+    cat <<'EOM' > "${R}/usr/share/applications/connman-gtk-flashback.desktop"
+[Desktop Entry]
+Type=Application
+Exec=connman-gtk
+Name=Connman Settings
+Categories=GTK;Utility;System;
+Keywords=connman;network;settings;wired;wifi;wi-fi;bluetooth;vpn;tethering
+X-GNOME-Settings-Panel=connman-gtk
+X-Unity-Settings-Panel=connman-gtk
+Icon=preferences-system-network
+EOM
+
+    # Theme
+    wget -c "https://github.com/Jannomag/Yaru-Colors/releases/download/21.04snap/Yaru-Colors_21.04.zip" -O "${TMP_DIR}/Yaru-Colors_21.04.zip"
+    unzip -o "${TMP_DIR}/Yaru-Colors_21.04.zip" -d "${TMP_DIR}"
+    mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
+    cp -a "${TMP_DIR}"/Wallpapers/Yaru-Pink.jpg "${R}/usr/share/backgrounds/"
+    cp -a "${TMP_DIR}"/Icons/Yaru-Pink "${R}/usr/share/icons/"
+    cp -a "${TMP_DIR}"/Themes/Yaru-Pink* "${R}/usr/share/themes/"
+    cp -a "${R}/usr/share/icons/ubuntu-mono-light" "${R}/usr/share/icons/ubuntu-mono-pink"
+    rm "${R}/usr/share/icons/ubuntu-mono-pink/*.cache"
+    sed -i s'|Ubuntu-Mono-Light|Ubuntu-Mono-Pink|' "${R}/usr/share/icons/ubuntu-mono-pink/index.theme"
+    sed -i s'|Inherits=Humanity|Inherits=Yaru-Pink,Humanity|' "${R}/usr/share/icons/ubuntu-mono-pink/index.theme"
+    nspawn gtk-update-icon-cache /usr/share/icons/ubuntu-mono-pink/
+
+    wget -qc "https://raw.githubusercontent.com/wimpysworld/ubuntu-retro-remix/master/.github/logo.svg" -O "${R}/usr/share/icons/hicolor/scalable/apps/ubuntu-retro-remix.svg"
+
+    # Create gschema override
+    cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_ubuntu-retro-remix.gschema.override"
+[x.dm.slick-greeter]
+background='/usr/share/backgrounds/Yaru-Pink.jpg'
+background-color='#e920a3'
+draw-grid=true
+draw-user-backgrounds=false
+enable-hidpi='auto'
+font-name='M+ 1p Medium 11'
+icon-theme-name='ubuntu-mono-pink'
+high-contrast=false
+show-hostname=true
+#logo=''
+onscreen-keyboard=false
+#other-monitors-logo=''
+play-ready-sound='/usr/share/sounds/Yaru/stereo/system-ready.oga'
+screen-reader=false
+show-power=true
+show-a11y=false
+show-keyboard=true
+show-clock=true
+show-quit=true
+theme-name='Yaru-Pink-light'
+xft-antialias=true
+xft-dpi=96
+xft-hintstyle='hintslight'
+xft-rgba='rgb'
+
+[org.gnome.desktop.background]
+color-shading-type='vertical'
+picture-uri='file:///usr/share/backgrounds/Yaru-Pink.jpg'
+primary-color='#e920a3'
+secondary-color='#742558'
+
+[org.gnome.desktop.datetime]
+automatic-timezone=true
+
+[org.gnome.desktop.interface]
+cursor-theme='Yaru'
+document-font-name='M+ 1p Medium 11'
+enable-hot-corners=false
+font-name='M+ 1p Medium 11'
+gtk-theme='Yaru-Pink-light'
+icon-theme='ubuntu-mono-pink'
+monospace-font-name='M+ 1mn Medium 14'
+
+[org.gnome.desktop.lockdown]
+disable-printing=true
+disable-print-setup=true
+disable-user-switching=true
+
+[org.gnome.desktop.media-handling]
+automount-open=false
+
+[org.gnome.desktop.privacy]
+remember-app-usage=false
+remember-recent-files=false
+report-technical-problems=false
+send-software-usage-stats=false
+
+[org.gnome.desktop.screensaver]
+color-shading-type='vertical'
+lock-enabled=false
+picture-uri='file:///usr/share/backgrounds/Yaru-Pink.jpg'
+primary-color='#e920a3'
+secondary-color='#742558'
+ubuntu-lock-on-suspend=false
+user-switch-enabled=false
+
+[org.gnome.desktop.session]
+idle-delay=0
+
+[org.gnome.desktop.sound]
+theme-name='Yaru'
+
+[org.gnome.desktop.wm.preferences]
+button-layout=':minimize,maximize,close'
+theme='Yaru-Pink-light'
+titlebar-font='M+ 1p Bold 11'
+titlebar-uses-system-font=false
+
+[org.gnome.gnome-flashback.desktop.background]
+fade=false
+
+[org.gnome.gnome-flashback.desktop.icons]
+show-home=false
+show-trash=false
+
+[org.gnome.metacity]
+alt-tab-thumbnails=true
+
+[org.gnome.metacity.theme]
+name='Yaru-Pink-light'
+
+[org.gnome.settings-deamon.plugins.power]
+idle-dim=false
+power-button-action='interactive'
+sleep-inactive-ac-timeout=0
+sleep-inactive-ac-type='nothing'
+sleep-inactive-battery-timeout=0
+sleep-inactive-battery-type='nothing'
+EOM
+
+    nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
+}
+
+function stage_07_system_config() {
+
+    #TODO! Regenerate ssh key oneshot
+    #https://askubuntu.com/questions/960927/how-to-generate-ssh-keys-before-the-ssh-daemon-does-for-the-first-time
+
+    cat <<'EOM' > "${R}/etc/samba/smb.conf"
+#
+# Sample configuration file for the Samba suite for Ubuntu Retro Remix.
+#
+#
+# You should read the smb.conf(5) manual page in order to understand the
+# options listed here. Whenever you modify this file you should run the command
+# "testparm" to check that you have not made any basic syntactic errors.
+
+[global]
+  server string = retro-remix
+  browseable = yes
+  writeable = yes
+  printable = no
+  deadtime = 30
+  mangled names = no
+  name resolve order = host bcast
+  printcap name = /dev/null
+  load printers = no
+  encrypt passwords = true
+  enable core files = no
+  passdb backend = smbpasswd
+  smb encrypt = disabled
+  fruit:model = Xserve
+
+  # samba share options
+  map to guest = Bad User
+  guest account = ludo
+  security = user
+
+  # samba tuning options
+  socket options = TCP_NODELAY IPTOS_LOWDELAY
+  min receivefile size = 16384
+  aio read size = 16384
+  aio write size = 16384
+  use sendfile = yes
+
+  # The following are default values for the master selection process
+  # local master = yes
+  # preferred master = auto
+  # domain master = auto
+  # os level = 20
+
+  # "strict allocate = yes" breaks large network transfers to external hdd
+  # Force this to "no" in case "yes" becomes the default in future
+  strict allocate = no
+
+  allocation roundup size = 0
+
+# Using the following configurations as a template allows you to add
+# writeable shares of disks and paths under /storage
+
+[Update]
+  path = /storage/.update
+  available = yes
+  browseable = yes
+  public = yes
+  writeable = yes
+  root preexec = mkdir -p /storage/.update
+
+[ROMs]
+  path = /storage/Retro/roms
+  available = yes
+  browseable = yes
+  public = yes
+  writeable = yes
+  root preexec = mkdir -p /storage/Retro/roms
+
+[Savestates]
+  path = /storage/Retro/savestates
+  available = yes
+  browseable = yes
+  public = yes
+  writeable = yes
+  root preexec = mkdir -p /storage/Retro/savestates
+
+[Savefiles]
+  path = /storage/Retro/savefiles
+  available = yes
+  browseable = yes
+  public = yes
+  writeable = yes
+  root preexec = mkdir -p /storage/Retro/savefiles
+
+[Screenshots]
+  path = /storage/Retro/screenshots
+  available = yes
+  browseable = yes
+  public = yes
+  writeable = yes
+  root preexec = mkdir -p /storage/Retro/screenshots
+
+[System]
+  path = /storage/Retro/system
+  available = yes
+  browseable = yes
+  public = yes
+  writeable = yes
+  root preexec = mkdir -p /storage/Retro/system
+
+[Playlists]
+  path = /storage/Retro/playlists
+  available = yes
+  browseable = yes
+  public = yes
+  writeable = yes
+  root preexec = mkdir -p /storage/Retro/playlists
+
+[Thumbnails]
+  path = /storage/Retro/thumbnails
+  available = yes
+  browseable = yes
+  public = yes
+  writeable = yes
+  root preexec = mkdir -p /storage/Retro/thumbnails
 EOM
 
     cat <<EOM > "${B}/README"
@@ -314,9 +549,41 @@ hdmi_drive=2
 EOM
 
     echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc quiet splash" > "${B}/cmdline.txt"
+
+    # Create user and groups
+    local DATE=""
+    DATE=$(date +%m%H%M%S)
+    local PASSWD=""
+    PASSWD=$(mkpasswd -m sha-512 "test" "${DATE}")
+    nspawn addgroup --gid 1000 ludo
+
+    # Create Raspberry Pi specific groups.
+    nspawn groupadd -f --system gpio
+    nspawn groupadd -f --system i2c
+    nspawn groupadd -f --system input
+    nspawn groupadd -f --system spi
+
+    cat <<'EOM' > "${R}/usr/local/sbin/adduser.local"
+#!/bin/sh
+# This script is executed as the final step when calling `adduser`
+# USAGE:
+#   adduser.local USER UID GID HOME
+
+# Add user to the Raspberry Pi specific groups
+usermod -a -G adm,gpio,i2c,input,spi,video $1
+EOM
+    chmod 755 "${R}/usr/local/sbin/adduser.local"
+
+    nspawn adduser --gecos "Ludo" --add_extra_groups --disabled-password --home /storage --gid 1000 --uid 1000 ludo
+    nspawn usermod -a -G adm,sudo -p "${PASSWD}" ludo
+
+    cat <<'EOM' > "${R}/etc/fstab"
+LABEL=writable      /               ext4    defaults,noatime,x-systemd.growfs   0   0
+LABEL=system-boot   /boot/firmware  vfat    defaults                            0   1
+EOM
 }
 
-function stage_06_clean() {
+function stage_08_clean() {
     nspawn apt-get -y update
     nspawn apt-get -y upgrade
     nspawn apt-get -y dist-upgrade
@@ -367,7 +634,7 @@ function stage_06_clean() {
     echo '' > "${R}"/etc/machine-id
 }
 
-function stage_07_image() {
+function stage_09_image() {
     # Build the image file
     local SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'.' -f1)
     ((SIZE_IMG+=2))
@@ -514,15 +781,17 @@ B="${TMP_DIR}/${IMG_ARCH}/${REMIX}/boot"
 R="${TMP_DIR}/${IMG_ARCH}/${REMIX}/root"
 
 if [ "${IMG_TEST}" == "DOS/MBR boot sector" ]; then
-    stage_00_tools
+    #stage_00_tools
     stage_01_unpack
-    stage_02_apt_prepare
-    stage_03_apt_install
-    stage_04_snap
-    stage_05_config
-    stage_06_clean
-    stage_07_image
-    stage_08_hash
+    stage_02_apt_remove
+    stage_03_snap_remove
+    stage_04_network
+    stage_05_install_ludo
+    stage_06_install_desktop
+    stage_07_system_config
+    stage_08_clean
+    stage_09_image
+    #stage_10_hash
 else
     echo "[!] ERROR: ${IMG} is not a valid disk image."
     if [ "${IMG_TEST}" == "XZ compressed data" ]; then
