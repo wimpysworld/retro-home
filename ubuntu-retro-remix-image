@@ -74,13 +74,21 @@ function stage_01_unpack() {
     rm -rf "${TMP_DIR}/root"
 }
 
-function stage_02_apt_prepare() {
-    # Remove most of the server components
-    nspawn apt -y purge --autoremove bcache-tools btrfs-progs byobu \
-    cloud-initramfs-copymods cloud-initramfs-dyn-netconf curl eatmydata \
-    ethtool finalrd htop landscape-common lvm2 lxd-agent-loader mdadm \
-    multipath-tools open-iscsi overlayroot screen sosreport tmux vim \
+function stage_02_apt_remove() {
+    # Depends
+    nspawn apt -y purge --autoremove apport bcache-tools btrfs-progs byobu \
+    cloud-guest-utils cloud-initramfs-copymods cloud-initramfs-dyn-netconf \
+    curl dirmngr ethtool fonts-ubuntu-console git gnupg htop lvm2 mdadm \
+    motd-news-config multipath-tools overlayroot patch pollinate screen \
+    software-properties-common sosreport tmux update-notifier-common vim \
     xfsprogs
+
+    # Recommends
+    nspawn apt -y purge --autoremove fwupd landscape-common lxd-agent-loader \
+    needrestart open-iscsi open-vm-tools snapd
+
+    # The meta package
+    nspawn apt -y purge --autoremove ubuntu-server
 
     nspawn apt -y update
     nspawn apt -y dist-upgrade
