@@ -637,44 +637,20 @@ LABEL=system-boot   /boot/firmware  vfat    defaults                            
 EOM
 }
 
-function stage_08_clean() {
-    nspawn apt-get -y update
-    nspawn apt-get -y upgrade
-    nspawn apt-get -y dist-upgrade
+function stage_06_clean() {
+    export B="${B_STAGE_6}"
+    export R="${R_STAGE_6}"
+    sync_from "${B_STAGE_5}" "${R_STAGE_5}"
+
     nspawn apt-get -y autoremove
     nspawn apt-get -y autoclean
     nspawn apt-get -y clean
 
-    # Remove old kernel
-    local OLD_KERNEL=$(ls -1 ${R}/lib/modules/ | head -n1)
-    local OLD_KERNEL_SHORT=$(echo "${OLD_KERNEL}" | sed s'/-raspi//')
-    local NEW_KERNEL=$(ls -1 ${R}/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
-    echo "Old: ${OLD_KERNEL} (${OLD_KERNEL_SHORT})"
-    echo "New: ${NEW_KERNEL}"
-    if [ "${OLD_KERNEL}" == "${NEW_KERNEL}" ]; then
-        echo "No old kernel to remove."
-    else
-        nspawn apt -y remove "linux-image-${OLD_KERNEL}" "linux-modules-${OLD_KERNEL}" "linux-raspi-headers-${OLD_KERNEL_SHORT}"
-        # linux-modules-extra-raspi was introduce in 21.10 (Impish)
-        case ${REL_VER} in
-            21.10) nspawn apt -y remove "linux-modules-extra-${OLD_KERNEL}";;
-        esac
-    fi
-
-    # Copy new devicetree, overlays and kernel to /boot/firmware
-    cp "${R}/lib/firmware/${NEW_KERNEL}/device-tree/*.dtb" "${B}/"
-    cp "${R}/lib/firmware/${NEW_KERNEL}/device-tree/broadcom/*.dtb" "${B}"/
-    cp "${R}/lib/firmware/${NEW_KERNEL}/device-tree/overlays/*" "${B}"/overlays/
-    cp -av "${R}/boot/vmlinuz-${NEW_KERNEL}" "${B}/vmlinuz"
-    cp -av "${R}/boot/initrd.img-${NEW_KERNEL}" "${B}/initrd.img"
-
-    rm -f "${B}"/meta-data
-    rm -f "${B}"/network-config
-    rm -f "${B}"/user-data
     rm -f "${B}"/{*.bak,*.old}
     rm -f "${R}"/boot/{*.bak,*.old}
     rm -f "${R}"/etc/ssh/ssh_host_*_key*
     rm -f "${R}"/etc/apt/*.save
+    rm -f "${R}"/etc/apt/apt.conf.d/90cache
     rm -f "${R}"/etc/apt/sources.list.d/*.save
     rm -f "${R}"/var/log/apt/*
     rm -f "${R}"/var/log/alternatives.log
@@ -682,10 +658,17 @@ function stage_08_clean() {
     rm -f "${R}"/var/log/fontconfig.log
     rm -rf "${R}"/tmp/*
     rm -f "${R}"/var/crash/*
+    rm -f "${R}"/var/cache/apt/*
+    rm -rf "${R}"/var/cache/apt/archives/*
     rm -f "${R}"/var/cache/debconf/*-old
+    rm -rf "${R}"/var/lib/apt/lists/*
     rm -f "${R}"/var/lib/dpkg/*-old
     [ -L "${R}"/var/lib/dbus/machine-id ] || rm -f "${R}"/var/lib/dbus/machine-id
     echo '' > "${R}"/etc/machine-id
+
+    cd "${R}/etc"
+    ln -sf ../run/connman/resolv.conf resolv.conf
+    cd -
 }
 
 function stage_09_image() {
