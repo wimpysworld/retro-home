@@ -818,7 +818,7 @@ function stage_06_clean() {
     cd -
 }
 
-function stage_09_image() {
+function stage_07_image() {
     # Build the image file
     local SIZE_IMG=""
     SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'.' -f1)
@@ -869,6 +869,7 @@ function stage_09_image() {
     rsync -aHAXx --delete "${R}"/ "${MOUNTDIR}/"
     echo "Syncing boot..."
     rsync -aHAXx --delete "${B}"/ "${MOUNTDIR}/boot/firmware/"
+    mkdir -p "${MOUNTDIR}/.disk"
     date +"%Y%m%d" > "${MOUNTDIR}/.disk/info"
     sync
     umount -l "${MOUNTDIR}/boot/firmware"
