@@ -389,10 +389,193 @@ EOM
     fi
 }
 
-function stage_07_system_config() {
+function stage_04_kernel() {
+    export B="${B_STAGE_4}"
+    export R="${R_STAGE_4}"
+    sync_from "${B_STAGE_3}" "${R_STAGE_3}"
 
-    #TODO! Regenerate ssh key oneshot
-    #https://askubuntu.com/questions/960927/how-to-generate-ssh-keys-before-the-ssh-daemon-does-for-the-first-time
+    cat <<'EOM' > "${B}/README"
+An overview of the files on the /boot/firmware partition (the 1st partition
+on the SD card) used by the Ubuntu boot process (roughly in order) is as
+follows:
+
+* bootcode.bin   - this is the second stage bootloader loaded by all pis with
+                   the exception of the pi4 (where this is replaced by flash
+                   memory)
+* config.txt     - the configuration file read by the boot process
+* start*.elf     - the third stage bootloader, which handles device-tree
+                   modification and which loads...
+* vmlinuz        - the Linux kernel
+* cmdline.txt    - the Linux kernel command line
+* initrd.img     - the initramfs
+EOM
+
+    # No uboot since 20.10
+    if [ "${IMG_ARCH}"  == "arm64" ]; then
+        ARM64="arm_64bit=1"
+    else
+        ARM64=""
+    fi
+
+    cat <<EOM > "${B}/config.txt"
+[pi4]
+max_framebuffers=2
+
+[all]
+${ARM64}
+kernel=vmlinuz
+cmdline=cmdline.txt
+initramfs initrd.img followkernel
+
+# Enable the audio output, I2C and SPI interfaces on the GPIO header
+dtparam=audio=on
+dtparam=i2c_arm=on
+dtparam=spi=on
+
+# Enable the full KMS graphics overlay, as recommended by Ludo
+dtoverlay=vc4-fkms-v3d
+gpu_mem=128
+start_x=1
+
+# Comment out the following line if the edges of the desktop appear outside
+# the edges of your display
+disable_overscan=1
+
+# If you have issues with audio, you may try uncommenting the following line
+# which forces the HDMI output into HDMI mode instead of DVI (which doesn't
+# support audio output)
+hdmi_drive=2
+
+# If you have a CM4, uncomment the following line to enable the USB2 outputs
+# on the IO board (assuming your CM4 is plugged into such a board)
+#dtoverlay=dwc2,dr_mode=host
+EOM
+
+    echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc consoleblank=0 vt.global_cursor_default=0 quiet splash" > "${B}/cmdline.txt"
+
+    cat <<'EOM' > "${R}/etc/fstab"
+LABEL=writable      /               ext4    defaults,noatime,x-systemd.growfs   0   0
+LABEL=system-boot   /boot/firmware  vfat    defaults                            0   1
+EOM
+
+    nspawn apt-get -y install libraspberrypi0 libraspberrypi-bin \
+    linux-firmware-raspi2 linux-headers-raspi linux-image-raspi \
+    linux-modules-extra-raspi pi-bluetooth raspi-config rpi-eeprom
+
+    local NEW_KERNEL=$(ls -1 "${R}"/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
+    if [ -z "${NEW_KERNEL}" ]; then
+        echo "ERROR! Could not detect the new kernel version"
+        exit 1
+    fi
+    echo "Kernel: ${NEW_KERNEL}"
+
+    # Copy firmware, devicetree, overlays and kernel to the boot file system
+    cp -v "${R}/lib/linux-firmware-raspi2/"* "${B}/"
+    cp -av "${R}/lib/firmware/${NEW_KERNEL}/device-tree/"* "${B}/"
+
+    # Move the arm64 device-tree
+    if [ -d "${B}/broadcom" ]; then
+        mv -v "${B}/broadcom/"*.dtb "${B}"/
+        rm -rf "${B}/broadcom"
+    fi
+
+    cp -av "${R}/boot/vmlinuz-${NEW_KERNEL}" "${B}/vmlinuz"
+    cp -av "${R}/boot/initrd.img-${NEW_KERNEL}" "${B}/initrd.img"
+}
+
+function stage_05_config() {
+    export B="${B_STAGE_5}"
+    export R="${R_STAGE_5}"
+    sync_from "${B_STAGE_4}" "${R_STAGE_4}"
+
+cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-sshd-handler.service"
+[Unit]
+Description=Disable sshd is LudOS has it disabled
+After=ssh.service
+ConditionPathExists=!/storage/.cache/services/sshd.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop ssh
+
+[Install]
+WantedBy=multi-user.target
+EOM
+        nspawn systemctl enable ludos-sshd-handler.service
+
+cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-samba-handler.service"
+[Unit]
+Description=Disable nmbd and smbd if LudOS has them disabled
+After=nmbd.service
+After=smbd.service
+ConditionPathExists=!/storage/.cache/services/samba.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop nmbd
+ExecStart=systemctl stop smbd
+
+[Install]
+WantedBy=multi-user.target
+EOM
+        nspawn systemctl enable ludos-samba-handler.service
+
+cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-bluez-handler.service"
+[Unit]
+Description=Disable Bluetooth if LudOS has it disabled
+After=bluetooth.target
+ConditionPathExists=!/storage/.cache/services/bluez.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop bluetooth
+
+[Install]
+WantedBy=multi-user.target
+EOM
+        nspawn systemctl enable ludos-bluez-handler.service
+
+    # Disable systemd-networkd et al; we're using connman
+    # - https://www.naut.ca/blog/2018/12/12/disabling-systemd-networking/
+    nspawn systemctl stop systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
+    nspawn systemctl disable systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
+    nspawn systemctl stop systemd-resolved
+    nspawn systemctl disable systemd-resolved.service
+    #rm ${R}/etc/dhcp/dhclient-enter-hooks.d/resolved
+
+    # Disable Ubuntu Advantage Tools; not required
+    nspawn systemctl disable ua-reboot-cmds.service
+    nspawn systemctl disable ua-timer.timer
+    nspawn systemctl disable ua-license-check.path
+
+    # Disable tracker
+    rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
+    rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
+    rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
+
+    # Supress kernel messages
+    # - https://superuser.com/questions/351387/how-to-stop-kernel-messages-from-flooding-my-console
+    echo "kernel.printk = 1 4 1 7" > "${R}/etc/sysctl.d/20-printk.conf"
+
+    sed -i 's|enabled=1|enabled=0|' "${R}/etc/default/apport"
+
+    # Regenerate ssh host keys on first boot
+    if  [ -d "${R}/etc/ssh" ]; then
+        cat <<'EOM' > "${R}/usr/lib/systemd/system/ssh-regenerate-hostkeys.service"
+[Unit]
+Description=Regenerate SSH host keys
+Before=ssh.service
+ConditionPathExists=!/etc/ssh/ssh_host_rsa_key
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ssh-keygen -A
+
+[Install]
+WantedBy=multi-user.target
+EOM
+        nspawn systemctl enable ssh-regenerate-hostkeys.service
+    fi
 
     cat <<"EOM" > "${R}/etc/samba/smb.conf"
 #
@@ -553,57 +736,6 @@ function stage_07_system_config() {
   root preexec = mkdir -p /storage/Retro/thumbnails
 EOM
 
-    cat <<EOM > "${B}/README"
-An overview of the files on the /boot/firmware partition (the 1st partition
-on the SD card) used by the Ubuntu boot process (roughly in order) is as
-follows:
-
-* bootcode.bin   - this is the second stage bootloader loaded by all pis with
-                   the exception of the pi4 (where this is replaced by flash
-                   memory)
-* config.txt     - the configuration file read by the boot process
-* start*.elf     - the third stage bootloader, which handles device-tree
-                   modification and which loads...
-* vmlinuz        - the Linux kernel
-* cmdline.txt    - the Linux kernel command line
-* initrd.img     - the initramfs
-EOM
-
-    cat <<EOM > "${B}/config.txt"
-[pi4]
-max_framebuffers=2
-
-[all]
-kernel=vmlinuz
-cmdline=cmdline.txt
-initramfs initrd.img followkernel
-
-# Enable the audio output, I2C and SPI interfaces on the GPIO header
-dtparam=audio=on
-dtparam=i2c_arm=on
-dtparam=spi=on
-
-# Enable the full KMS graphics overlay, as recommended by Ludo
-dtoverlay=vc4-kms-v3d
-gpu_mem=128
-start_x=1
-
-# Comment out the following line if the edges of the desktop appear outside
-# the edges of your display
-disable_overscan=1
-
-# If you have issues with audio, you may try uncommenting the following line
-# which forces the HDMI output into HDMI mode instead of DVI (which doesn't
-# support audio output)
-hdmi_drive=2
-
-# If you have a CM4, uncomment the following line to enable the USB2 outputs
-# on the IO board (assuming your CM4 is plugged into such a board)
-#dtoverlay=dwc2,dr_mode=host
-EOM
-
-    echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc quiet splash" > "${B}/cmdline.txt"
-
     # Create user and groups
     local DATE=""
     DATE=$(date +%m%H%M%S)
@@ -628,13 +760,28 @@ usermod -a -G adm,gpio,i2c,input,spi,video $1
 EOM
     chmod 755 "${R}/usr/local/sbin/adduser.local"
 
-    nspawn adduser --gecos "Ludo" --add_extra_groups --disabled-password --home /storage --gid 1000 --uid 1000 ludo
+    nspawn adduser --gecos Ludo --add_extra_groups --disabled-password --home /storage --gid 1000 --uid 1000 ludo
     nspawn usermod -a -G adm,sudo -p "${PASSWD}" ludo
 
-    cat <<'EOM' > "${R}/etc/fstab"
-LABEL=writable      /               ext4    defaults,noatime,x-systemd.growfs   0   0
-LABEL=system-boot   /boot/firmware  vfat    defaults                            0   1
-EOM
+    # Create directozries Ludo requires
+    for DOT_DIR in .cache/connman .cache/services .config/ludo .local/ludo .local/share/ludo .ludo .update; do
+        mkdir -p "${R}/storage/${DOT_DIR}"
+    done
+
+    for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv; do
+        touch "${R}/storage/${CONF_FILE}"
+    done
+
+    for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
+        mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
+    done
+
+    chown -Rv 1000:1000 "${R}/storage"
+
+    echo "ludo   ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/ludo" > "${R}/etc/sudoers.d/090-ludo"
+    chmod -v 0440 "${R}/etc/sudoers.d/090-ludo"
+    # PolicyKit object
+    #org.freedesktop.systemd1.manage-units
 }
 
 function stage_06_clean() {
