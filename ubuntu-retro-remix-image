@@ -397,7 +397,7 @@ function stage_07_system_config() {
     #TODO! Regenerate ssh key oneshot
     #https://askubuntu.com/questions/960927/how-to-generate-ssh-keys-before-the-ssh-daemon-does-for-the-first-time
 
-    cat <<'EOM' > "${R}/etc/samba/smb.conf"
+    cat <<"EOM" > "${R}/etc/samba/smb.conf"
 #
 # Sample configuration file for the Samba suite for Ubuntu Retro Remix.
 #
@@ -407,7 +407,9 @@ function stage_07_system_config() {
 # "testparm" to check that you have not made any basic syntactic errors.
 
 [global]
-  server string = retro-remix
+  netbios name = retro-remix-${REMIX}
+  server string = Retro Remix (${REMIX})
+  workgroup = Retro Remix
   browseable = yes
   writeable = yes
   printable = no
@@ -424,11 +426,11 @@ function stage_07_system_config() {
 
   # samba share options
   map to guest = Bad User
-  guest account = ludo
+  guest account = root
   security = user
 
   # samba tuning options
-  socket options = TCP_NODELAY IPTOS_LOWDELAY
+  socket options = TCP_NODELAY IPTOS_LOWDELAY SO_SNDBUF=65535 SO_RCVBUF=65535
   min receivefile size = 16384
   aio read size = 16384
   aio write size = 16384
@@ -455,6 +457,11 @@ function stage_07_system_config() {
   browseable = yes
   public = yes
   writeable = yes
+  create mask = 0644
+  force create mode = 0644
+  force directory mode = 0755
+  force user = ludo
+  force group = ludo
   root preexec = mkdir -p /storage/.update
 
 [ROMs]
@@ -463,6 +470,11 @@ function stage_07_system_config() {
   browseable = yes
   public = yes
   writeable = yes
+  create mask = 0644
+  force create mode = 0644
+  force directory mode = 0755
+  force user = ludo
+  force group = ludo
   root preexec = mkdir -p /storage/Retro/roms
 
 [Savestates]
@@ -471,6 +483,11 @@ function stage_07_system_config() {
   browseable = yes
   public = yes
   writeable = yes
+  create mask = 0644
+  force create mode = 0644
+  force directory mode = 0755
+  force user = ludo
+  force group = ludo
   root preexec = mkdir -p /storage/Retro/savestates
 
 [Savefiles]
@@ -479,6 +496,11 @@ function stage_07_system_config() {
   browseable = yes
   public = yes
   writeable = yes
+  create mask = 0644
+  force create mode = 0644
+  force directory mode = 0755
+  force user = ludo
+  force group = ludo
   root preexec = mkdir -p /storage/Retro/savefiles
 
 [Screenshots]
@@ -487,6 +509,11 @@ function stage_07_system_config() {
   browseable = yes
   public = yes
   writeable = yes
+  create mask = 0644
+  force create mode = 0644
+  force directory mode = 0755
+  force user = ludo
+  force group = ludo
   root preexec = mkdir -p /storage/Retro/screenshots
 
 [System]
@@ -495,6 +522,11 @@ function stage_07_system_config() {
   browseable = yes
   public = yes
   writeable = yes
+  create mask = 0644
+  force create mode = 0644
+  force directory mode = 0755
+  force user = ludo
+  force group = ludo
   root preexec = mkdir -p /storage/Retro/system
 
 [Playlists]
@@ -503,6 +535,11 @@ function stage_07_system_config() {
   browseable = yes
   public = yes
   writeable = yes
+  create mask = 0644
+  force create mode = 0644
+  force directory mode = 0755
+  force user = ludo
+  force group = ludo
   root preexec = mkdir -p /storage/Retro/playlists
 
 [Thumbnails]
@@ -511,6 +548,11 @@ function stage_07_system_config() {
   browseable = yes
   public = yes
   writeable = yes
+  create mask = 0644
+  force create mode = 0644
+  force directory mode = 0755
+  force user = ludo
+  force group = ludo
   root preexec = mkdir -p /storage/Retro/thumbnails
 EOM
 
