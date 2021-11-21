@@ -582,7 +582,7 @@ EOM
     local DATE=""
     DATE=$(date +%m%H%M%S)
     local PASSWD=""
-    PASSWD=$(mkpasswd -m sha-512 "test" "${DATE}")
+    PASSWD=$(mkpasswd -m sha-512 retro "${DATE}")
     nspawn addgroup --gid 1000 ludo
 
     # Create Raspberry Pi specific groups.
