@@ -18,7 +18,7 @@ LC_ALL=C
 function usage () {
   echo
   echo "Usage"
-  echo "  $0 --remix <targetdevice> --img ubuntu-21.10-preinstalled-server-armhf+raspi.img"
+  echo "  $0 --remix <targetdevice>"
   echo
   echo "Available supported devices are:"
   echo "  raspi"
@@ -27,8 +27,33 @@ function usage () {
   echo "  superpi"
 }
 
+function sync_from() {
+    if [ -z "${1}" ] || [ -z "${2}" ]; then
+        echo "ERROR! Source stages to sync were not passed."
+        exit 1
+    fi
+
+    local B_SOURCE="${1}"
+    local R_SOURCE="${2}"
+
+    if [ -d "${B}" ] && [ -d "${R}" ]; then
+        echo "Syncing from ${B_SOURCE}..."
+        rsync -aHAXx --delete "${B_SOURCE}/" "${B}/"
+        echo "Syncing from ${R_SOURCE}..."
+        rsync -aHAXx --delete "${R_SOURCE}/" "${R}/"
+    else
+        echo "ERROR! Either ${B} or ${R} do not exist!"
+        exit 1
+    fi
+}
+
 function nspawn() {
-    echo "nameserver 1.1.1.1" > "${TMP_DIR}/resolv.conf"
+    # Create basic resolv.conf for bind mounting inside the container
+    echo "nameserver 1.1.1.1" > "${R_STAGE_0}/resolv.conf"
+
+    if pidof apt-cacher-ng && [ -d "${R}/etc/apt/apt.conf.d" ]; then
+        echo "Acquire::http { Proxy \"http://${APT_CACHE_IP}:3142\"; }" > "${R}/etc/apt/apt.conf.d/90cache"
+    fi
 
     # Make sure the container has a machine-id
     systemd-machine-id-setup --root "${R}" --print
@@ -36,204 +61,150 @@ function nspawn() {
     # Bind mount resolv.conf and the firmware, set the hostname and spawn
     systemd-nspawn \
       --resolv-conf=off \
-      --bind-ro="${TMP_DIR}/resolv.conf":/etc/resolv.conf \
-      --bind=${B}:/boot/firmware \
-      --hostname="${REMIX}" \
-      --machine="${REMIX}" \
-      -D "${R}" "${@}"
+      --bind-ro="${R_STAGE_0}/resolv.conf":/etc/resolv.conf \
+      --bind="${B}":/boot/firmware \
+      --machine="retro-remix-${REMIX}" \
+      --directory "${R}" "${@}"
+
+    if [ -e "${R}/etc/apt/apt.conf.d/90cache" ]; then
+        rm -f "${R}/etc/apt/apt.conf.d/90cache"
+    fi
 }
 
-function stage_00_tools() {
+function stage_01_bootstrap() {
+    local REPO=""
+    export B="${B_STAGE_1}"
+    export R="${R_STAGE_1}"
+
+    rm -rf "${B_STAGE_1}"/*
+    rm -rf "${R_STAGE_1}"/*
+
     # Required tools on the host
-    apt-get -y install binfmt-support debootstrap \
-    git qemu-user-static rsync systemd-container \
-    ubuntu-keyring whois xz-utils
-}
+    apt-get -y install binfmt-support debootstrap git qemu-user-static rsync \
+    systemd-container ubuntu-keyring whois xz-utils
 
-function stage_01_unpack() {
-    # Capture the patition details.
-    BOOT_PARTITION=$(fdisk -l "${IMG}" | grep "c W95 FAT32 (LBA)")
-    ROOT_PARTITION=$(fdisk -l "${IMG}" | grep "83 Linux")
-    echo "${BOOT_PARTITION}"
-    echo "${ROOT_PARTITION}"
+    # Bootstrap a minimal Ubuntu
+    #   --variant=minbase; if I ever need to go smaller
+    #   Include cloud-guest-utils; prevents cloud-image-utils, and therefore qemu-system-x86, being installed later
+    #   netplan.io is excluded; Ludo uses connman
 
-    # Grab the starting sector of the partitions.
-    BOOT_START_SECTOR=$(echo "${BOOT_PARTITION}" | sed -e 's/\*//g' | awk '{print $2}')
-    ROOT_START_SECTOR=$(echo "${ROOT_PARTITION}" | sed -e 's/\*//g' | awk '{print $2}')
+    if pidof apt-cacher-ng; then
+        REPO="http://localhost:3142/ports.ubuntu.com/"
+    else
+        REPO="http://ports.ubuntu.com/"
+    fi
 
-    # Calculate the start byte of the partitions.
-    ((BOOT_START_BYTE=BOOT_START_SECTOR * 512))
-    ((ROOT_START_BYTE=ROOT_START_SECTOR * 512))
+    debootstrap \
+        --arch="${IMG_ARCH}" \
+        --cache-dir="${R_STAGE_0}" \
+        --components=main,restricted,universe,multiverse \
+        --exclude=netplan.io,ubuntu-minimal \
+        --foreign \
+        --include=cloud-guest-utils \
+        "${IMG_RELEASE}" "${R}" "${REPO}"
+    nspawn /debootstrap/debootstrap \
+        --second-stage
 
-    BOOT_SECTOR_LENGTH=$(echo "${BOOT_PARTITION}" | sed -e 's/\*//g' | awk '{print $4}')
-    ROOT_SECTOR_LENGTH=$(echo "${ROOT_PARTITION}" | sed -e 's/\*//g' | awk '{print $4}')
+    cat <<EOM >"${R}/etc/apt/sources.list"
+deb http://ports.ubuntu.com/ ${IMG_RELEASE} main restricted universe multiverse
+deb-src http://ports.ubuntu.com/ ${IMG_RELEASE} main restricted universe multiverse
 
-    # Calculate the byte length of the partitions.
-    ((BOOT_BYTE_LENGTH=BOOT_SECTOR_LENGTH * 512))
-    ((ROOT_BYTE_LENGTH=ROOT_SECTOR_LENGTH * 512))
+deb http://ports.ubuntu.com/ ${IMG_RELEASE}-updates main restricted universe multiverse
+deb-src http://ports.ubuntu.com/ ${IMG_RELEASE}-updates main restricted universe multiverse
 
-    mkdir -p "${TMP_DIR}"/{boot,root}
-    mkdir -p "${B}"
-    mkdir -p "${R}"
-    # Mount the partitions to the mount points.
-    mount -v -o offset=${BOOT_START_BYTE},sizelimit=${BOOT_BYTE_LENGTH} -t vfat "${IMG}" "${TMP_DIR}/boot"
-    mount -v -o offset=${ROOT_START_BYTE},sizelimit=${ROOT_BYTE_LENGTH} -t ext4 "${IMG}" "${TMP_DIR}/root"
-    rsync -aHAXx --delete "${TMP_DIR}/boot/" "${B}/"
-    rsync -aHAXx --delete "${TMP_DIR}/root/" "${R}/"
-    umount -l "${TMP_DIR}/boot"
-    umount -l "${TMP_DIR}/root"
-    rm -rf "${TMP_DIR}/boot"
-    rm -rf "${TMP_DIR}/root"
-}
+deb http://ports.ubuntu.com/ ${IMG_RELEASE}-security main restricted universe multiverse
+deb-src http://ports.ubuntu.com/ ${IMG_RELEASE}-security main restricted universe multiverse
 
-function stage_02_apt_remove() {
-    # Depends
-    nspawn apt -y purge --autoremove apport bcache-tools btrfs-progs byobu \
-    cloud-guest-utils cloud-initramfs-copymods cloud-initramfs-dyn-netconf \
-    curl dirmngr ethtool fonts-ubuntu-console git gnupg htop lvm2 mdadm \
-    motd-news-config multipath-tools overlayroot patch pollinate screen \
-    software-properties-common sosreport tmux update-notifier-common vim \
-    xfsprogs
-
-    # Recommends
-    nspawn apt -y purge --autoremove fwupd landscape-common lxd-agent-loader \
-    needrestart open-iscsi open-vm-tools snapd
-
-    # The meta package
-    nspawn apt -y purge --autoremove ubuntu-server
-
-    nspawn apt -y update
-    nspawn apt -y dist-upgrade
-}
-
-function stage_03_snap_remove() {
-    # Remove existing seeded snaps.
-    rm -v "${R}"/etc/systemd/system/snap-*.mount
-    rm -v "${R}"/etc/systemd/system/snap.lxd.*
-    rm -v "${R}"/etc/systemd/system/multi-user.target.wants/snap-*.mount
-    rm -rfv "${R}"/snap/*
-    rm -rfv "${R}"/var/lib/snapd/seed/*
-    rm -fv "${R}"/var/lib/snapd/snaps/*.snap
-    rm -fv "${R}"/var/lib/snapd/state.json
-    rm -fv "${R}"/var/lib/snapd/system-key
-}
-
-function stage_04_network() {
-    # nspawn systemctl stop \
-    #     systemd-networkd.socket \
-    #     systemd-networkd \
-    #     networkd-dispatcher \
-    #     systemd-networkd-wait-online
-
-    # nspawn systemctl disable \
-    #     systemd-networkd.socket \
-    #     systemd-networkd \
-    #     networkd-dispatcher \
-    #     systemd-networkd-wait-online
-
-    # nspawn systemctl disable systemd-resolved.service
-    # nspawn systemctl stop systemd-resolved
-    #nspawn apt -y purge --autoremove networkd-dispatcher
-    #rm "${R}/etc/dhcp/dhclient-enter-hooks.d/resolved"
-
-    nspawn apt -y purge --autoremove netplan.io
-
-    # Disable cloud-init from managing the network
-    echo "network: {config: disabled}" > "${R}/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg"
-
-    mkdir -p ${R}/etc/systemd/resolved.conf.d
-    cat <<'EOM' > "${R}/etc/systemd/resolved.conf.d/resolved.conf"
-# Create basic resolv.conf for bind mounting inside the container
-[Resolve]
-# Some examples of DNS servers which may be used for DNS= and FallbackDNS=:
-# Cloudflare: 1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001
-# Google:     8.8.8.8 8.8.4.4 2001:4860:4860::8888 2001:4860:4860::8844
-# Quad9:      9.9.9.9 149.112.112.112 2620:fe::fe 2620:fe::9
-DNS=1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001
-FallbackDNS=9.9.9.9 149.112.112.112 2620:fe::fe 2620:fe::9
+deb http://ports.ubuntu.com/ ${IMG_RELEASE}-backports main restricted universe multiverse
+deb-src http://ports.ubuntu.com/ ${IMG_RELEASE}-backports main restricted universe multiverse
 EOM
 
-#     cat <<"EOM" > "${R}/etc/hosts"
-# 127.0.0.1 localhost ubuntu
+    nspawn hostnamectl --static set-hostname "retro-remix-${REMIX}"
+    echo "retro-remix-${REMIX}" > "${R}/etc/hostname"
+    sed -i "1s|.*|127.0.0.1\tlocalhost retro-remix-${REMIX}|" "${R}/etc/hosts"
 
-# # The following lines are desirable for IPv6 capable hosts
-# ::1 ip6-localhost ip6-loopback
-# fe00::0 ip6-localnet
-# ff00::0 ip6-mcastprefix
-# ff02::1 ip6-allnodes
-# ff02::2 ip6-allrouters
-# ff02::3 ip6-allhosts
-# EOM
+    nspawn apt-get -y update
+    nspawn apt-get -y upgrade
+    nspawn apt-get -y dist-upgrade
+
+    # Install Multicast DNS Service Discovery and first boot filesystem expansion
+    nspawn apt-get -y install avahi-daemon cloud-initramfs-growroot
+
+    if [ "${SKIP_UBUNTU_STANDARD}" -eq 0 ]; then
+        # Add standard Ubuntu userspace
+        nspawn apt-get -y install ubuntu-standard
+    fi
+
+    nspawn apt-get -y autoclean
+    nspawn apt-get -y clean
 }
 
-function stage_05_install_ludo() {
-    nspawn apt -y install cloud-guest-utils cloud-initramfs-growroot \
-    libraspberrypi0 libraspberrypi-bin pi-bluetooth raspi-config rpi-eeprom
+function stage_02_ludo() {
+    export B="${B_STAGE_2}"
+    export R="${R_STAGE_2}"
+    sync_from "${B_STAGE_1}" "${R_STAGE_1}"
 
-    # linux-modules-extra-raspi was introduce in 21.10 (Impish)
-    case ${REL_VER} in
-        21.10) nspawn apt -y install linux-modules-extra-raspi;;
-    esac
+    if [ "${SKIP_LUDO}" -eq 0 ]; then
+        # X11 et all
+        nspawn apt-get -y install libgles1 libgles2 libglfw3 libosmesa6 \
+        libxvmc1 x11-xserver-utils x11-utils xserver-xorg
 
-    # X11 and graphics stack
-    nspawn apt -y install libegl1 libgles1 libgles2 libglfw3 libglvnd0 \
-    libosmesa6 libvulkan1 libxvmc1 xserver-xorg
+        # Install xdg-utils now, but prevent perl proliferation
+        nspawn apt-get -y install --no-install-recommends xdg-utils
 
-    # LudOS requirements
-    nspawn apt -y install bluez connman samba
+        # LudOS requirements
+        nspawn apt-get -y install bluez connman feh ssh
+        nspawn apt-get -y install --no-install-recommends samba
 
-    local LUDO_VER="0.16.9"
-    wget -qc "https://github.com/libretro/ludo/releases/download/v${LUDO_VER}/ludo_${LUDO_VER}-1_armhf.deb" -O "${R}/ludo.deb"
-    nspawn apt -y install /ludo.deb
-    rm -f "${R}/ludo.deb"
+        local LUDO_VER="0.16.10"
+        wget -qc "https://github.com/libretro/ludo/releases/download/v${LUDO_VER}/ludo_${LUDO_VER}-1_armhf.deb" -O "${R_STAGE_0}/ludo.deb"
+        cp "${R_STAGE_0}/ludo.deb" "${R}/ludo.deb"
+        nspawn apt-get -y install /ludo.deb
+        rm -f "${R}/ludo.deb"
 
-    sed -i s'|Icon=ludo|Icon=/usr/share/icons/hicolor/1024x1024/apps/ludo\.png|' "${R}/usr/share/applications/ludo.desktop"
+        sed -i s'|Icon=ludo|Icon=/usr/share/icons/hicolor/1024x1024/apps/ludo\.png|' "${R}/usr/share/applications/ludo.desktop"
 
-    # Create LudOS xsession
-    cat <<'EOM' > "${R}/usr/local/bin/ludos"
+        # Create LudOS xsession
+        cat <<'EOM' > "${R}/usr/local/bin/ludos"
 #!/usr/bin/env bash
 export __GL_YIELD=USLEEP
 export SDL_MOUSE_RELATIVE=0
-#export DISPLAY=:0.0
-#export WAYLAND_DISPLAY=wayland-0
-exec /usr/bin/ludo -ludos
+export DISPLAY=:0.0
+export WAYLAND_DISPLAY=wayland-0
+
+# Disable screen blanking, DPMS and screensaver
+xset s noblank
+xset -dpms
+xset -s off
+
+if [ "$(id -u)" -eq 0 ]; then
+    xsetroot -solid rgb:67/67/67
+    feh --bg-scale /usr/share/backgrounds/Retro-Remix-Wallpaper.png
+    /usr/bin/ludo -ludos
+    chown -R ludo:ludo /storage/{.cache,.config,.local}
+else
+    /usr/bin/ludo -ludos
+fi
 EOM
-    chmod 755 "${R}/usr/local/bin/ludos"
+        chmod 755 "${R}/usr/local/bin/ludos"
 
-    mkdir -p "${R}/usr/share/xsessions"
-    cp -a "${R}/usr/share/applications/ludo.desktop" "${R}/usr/share/xsessions/ludos.desktop"
-    sed -i 's|Exec=ludo|Exec=ludos|' "${R}/usr/share/xsessions/ludos.desktop"
-    sed -i 's|Name=Ludo|Name=LudOS|' "${R}/usr/share/xsessions/ludos.desktop"
+        mkdir -p "${R}/usr/share/xsessions"
+        cp -a "${R}/usr/share/applications/ludo.desktop" "${R}/usr/share/xsessions/ludos.desktop"
+        sed -i 's|Exec=ludo|Exec=ludos|' "${R}/usr/share/xsessions/ludos.desktop"
+        sed -i 's|Name=Ludo|Name=Retro Remix|' "${R}/usr/share/xsessions/ludos.desktop"
 
-    # Display manager
-    nspawn apt -y install --no-install-recommends lightdm slick-greeter
+        # Display manager
+        nspawn apt-get -y install --no-install-recommends lightdm slick-greeter
 
-    #TODO!
-    # Root login for the LudOS session - https://gist.github.com/intrd/12c12f6c863b3367f8c2249edd78b26c
-    # Enable auto-login for 'ludo' user
-    cat <<'EOM' > "${R}/etc/lightdm/lightdm.conf"
+        # Enable auto-login to run LudOS
+        cat <<'EOM' > "${R}/etc/lightdm/lightdm.conf"
 [SeatDefaults]
-autologin-user=ludo
+autologin-user=root
 autologin-user-timeout=0
 autologin-session=ludos
 EOM
 
-    # Create directories Ludo requires
-    for DOT_DIR in .cache/connman .cache/services .config/ludo .local/ludo .ludo .update; do
-        mkdir -p "${R}/storage/${DOT_DIR}"
-    done
-
-    for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf; do
-        touch "${R}/storage/${CONF_FILE}"
-    done
-
-    for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
-        mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
-    done
-
-    chown -Rv 1000:1000 "${R}/storage"
-
-    cat <<'EOM' > "${R}/etc/ludo.toml"
+        cat <<'EOM' > "${R}/etc/ludo.toml"
 video_fullscreen = true
 cores_dir = "/usr/lib/ludo"
 assets_dir = "/usr/share/ludo/assets"
@@ -788,14 +759,6 @@ else
                 REMIX="${2}"
                 shift
                 shift;;
-            -img|--img)
-                IMG="${2}"
-                if [ ! -e "${IMG}" ]; then
-                    echo "[!] ERROR: ${IMG} was not found."
-                    exit 1
-                fi
-                shift
-                shift;;
             *)
                 echo "[!] ERROR: \"${1}\" is not a supported parameter."
                 usage
@@ -828,32 +791,41 @@ case "${REMIX}" in
         exit 1;;
 esac
 
+# Install apt-cacher-ng on the host and this script will use it.
+APT_CACHE_IP=$(ip route get 1.1.1.1 | head -n 1 | cut -d' ' -f 7)
+IMG_QUALITY="-alpha2"
+IMG_VER="21.10"
+IMG_RELEASE="impish"
+IMG_ARCH="armhf"
+IMG_OUT="ubuntu-retro-${REMIX}-remix-${IMG_VER}${IMG_QUALITY}-${IMG_ARCH}.img"
 TMP_DIR=$(pwd)
-IMG_QUALITY="-alpha1"
-IMG_VER=$(echo "${IMG}" | cut -d'-' -f2)
-IMG_ARCH=$(echo "${IMG}" | cut -d'+' -f1 | cut -d'-' -f5)
-IMG_OUT=$(echo "${IMG}" | sed "s/ubuntu-/ubuntu-retro-${REMIX}-remix-/" | sed "s/preinstalled-server-//" | sed "s/${IMG_VER}/${IMG_VER}${IMG_QUALITY}/" | sed "s/\+raspi//")
-IMG_TEST=$(file -b "${IMG}" | cut -d';' -f1)
-B="${TMP_DIR}/${IMG_ARCH}/${REMIX}/boot"
-R="${TMP_DIR}/${IMG_ARCH}/${REMIX}/root"
 
-if [ "${IMG_TEST}" == "DOS/MBR boot sector" ]; then
-    #stage_00_tools
-    stage_01_unpack
-    stage_02_apt_remove
-    stage_03_snap_remove
-    stage_04_network
-    stage_05_install_ludo
-    stage_06_install_desktop
-    stage_07_system_config
-    stage_08_clean
-    stage_09_image
-    #stage_10_hash
-else
-    echo "[!] ERROR: ${IMG} is not a valid disk image."
-    if [ "${IMG_TEST}" == "XZ compressed data" ]; then
-        echo "           Try decompressing ${IMG} first using:"
-        echo "           unxz --decompress --keep ${IMG}"
-    fi
-    exit 1
-fi
+# Create caches
+for LOOP in 0 1 2 3 4 5 6 7 8 9; do
+    case ${LOOP} in
+      0)
+        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/${REMIX}/${IMG_VER}/${LOOP}_cache"
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/${REMIX}/${IMG_VER}/${LOOP}_cache" 2>/dev/null
+        ;;
+      *)
+        export B_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/${REMIX}/${IMG_VER}/${LOOP}_boot"
+        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/${REMIX}/${IMG_VER}/${LOOP}_root"
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/${REMIX}/${IMG_VER}/${LOOP}_boot" 2>/dev/null
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/${REMIX}/${IMG_VER}/${LOOP}_root/boot/firmware" 2>/dev/null
+        ;;
+    esac
+done
+
+# Set to 1 to skip installing these components
+SKIP_LUDO=0
+SKIP_DESKTOP=0
+SKIP_UBUNTU_STANDARD=0
+
+stage_01_bootstrap
+stage_02_ludo
+stage_03_micro_desktop
+stage_04_kernel
+stage_05_config
+stage_06_clean
+stage_07_image
+#stage_08_hash
