@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 LC_ALL=C
 
+# TODO
+# - Add Plymouth splash
+# - Add 'ludo' user authentication for Samba
+# - Add Ludo icon to Slickgreeter
+# - Add Ludo icon to .faces
+# - Add a custom panel layout?
+# - Add Vivaldi browser?
+# - Integrate LudOS session with desktop session
+# - Integrate Brisk Menu?
+# - Disable GNOME suspend
+# - Disable Tracker; via systemd unit
+# - Disable TeXinfo icon
+
 # Display help usage
 function usage () {
   echo
