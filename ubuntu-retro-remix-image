@@ -664,7 +664,8 @@ function stage_08_clean() {
 
 function stage_09_image() {
     # Build the image file
-    local SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'.' -f1)
+    local SIZE_IMG=""
+    SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'.' -f1)
     ((SIZE_IMG+=2))
     local SIZE_BOOT="256MiB"
 
