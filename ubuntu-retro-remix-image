@@ -824,6 +824,9 @@ function stage_06_clean() {
 }
 
 function stage_07_image() {
+    export B="${B_STAGE_6}"
+    export R="${R_STAGE_6}"
+
     # Build the image file
     local SIZE_IMG=""
     SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'.' -f1)
@@ -892,6 +895,9 @@ function stage_07_image() {
 }
 
 function stage_08_hash() {
+    export B="${B_STAGE_6}"
+    export R="${R_STAGE_6}"
+
     local HASH="sha256"
     local OUT_HASH="${TMP_DIR}/${IMG_OUT}.xz.${HASH}"
 
