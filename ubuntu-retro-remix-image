@@ -268,7 +268,7 @@ EOM
         wget -qc "https://raw.githubusercontent.com/wimpysworld/ubuntu-retro-remix/master/.github/logo.svg" -O "${R_STAGE_0}/ubuntu-retro-remix.svg"
         cp "${R_STAGE_0}/ubuntu-retro-remix.svg" "${R}/usr/share/icons/hicolor/scalable/apps/ubuntu-retro-remix.svg"
         for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
-            convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R_STAGE_0}/ubuntu-retro-remix.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/ubuntu-retro-remix.png"
+            convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R_STAGE_0}/ubuntu-retro-remix.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ubuntu-retro-remix.png"
         done
 
         # Composite the Retro Remix wallpaper
