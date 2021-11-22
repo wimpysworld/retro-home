@@ -128,9 +128,9 @@ EOM
     # Install Multicast DNS Service Discovery and first boot filesystem expansion
     nspawn apt-get -y install avahi-daemon cloud-initramfs-growroot
 
+    # Add standard Ubuntu userspace
     if [ "${SKIP_UBUNTU_STANDARD}" -eq 0 ]; then
-        # Add standard Ubuntu userspace
-        nspawn apt-get -y install ubuntu-standard
+        nspawn apt-get -y install standard^
     fi
 
     nspawn apt-get -y autoclean
