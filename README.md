@@ -10,7 +10,7 @@
 
 ## Introduction
 
-A script that build Raspberry Pi images of Ubuntu for retro gaming.
+A script that builds Raspberry Pi images of Ubuntu for retro gaming.
 
 We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/GeHJGD9)
 
@@ -18,15 +18,14 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
 
 ## Installation
 
-  * Clone this project to an Intel 64-bit Ubuntu workstation.
+  * Clone this project to an Intel 64-bit Ubuntu workstation, ideally running in a VM via [Quickemu](https://github.com/quickemu-project/quickemu)
     * `git clone https://github.com/wimpysworld/ubuntu-retro-remix.git`
-  * Download the armhf [Ubuntu Server 20.04 pre-installed image for Raspberry Pi](https://ubuntu.com/download/raspberry-pi) into the project directory.
 
 ### Usage
 
 ```
 Usage
-  sudo ./ubuntu-retro-remix-image --remix <targetdevice> --img ubuntu-20.04-preinstalled-server-armhf+raspi.img
+  sudo ./ubuntu-retro-remix-image --remix <targetdevice>
 
 Available supported devices are:
   raspi
@@ -37,15 +36,4 @@ Available supported devices are:
 
 ## TODO
 
-Pretty much everything.
-
-## Notes
-
-While researching RetroArch this useful information was discovered.
-
-  * https://gist.github.com/AlexMax/32e5d038a66ce57253e740ea75736805
-
-## Cores
-
-  * nestopia
-  * zsnes or bsnes, but not zsnes next
+ - Lots. But it basically works.
