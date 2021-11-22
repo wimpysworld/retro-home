@@ -8,7 +8,6 @@ LC_ALL=C
 # - Add a custom panel layout?
 # - Add Vivaldi browser?
 # - Integrate LudOS session with desktop session
-# - Integrate Brisk Menu?
 # - Disable GNOME suspend
 # - Disable Tracker; via systemd unit
 # - Disable TeXinfo icon
