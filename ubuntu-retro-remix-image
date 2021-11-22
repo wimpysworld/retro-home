@@ -4,7 +4,6 @@ LC_ALL=C
 # TODO
 # - Add Plymouth splash
 # - Add 'ludo' user authentication for Samba
-# - Add Ludo icon to Slickgreeter
 # - Add Ludo icon to .faces
 # - Add a custom panel layout?
 # - Add Vivaldi browser?
@@ -279,6 +278,13 @@ EOM
         mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
         cp -a "${R_STAGE_0}/Retro-Remix-Wallpaper.png" "${R}/usr/share/backgrounds/"
 
+
+        for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
+            convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
+        done
+        # Make an icon for Slick Greeter
+        convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
+
         # Create gschema override
         cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_ubuntu-retro-remix.gschema.override"
 [x.dm.slick-greeter]
@@ -291,7 +297,7 @@ font-name='M+ 1p Medium 11'
 icon-theme-name='ubuntu-mono-yaru'
 high-contrast=false
 show-hostname=true
-#logo='/usr/share/icons/hicolor/64x64/ubuntu-retro-remix.png'
+logo='/usr/share/pixmaps/ludo.png'
 onscreen-keyboard=false
 #other-monitors-logo=''
 play-ready-sound='/usr/share/sounds/Yaru/stereo/system-ready.oga'
