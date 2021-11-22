@@ -4,3 +4,5 @@ resolv.conf
 *.img.xz.sha256
 *.img.xz
 *.img
+
+widevine-flash-20211119_armhf.tgz
