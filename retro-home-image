@@ -948,25 +948,35 @@ else
     done
 fi
 
+SKIP_LUDO=0
+SKIP_DESKTOP=0
+SKIP_UBUNTU_STANDARD=0
+
 # Set variables based on chosen desktop environment
 case "${REMIX}" in
     raspi)
-        echo "[+] Specified Rasberry Pi"
+        echo "[+] Specified Rasberry Pi 2, 3, 4 or 400"
         shift;;
     gamehat)
+        SKIP_DESKTOP=1
         echo "[+] Specified Waveshare Game HAT"
         not_implemented
         shift;;
     gpi)
+        SKIP_DESKTOP=1
         echo "[+] Specified RetroFlag GPi Case"
+        echo "[!] The RetroFlag GPi Case is only supported with:"
+        echo "      - Raspberry Pi Zero 2 W"
         not_implemented
         shift;;
     gpimate)
         # https://retrogamerestore.com/store/gpimate/
+        SKIP_DESKTOP=1
         echo "[+] Specified RetroFlag GPi Case with GPiMate for CM3+Lite"
         not_implemented
         shift;;
     gpimateplus)
+        SKIP_DESKTOP=1
         # https://retrogamerestore.com/store/gpimateplus/
         # https://github.com/martinx72/GPiMatePlusHowTo
         echo "[+] Specified RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
@@ -1030,11 +1040,6 @@ for LOOP in 0 1 2 3 4 5 6 7 8 9; do
         ;;
     esac
 done
-
-# Set to 1 to skip installing these components
-SKIP_LUDO=0
-SKIP_DESKTOP=0
-SKIP_UBUNTU_STANDARD=0
 
 stage_01_bootstrap
 stage_02_ludo
