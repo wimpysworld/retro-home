@@ -189,7 +189,7 @@ EOM
         mkdir -p "${R}/usr/share/xsessions"
         cp -a "${R}/usr/share/applications/ludo.desktop" "${R}/usr/share/xsessions/ludos.desktop"
         sed -i 's|Exec=ludo|Exec=ludos|' "${R}/usr/share/xsessions/ludos.desktop"
-        sed -i 's|Name=Ludo|Name=Retro Remix|' "${R}/usr/share/xsessions/ludos.desktop"
+        sed -i 's|Name=Ludo|Name=Retro Home|' "${R}/usr/share/xsessions/ludos.desktop"
 
         # Display manager
         nspawn apt-get -y install --no-install-recommends lightdm slick-greeter
@@ -273,7 +273,7 @@ EOM
         # Composite the Retro Home wallpaper
         wget -c "https://linuxconfig.org/wp-content/uploads/2020/03/Focal-Fossa_Plain_WP_1920x1080_GREY.png" -O "${R_STAGE_0}/Yaru-Grey.png"
         composite -gravity center "${R}/usr/share/icons/hicolor/256x256/retro-home.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Home-Wallpaper.png"
-        # Add the Retro Remix wallpaper
+        # Add the Retro Home wallpaper
         mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
         cp -a "${R_STAGE_0}/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
 
@@ -584,7 +584,7 @@ EOM
 
     cat <<"EOM" > "${R}/etc/samba/smb.conf"
 #
-# Sample configuration file for the Samba suite for Ubuntu Retro Remix.
+# Sample configuration file for the Samba suite for Retro Home.
 #
 #
 # You should read the smb.conf(5) manual page in order to understand the
