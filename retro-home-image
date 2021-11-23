@@ -16,7 +16,7 @@ LC_ALL=C
 function usage () {
   echo
   echo "Usage"
-  echo "  $0 --remix <targetdevice>"
+  echo "  $0 --device <targetdevice>"
   echo
   echo "Available supported devices are:"
   echo "  raspi"
@@ -924,7 +924,7 @@ if [ $# -lt 1 ]; then
 else
     while [ $# -gt 0 ]; do
         case "${1}" in
-            -remix|--remix)
+            -device|--device)
                 REMIX="${2}"
                 shift
                 shift;;
@@ -939,7 +939,7 @@ fi
 # Set variables based on chosen desktop environment
 case "${REMIX}" in
     raspi)
-        echo "[+] Specified Raspi"
+        echo "[+] Specified Rasberry Pi"
         shift;;
     nespi)
         echo "[+] Specified NESPi"
@@ -952,9 +952,9 @@ case "${REMIX}" in
         shift;;
     *)
         if [ -z "${REMIX}" ]; then
-        echo "[!] ERROR: Please specifiy an retro remix"
+        echo "[!] ERROR: Please specifiy a target device"
         else
-        echo "[!] ERROR: ${REMIX} is not a valid retro remix"
+        echo "[!] ERROR: ${REMIX} is not a valid target device"
         fi
         usage
         exit 1;;
