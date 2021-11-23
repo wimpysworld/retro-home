@@ -986,6 +986,17 @@ case "${REMIX}" in
         echo "[+] Specified RetroFlag MEGAPi Case"
         not_implemented
         shift;;
+    minin64)
+        # https://megabitnes.com/store/n64-pi4/
+        echo "[+] Specified Megabit Mini N64"
+        not_implemented
+        shift;;
+    minips1)
+        # https://megabitnes.com/store/mini-ps1-case-non-nfc/
+        # https://megabitnes.com/non-nfc/
+        echo "[+] Specified Megabit Mini PS1 (Non-NFC)"
+        not_implemented
+        shift;;
     monster)
         echo "[+] Specified Monster Arcade Controller Kit"
         not_implemented
