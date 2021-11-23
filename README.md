@@ -63,6 +63,8 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
     * Wonder Swan
     * Wonder Swan Color
   * Supported Raspberry Pi:
+    * Raspberry Pi Compute Module 3 Lite
+    * Raspberry Pi Compute Module 4 Lite
     * Raspberry Pi 2 Model B
     * Raspberry Pi 3 Model A+
     * Raspberry Pi 3 Model B
