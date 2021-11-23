@@ -18,11 +18,23 @@ function usage () {
   echo "Usage"
   echo "  $0 --device <targetdevice>"
   echo
-  echo "Available supported devices are:"
-  echo "  raspi"
-  echo "  megapi"
-  echo "  nespi"
-  echo "  superpi"
+  echo "Supported (or planned) devices are:"
+  echo "  raspi:            Rasberry Pi 2, 3 and 4"
+  echo "  gamehat:          Waveshare Game HAT"
+  echo "  gpi:              RetroFlag GPi Case"
+  echo "  gpimate:          RetroFlag GPi Case with GPiMate for CM3+Lite"
+  echo "  gpimateplus:      RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
+  echo "  nespi:            RetroFlag NESPi Case+"
+  echo "  megapi:           RetroFlag MEGAPi Case"
+  echo "  monster:          Monster Arcade Controller Kit"
+  echo "  picade:           Pimoroni Picade"
+  echo "  picadeconsole:    Pimoroni Picade Console"
+  echo "  superpi:          RetroFlag SUPERPi Case"
+}
+
+function not_implemented() {
+    echo "[!] Hardware support for ${REMIX} is not yet implemented, but is planned."
+    exit 1
 }
 
 function sync_from() {
@@ -941,14 +953,48 @@ case "${REMIX}" in
     raspi)
         echo "[+] Specified Rasberry Pi"
         shift;;
-    nespi)
-        echo "[+] Specified NESPi"
+    gamehat)
+        echo "[+] Specified Waveshare Game HAT"
+        not_implemented
         shift;;
-    superpi)
-        echo "[+] Specified SUPERPi"
+    gpi)
+        echo "[+] Specified RetroFlag GPi Case"
+        not_implemented
+        shift;;
+    gpimate)
+        # https://retrogamerestore.com/store/gpimate/
+        echo "[+] Specified RetroFlag GPi Case with GPiMate for CM3+Lite"
+        not_implemented
+        shift;;
+    gpimateplus)
+        # https://retrogamerestore.com/store/gpimateplus/
+        # https://github.com/martinx72/GPiMatePlusHowTo
+        echo "[+] Specified RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
+        not_implemented
         shift;;
     megapi)
-        echo "[+] Specified MEGA Pi"
+        echo "[+] Specified RetroFlag MEGAPi Case"
+        not_implemented
+        shift;;
+    monster)
+        echo "[+] Specified Monster Arcade Controller Kit"
+        not_implemented
+        shift;;
+    nespi)
+        echo "[+] Specified RetroFlag NESPi Case+"
+        not_implemented
+        shift;;
+    picade)
+        echo "[+] Specified Pimoroni Picade"
+        not_implemented
+        shift;;
+    picadeconsole)
+        echo "[+] Specified Pimoroni Picade Console"
+        not_implemented
+        shift;;
+    superpi)
+        echo "[+] Specified RetroFlag SUPERPi Case"
+        not_implemented
         shift;;
     *)
         if [ -z "${REMIX}" ]; then
