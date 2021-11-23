@@ -1,20 +1,18 @@
 <h1 align="center">
- <img src=".github/logo.png" alt="Ubuntu Retro Remix Logo" width="256" />
+ <img src=".github/logo.png" alt="Retro Home Logo" width="256" />
   <br />
-  Ubuntu Retro Remix Image Builder
+  Retro Home Image Builder
 </h1>
 
-<p align="center"><b>Build Raspberry Pi images of Ubuntu for retro gaming</b></p>
+<p align="center"><b>Build Raspberry Pi images of Retro Home</b></p>
 <!-- <div align="center"><img src=".github/screenshot.jpg" alt="Ubuntu Retro Remix Screenshot" /></div> -->
 <p align="center">Made with 💝 for <img src=".github/ubuntu.png" align="top" width="18" /></p>
 
 ## Introduction
 
-A script that builds Raspberry Pi images of Ubuntu for retro gaming.
+A script that builds Raspberry Pi images of Ubuntu of Retro Home, your home for retro gaming.
 
 We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/GeHJGD9)
-
-[![Ubuntu Retro Remix - Working hardware acceleration!](https://img.youtube.com/vi/aEUt5s4127c/0.jpg)](https://www.youtube.com/watch?v=aEUt5s4127c)
 
 ## Installation
 
@@ -25,7 +23,7 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
 
 ```
 Usage
-  sudo ./ubuntu-retro-remix-image --remix <targetdevice>
+  sudo ./retro-home-image --remix <targetdevice>
 
 Available supported devices are:
   raspi
