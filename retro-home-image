@@ -962,6 +962,16 @@ case "${REMIX}" in
         echo "[+] Specified Waveshare Game HAT"
         not_implemented
         shift;;
+    gamepi20)
+        SKIP_DESKTOP=1
+        echo "[+] Specified Waveshare GamePi20"
+        not_implemented
+        shift;;
+    gamepi43)
+        SKIP_DESKTOP=1
+        echo "[+] Specified Waveshare GamePi43"
+        not_implemented
+        shift;;
     gpi)
         SKIP_DESKTOP=1
         echo "[+] Specified RetroFlag GPi Case"
@@ -980,6 +990,11 @@ case "${REMIX}" in
         # https://retrogamerestore.com/store/gpimateplus/
         # https://github.com/martinx72/GPiMatePlusHowTo
         echo "[+] Specified RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
+        not_implemented
+        shift;;
+    gpm280)
+        SKIP_DESKTOP=1
+        echo "[+] Specified Waveshare GPM280"
         not_implemented
         shift;;
     megapi)
