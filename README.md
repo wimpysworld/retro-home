@@ -10,14 +10,14 @@
 
 ## Introduction
 
-A script that builds Raspberry Pi images of Ubuntu of Retro Home, your home for retro gaming.
+A script that builds Raspberry Pi images of Retro Home, your home for retro gaming.
 
 We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/GeHJGD9)
 
 ## Installation
 
   * Clone this project to an Intel 64-bit Ubuntu workstation, ideally running in a VM via [Quickemu](https://github.com/quickemu-project/quickemu)
-    * `git clone https://github.com/wimpysworld/ubuntu-retro-remix.git`
+    * `git clone https://github.com/wimpysworld/retro-home.git`
 
 ### Usage
 
