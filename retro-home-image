@@ -886,17 +886,17 @@ function stage_07_image() {
     losetup -d "${BOOT_LOOP}"
     ls -lh "${TMP_DIR}/${IMG_OUT}"
     rm -rf "${MOUNTDIR}"
+}
+
+function stage_08_compress_and_hash() {
+    export B="${B_STAGE_6}"
+    export R="${R_STAGE_6}"
 
     # NOTE! Disabled while iterating
     echo "Compressing ${IMG_OUT}.xz"
     rm "${TMP_DIR}/${IMG_OUT}.xz" 2>/dev/null
     xz --keep -T 0 "${TMP_DIR}/${IMG_OUT}"
     ls -lh "${TMP_DIR}/${IMG_OUT}.xz"
-}
-
-function stage_08_hash() {
-    export B="${B_STAGE_6}"
-    export R="${R_STAGE_6}"
 
     local HASH="sha256"
     local OUT_HASH="${TMP_DIR}/${IMG_OUT}.xz.${HASH}"
@@ -997,4 +997,4 @@ stage_04_kernel
 stage_05_config
 stage_06_clean
 stage_07_image
-#stage_08_hash
+#stage_08_compress_and_hash
