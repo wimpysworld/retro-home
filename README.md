@@ -62,6 +62,14 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
     * Vectrex
     * Wonder Swan
     * Wonder Swan Color
+  * Supported Raspberry Pi:
+    * Raspberry Pi 2 Model B
+    * Raspberry Pi 3 Model A+
+    * Raspberry Pi 3 Model B
+    * Raspberry Pi 3 Model B+
+    * Raspberry Pi 4 Model B  (**Recommended**)
+    * Raspberry Pi 400
+    * Raspberry Pi Zero 2 W
   * Automatic first boot file system expansion
   * WiFi and Bluetooth management
   * Integrated Samba and SSH server for copying over ROMS
