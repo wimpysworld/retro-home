@@ -61,7 +61,7 @@ function nspawn() {
       --resolv-conf=off \
       --bind-ro="${R_STAGE_0}/resolv.conf":/etc/resolv.conf \
       --bind="${B}":/boot/firmware \
-      --machine="retro-remix-${REMIX}" \
+      --machine="retro-home-${REMIX}" \
       --directory "${R}" "${@}"
 
     if [ -e "${R}/etc/apt/apt.conf.d/90cache" ]; then
@@ -117,9 +117,9 @@ deb http://ports.ubuntu.com/ ${IMG_RELEASE}-backports main restricted universe m
 deb-src http://ports.ubuntu.com/ ${IMG_RELEASE}-backports main restricted universe multiverse
 EOM
 
-    nspawn hostnamectl --static set-hostname "retro-remix-${REMIX}"
-    echo "retro-remix-${REMIX}" > "${R}/etc/hostname"
-    sed -i "1s|.*|127.0.0.1\tlocalhost retro-remix-${REMIX}|" "${R}/etc/hosts"
+    nspawn hostnamectl --static set-hostname "retro-home-${REMIX}"
+    echo "retro-home-${REMIX}" > "${R}/etc/hostname"
+    sed -i "1s|.*|127.0.0.1\tlocalhost retro-home-${REMIX}|" "${R}/etc/hosts"
 
     nspawn apt-get -y update
     nspawn apt-get -y upgrade
@@ -177,7 +177,7 @@ xset -s off
 
 if [ "$(id -u)" -eq 0 ]; then
     xsetroot -solid rgb:67/67/67
-    feh --bg-scale /usr/share/backgrounds/Retro-Remix-Wallpaper.png
+    feh --bg-scale /usr/share/backgrounds/Retro-Home-Wallpaper.png
     /usr/bin/ludo -ludos
     chown -R ludo:ludo /storage/{.cache,.config,.local}
 else
@@ -264,18 +264,18 @@ EOM
         sed -i s'|Inherits=Humanity|Inherits=Yaru,Humanity|' "${R}/usr/share/icons/ubuntu-mono-yaru/index.theme"
         nspawn gtk-update-icon-cache /usr/share/icons/ubuntu-mono-yaru/
 
-        wget -qc "https://raw.githubusercontent.com/wimpysworld/ubuntu-retro-remix/master/.github/logo.svg" -O "${R_STAGE_0}/ubuntu-retro-remix.svg"
-        cp "${R_STAGE_0}/ubuntu-retro-remix.svg" "${R}/usr/share/icons/hicolor/scalable/apps/ubuntu-retro-remix.svg"
+        wget -qc "https://raw.githubusercontent.com/wimpysworld/retro-home/master/.github/logo.svg" -O "${R_STAGE_0}/retro-home.svg"
+        cp "${R_STAGE_0}/retro-home.svg" "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
         for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
-            convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R_STAGE_0}/ubuntu-retro-remix.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ubuntu-retro-remix.png"
+            convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R_STAGE_0}/retro-home.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/retro-home.png"
         done
 
-        # Composite the Retro Remix wallpaper
+        # Composite the Retro Home wallpaper
         wget -c "https://linuxconfig.org/wp-content/uploads/2020/03/Focal-Fossa_Plain_WP_1920x1080_GREY.png" -O "${R_STAGE_0}/Yaru-Grey.png"
-        composite -gravity center "${R}/usr/share/icons/hicolor/256x256/ubuntu-retro-remix.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Remix-Wallpaper.png"
+        composite -gravity center "${R}/usr/share/icons/hicolor/256x256/retro-home.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Home-Wallpaper.png"
         # Add the Retro Remix wallpaper
         mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
-        cp -a "${R_STAGE_0}/Retro-Remix-Wallpaper.png" "${R}/usr/share/backgrounds/"
+        cp -a "${R_STAGE_0}/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
 
 
         for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
@@ -285,9 +285,9 @@ EOM
         convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
 
         # Create gschema override
-        cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_ubuntu-retro-remix.gschema.override"
+        cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_retro-home.gschema.override"
 [x.dm.slick-greeter]
-background='/usr/share/backgrounds/Retro-Remix-Wallpaper.png'
+background='/usr/share/backgrounds/Retro-Home-Wallpaper.png'
 background-color='#676767'
 draw-grid=true
 draw-user-backgrounds=false
@@ -314,7 +314,7 @@ xft-rgba='rgb'
 
 [org.gnome.desktop.background:GNOME-Flashback]
 color-shading-type='vertical'
-picture-uri='file:///usr/share/backgrounds/Retro-Remix-Wallpaper.png'
+picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
 primary-color='#676767'
 secondary-color='#676767'
 
@@ -347,7 +347,7 @@ send-software-usage-stats=false
 [org.gnome.desktop.screensaver:GNOME-Flashback]
 color-shading-type='vertical'
 lock-enabled=false
-picture-uri='file:///usr/share/backgrounds/Retro-Remix-Wallpaper.png'
+picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
 primary-color='#676767'
 secondary-color='#676767'
 ubuntu-lock-on-suspend=false
@@ -592,9 +592,9 @@ EOM
 # "testparm" to check that you have not made any basic syntactic errors.
 
 [global]
-  netbios name = retro-remix-${REMIX}
-  server string = Retro Remix (${REMIX})
-  workgroup = Retro Remix
+  netbios name = retro-home-${REMIX}
+  server string = Retro Home (${REMIX})
+  workgroup = Retro Home
   browseable = yes
   writeable = yes
   printable = no
@@ -962,25 +962,25 @@ esac
 
 # Install apt-cacher-ng on the host and this script will use it.
 APT_CACHE_IP=$(ip route get 1.1.1.1 | head -n 1 | cut -d' ' -f 7)
-IMG_QUALITY="-alpha2"
+IMG_QUALITY="-alpha3"
 IMG_VER="21.10"
 IMG_RELEASE="impish"
 IMG_ARCH="armhf"
-IMG_OUT="ubuntu-retro-${REMIX}-remix-${IMG_VER}${IMG_QUALITY}-${IMG_ARCH}.img"
+IMG_OUT="retro-home-${REMIX}-${IMG_VER}${IMG_QUALITY}-${IMG_ARCH}.img"
 TMP_DIR=$(pwd)
 
 # Create caches
 for LOOP in 0 1 2 3 4 5 6 7 8 9; do
     case ${LOOP} in
       0)
-        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-remix-${REMIX}/${IMG_VER}/${LOOP}_cache"
-        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-remix-${REMIX}/${IMG_VER}/${LOOP}_cache" 2>/dev/null
+        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_cache"
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_cache" 2>/dev/null
         ;;
       *)
-        export B_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-remix-${REMIX}/${IMG_VER}/${LOOP}_boot"
-        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-remix-${REMIX}/${IMG_VER}/${LOOP}_root"
-        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-remix-${REMIX}/${IMG_VER}/${LOOP}_boot" 2>/dev/null
-        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-remix-${REMIX}/${IMG_VER}/${LOOP}_root/boot/firmware" 2>/dev/null
+        export B_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_boot"
+        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_root"
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_boot" 2>/dev/null
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_root/boot/firmware" 2>/dev/null
         ;;
     esac
 done
