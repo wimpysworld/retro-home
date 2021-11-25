@@ -175,63 +175,8 @@ function stage_02_ludo() {
         nspawn apt-get -y install /ludo.deb
         rm -f "${R}/ludo.deb"
 
-        sed -i s'|Icon=ludo|Icon=/usr/share/icons/hicolor/1024x1024/apps/ludo\.png|' "${R}/usr/share/applications/ludo.desktop"
-
-        # Create LudOS xsession
-        cat <<'EOM' > "${R}/usr/local/bin/ludos"
-#!/usr/bin/env bash
-export __GL_YIELD=USLEEP
-export SDL_MOUSE_RELATIVE=0
-export DISPLAY=:0.0
-export WAYLAND_DISPLAY=wayland-0
-
-# Disable screen blanking, DPMS and screensaver
-xset s noblank
-xset -dpms
-xset -s off
-
-if [ "$(id -u)" -eq 0 ]; then
-    xsetroot -solid rgb:67/67/67
-    feh --bg-scale /usr/share/backgrounds/Retro-Home-Wallpaper.png
-    /usr/bin/ludo -ludos
-    chown -R ludo:ludo /storage/{.cache,.config,.local}
-else
-    /usr/bin/ludo -ludos
-fi
-EOM
-        chmod 755 "${R}/usr/local/bin/ludos"
-
-        mkdir -p "${R}/usr/share/xsessions"
-        cp -a "${R}/usr/share/applications/ludo.desktop" "${R}/usr/share/xsessions/ludos.desktop"
-        sed -i 's|Exec=ludo|Exec=ludos|' "${R}/usr/share/xsessions/ludos.desktop"
-        sed -i 's|Name=Ludo|Name=Retro Home|' "${R}/usr/share/xsessions/ludos.desktop"
-
         # Display manager
         nspawn apt-get -y install --no-install-recommends lightdm slick-greeter
-
-        # Enable auto-login to run LudOS
-        cat <<'EOM' > "${R}/etc/lightdm/lightdm.conf"
-[SeatDefaults]
-autologin-user=root
-autologin-user-timeout=0
-autologin-session=ludos
-EOM
-
-        cat <<'EOM' > "${R}/etc/ludo.toml"
-video_fullscreen = true
-cores_dir = "/usr/lib/ludo"
-assets_dir = "/usr/share/ludo/assets"
-database_dir = "/usr/share/ludo/database"
-playlists_dir = "/storage/Retro/playlists"
-savefiles_dir = "/storage/Retro/savefiles"
-savestates_dir = "/storage/Retro/savestates"
-screenshots_dir = "/storage/Retro/screenshots"
-system_dir = "/storage/Retro/system"
-thumbnail_dir = "/storage/Retro/thumbnails"
-bluetooth_service = true
-samba_service = true
-ssh_service = true
-EOM
     fi
 }
 
@@ -260,152 +205,6 @@ function stage_03_micro_desktop() {
         #     mkdir -p "${R}/etc/skel/.config/vivaldi/WidevineCdm"
         #     echo '{"Path":"/opt/WidevineCdm"}' > "${R}/etc/skel/.config/vivaldi/WidevineCdm/latest-component-updated-widevine-cdm"
         # fi
-
-        cat <<'EOM' > "${R}/usr/share/applications/connman-gtk-flashback.desktop"
-[Desktop Entry]
-Type=Application
-Exec=connman-gtk
-Name=Connman Settings
-Categories=GTK;Utility;System;
-Keywords=connman;network;settings;wired;wifi;wi-fi;bluetooth;vpn;tethering
-X-GNOME-Settings-Panel=connman-gtk
-X-Unity-Settings-Panel=connman-gtk
-Icon=preferences-system-network
-EOM
-
-        # Theme
-        cp -a "${R}/usr/share/icons/ubuntu-mono-light" "${R}/usr/share/icons/ubuntu-mono-yaru"
-        sed -i s'|Ubuntu-Mono-Light|Ubuntu-Mono-Yaru|' "${R}/usr/share/icons/ubuntu-mono-yaru/index.theme"
-        sed -i s'|Inherits=Humanity|Inherits=Yaru,Humanity|' "${R}/usr/share/icons/ubuntu-mono-yaru/index.theme"
-        nspawn gtk-update-icon-cache /usr/share/icons/ubuntu-mono-yaru/
-
-        wget -qc "https://raw.githubusercontent.com/wimpysworld/retro-home/master/.github/logo.svg" -O "${R_STAGE_0}/retro-home.svg"
-        cp "${R_STAGE_0}/retro-home.svg" "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
-        for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
-            convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R_STAGE_0}/retro-home.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/retro-home.png"
-        done
-
-        # Composite the Retro Home wallpaper
-        wget -c "https://linuxconfig.org/wp-content/uploads/2020/03/Focal-Fossa_Plain_WP_1920x1080_GREY.png" -O "${R_STAGE_0}/Yaru-Grey.png"
-        composite -gravity center "${R}/usr/share/icons/hicolor/256x256/retro-home.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Home-Wallpaper.png"
-        # Add the Retro Home wallpaper
-        mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
-        cp -a "${R_STAGE_0}/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
-
-
-        for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
-            convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
-        done
-        # Make an icon for Slick Greeter
-        convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
-
-        # Create gschema override
-        cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_retro-home.gschema.override"
-[x.dm.slick-greeter]
-background='/usr/share/backgrounds/Retro-Home-Wallpaper.png'
-background-color='#676767'
-draw-grid=true
-draw-user-backgrounds=false
-enable-hidpi='auto'
-font-name='M+ 1p Medium 11'
-icon-theme-name='ubuntu-mono-yaru'
-high-contrast=false
-show-hostname=true
-logo='/usr/share/pixmaps/ludo.png'
-onscreen-keyboard=false
-#other-monitors-logo=''
-play-ready-sound='/usr/share/sounds/Yaru/stereo/system-ready.oga'
-screen-reader=false
-show-power=true
-show-a11y=false
-show-keyboard=true
-show-clock=true
-show-quit=true
-theme-name='Yaru'
-xft-antialias=true
-xft-dpi=96
-xft-hintstyle='hintslight'
-xft-rgba='rgb'
-
-[org.gnome.desktop.background:GNOME-Flashback]
-color-shading-type='vertical'
-picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
-primary-color='#676767'
-secondary-color='#676767'
-
-[org.gnome.desktop.datetime:GNOME-Flashback]
-automatic-timezone=true
-
-[org.gnome.desktop.interface:GNOME-Flashback]
-cursor-theme='Yaru'
-document-font-name='M+ 1p Medium 11'
-enable-hot-corners=false
-font-name='M+ 1p Medium 11'
-gtk-theme='Yaru'
-icon-theme='ubuntu-mono-yaru'
-monospace-font-name='M+ 1mn Medium 14'
-
-[org.gnome.desktop.lockdown:GNOME-Flashback]
-disable-printing=true
-disable-print-setup=true
-disable-user-switching=true
-
-[org.gnome.desktop.media-handling:GNOME-Flashback]
-automount-open=false
-
-[org.gnome.desktop.privacy:GNOME-Flashback]
-remember-app-usage=false
-remember-recent-files=false
-report-technical-problems=false
-send-software-usage-stats=false
-
-[org.gnome.desktop.screensaver:GNOME-Flashback]
-color-shading-type='vertical'
-lock-enabled=false
-picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
-primary-color='#676767'
-secondary-color='#676767'
-ubuntu-lock-on-suspend=false
-user-switch-enabled=false
-
-[org.gnome.desktop.session:GNOME-Flashback]
-idle-delay=0
-
-[org.gnome.desktop.sound:GNOME-Flashback]
-theme-name='Yaru'
-
-[org.gnome.desktop.wm.preferences:GNOME-Flashback]
-button-layout=':minimize,maximize,close'
-theme='Yaru'
-titlebar-font='M+ 1p Bold 11'
-titlebar-uses-system-font=false
-
-[org.gnome.gedit.preferences.editor]
-editor-font='M+ 1mn Medium 14'
-
-[org.gnome.gnome-flashback.desktop.background:GNOME-Flashback]
-fade=false
-
-[org.gnome.gnome-flashback.desktop.icons:GNOME-Flashback]
-show-home=false
-show-trash=false
-
-[org.gnome.metacity:GNOME-Flashback]
-alt-tab-thumbnails=true
-
-[org.gnome.metacity.theme:GNOME-Flashback]
-name='Yaru'
-
-[org.gnome.settings-deamon.plugins.power:GNOME-Flashback]
-idle-dim=false
-power-button-action='interactive'
-sleep-inactive-ac-timeout=0
-sleep-inactive-ac-type='nothing'
-sleep-inactive-battery-timeout=0
-sleep-inactive-battery-type='nothing'
-EOM
-
-        nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
     fi
 }
 
@@ -508,76 +307,44 @@ function stage_05_config() {
     export R="${R_STAGE_5}"
     sync_from "${B_STAGE_4}" "${R_STAGE_4}"
 
-cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-sshd-handler.service"
-[Unit]
-Description=Disable sshd is LudOS has it disabled
-After=ssh.service
-ConditionPathExists=!/storage/.cache/services/sshd.conf
+    # Create user and groups
+    local DATE=""
+    DATE=$(date +%m%H%M%S)
+    local PASSWD=""
+    PASSWD=$(mkpasswd -m sha-512 retro "${DATE}")
+    nspawn addgroup --gid 1000 ludo
 
-[Service]
-Type=oneshot
-ExecStart=systemctl stop ssh
+    # Create Raspberry Pi specific groups.
+    nspawn groupadd -f --system gpio
+    nspawn groupadd -f --system i2c
+    nspawn groupadd -f --system input
+    nspawn groupadd -f --system spi
 
-[Install]
-WantedBy=multi-user.target
+    cat <<'EOM' > "${R}/usr/local/sbin/adduser.local"
+#!/bin/sh
+# This script is executed as the final step when calling `adduser`
+# USAGE:
+#   adduser.local USER UID GID HOME
+
+# Add user to the Raspberry Pi specific groups
+usermod -a -G adm,gpio,i2c,input,spi,video $1
 EOM
-        nspawn systemctl enable ludos-sshd-handler.service
+    chmod 755 "${R}/usr/local/sbin/adduser.local"
 
-cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-samba-handler.service"
-[Unit]
-Description=Disable nmbd and smbd if LudOS has them disabled
-After=nmbd.service
-After=smbd.service
-ConditionPathExists=!/storage/.cache/services/samba.conf
-
-[Service]
-Type=oneshot
-ExecStart=systemctl stop nmbd
-ExecStart=systemctl stop smbd
-
-[Install]
-WantedBy=multi-user.target
-EOM
-        nspawn systemctl enable ludos-samba-handler.service
-
-cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-bluez-handler.service"
-[Unit]
-Description=Disable Bluetooth if LudOS has it disabled
-After=bluetooth.target
-ConditionPathExists=!/storage/.cache/services/bluez.conf
-
-[Service]
-Type=oneshot
-ExecStart=systemctl stop bluetooth
-
-[Install]
-WantedBy=multi-user.target
-EOM
-        nspawn systemctl enable ludos-bluez-handler.service
-
-    # Disable systemd-networkd et al; we're using connman
-    # - https://www.naut.ca/blog/2018/12/12/disabling-systemd-networking/
-    nspawn systemctl stop systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
-    nspawn systemctl disable systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
-    nspawn systemctl stop systemd-resolved
-    nspawn systemctl disable systemd-resolved.service
-    #rm ${R}/etc/dhcp/dhclient-enter-hooks.d/resolved
+    nspawn adduser --gecos Ludo --add_extra_groups --disabled-password --home /storage --gid 1000 --uid 1000 ludo
+    nspawn usermod -a -G adm,sudo -p "${PASSWD}" ludo
 
     # Disable Ubuntu Advantage Tools; not required
     nspawn systemctl disable ua-reboot-cmds.service
     nspawn systemctl disable ua-timer.timer
     nspawn systemctl disable ua-license-check.path
 
-    # Disable tracker
-    rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
-    rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
-    rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
+    # Disable apport
+    sed -i 's|enabled=1|enabled=0|' "${R}/etc/default/apport"
 
     # Supress kernel messages
     # - https://superuser.com/questions/351387/how-to-stop-kernel-messages-from-flooding-my-console
     echo "kernel.printk = 1 4 1 7" > "${R}/etc/sysctl.d/20-printk.conf"
-
-    sed -i 's|enabled=1|enabled=0|' "${R}/etc/default/apport"
 
     # Regenerate ssh host keys on first boot
     if  [ -d "${R}/etc/ssh" ]; then
@@ -597,7 +364,79 @@ EOM
         nspawn systemctl enable ssh-regenerate-hostkeys.service
     fi
 
-    cat <<"EOM" > "${R}/etc/samba/smb.conf"
+    if [ "${SKIP_LUDO}" -eq 0 ]; then
+        cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-sshd-handler.service"
+[Unit]
+Description=Disable sshd if LudOS has it disabled
+After=ssh.service
+ConditionPathExists=!/storage/.cache/services/sshd.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop ssh
+
+[Install]
+WantedBy=multi-user.target
+EOM
+        nspawn systemctl enable ludos-sshd-handler.service
+
+        cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-samba-handler.service"
+[Unit]
+Description=Disable nmbd and smbd if LudOS has them disabled
+After=nmbd.service
+After=smbd.service
+ConditionPathExists=!/storage/.cache/services/samba.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop nmbd
+ExecStart=systemctl stop smbd
+
+[Install]
+WantedBy=multi-user.target
+EOM
+        nspawn systemctl enable ludos-samba-handler.service
+
+        cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-bluez-handler.service"
+[Unit]
+Description=Disable Bluetooth if LudOS has it disabled
+After=bluetooth.target
+ConditionPathExists=!/storage/.cache/services/bluez.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop bluetooth
+
+[Install]
+WantedBy=multi-user.target
+EOM
+        nspawn systemctl enable ludos-bluez-handler.service
+
+        # Disable systemd-networkd et al; we're using connman
+        # - https://www.naut.ca/blog/2018/12/12/disabling-systemd-networking/
+        nspawn systemctl stop systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
+        nspawn systemctl disable systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
+        nspawn systemctl stop systemd-resolved
+        nspawn systemctl disable systemd-resolved.service
+        #rm ${R}/etc/dhcp/dhclient-enter-hooks.d/resolved
+
+        cat <<'EOM' > "${R}/etc/ludo.toml"
+video_fullscreen = true
+cores_dir = "/usr/lib/ludo"
+assets_dir = "/usr/share/ludo/assets"
+database_dir = "/usr/share/ludo/database"
+playlists_dir = "/storage/Retro/playlists"
+savefiles_dir = "/storage/Retro/savefiles"
+savestates_dir = "/storage/Retro/savestates"
+screenshots_dir = "/storage/Retro/screenshots"
+system_dir = "/storage/Retro/system"
+thumbnail_dir = "/storage/Retro/thumbnails"
+bluetooth_service = true
+samba_service = true
+ssh_service = true
+EOM
+
+        cat <<EOM > "${R}/etc/samba/smb.conf"
 #
 # Sample configuration file for the Samba suite for Retro Home.
 #
@@ -756,52 +595,219 @@ EOM
   root preexec = mkdir -p /storage/Retro/thumbnails
 EOM
 
-    # Create user and groups
-    local DATE=""
-    DATE=$(date +%m%H%M%S)
-    local PASSWD=""
-    PASSWD=$(mkpasswd -m sha-512 retro "${DATE}")
-    nspawn addgroup --gid 1000 ludo
+        # Create directozries Ludo requires
+        for DOT_DIR in .cache/connman .cache/services .config/ludo .local/ludo .local/share/ludo .ludo .update; do
+            mkdir -p "${R}/storage/${DOT_DIR}"
+        done
 
-    # Create Raspberry Pi specific groups.
-    nspawn groupadd -f --system gpio
-    nspawn groupadd -f --system i2c
-    nspawn groupadd -f --system input
-    nspawn groupadd -f --system spi
+        for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv; do
+            touch "${R}/storage/${CONF_FILE}"
+        done
 
-    cat <<'EOM' > "${R}/usr/local/sbin/adduser.local"
-#!/bin/sh
-# This script is executed as the final step when calling `adduser`
-# USAGE:
-#   adduser.local USER UID GID HOME
+        for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
+            mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
+        done
 
-# Add user to the Raspberry Pi specific groups
-usermod -a -G adm,gpio,i2c,input,spi,video $1
+        chown -Rv 1000:1000 "${R}/storage"
+
+        echo "ludo   ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/ludo" > "${R}/etc/sudoers.d/090-ludo"
+        chmod -v 0440 "${R}/etc/sudoers.d/090-ludo"
+        # PolicyKit object
+        #org.freedesktop.systemd1.manage-units
+
+        # Generate retro-home icons
+        wget -qc "https://raw.githubusercontent.com/wimpysworld/retro-home/master/.github/logo.svg" -O "${R_STAGE_0}/retro-home.svg"
+        cp "${R_STAGE_0}/retro-home.svg" "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
+        for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
+            mkdir -p "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps"
+            convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R_STAGE_0}/retro-home.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/retro-home.png"
+        done
+
+        # Generate ludo icons
+        for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
+            convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
+        done
+        nspawn gtk-update-icon-cache /usr/share/icons/hicolor/
+
+        # Make an Ludo icon for Slick Greeter
+        convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
+
+        # Generate ubuntu-mono-yaru icon theme
+        cp -a "${R}/usr/share/icons/ubuntu-mono-light" "${R}/usr/share/icons/ubuntu-mono-yaru"
+        sed -i s'|Ubuntu-Mono-Light|Ubuntu-Mono-Yaru|' "${R}/usr/share/icons/ubuntu-mono-yaru/index.theme"
+        sed -i s'|Inherits=Humanity|Inherits=Yaru,Humanity|' "${R}/usr/share/icons/ubuntu-mono-yaru/index.theme"
+        nspawn gtk-update-icon-cache /usr/share/icons/ubuntu-mono-yaru/
+
+        # Composite the Retro Home wallpaper
+        wget -c "https://linuxconfig.org/wp-content/uploads/2020/03/Focal-Fossa_Plain_WP_1920x1080_GREY.png" -O "${R_STAGE_0}/Yaru-Grey.png"
+        composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Home-Wallpaper.png"
+        # Add the Retro Home wallpaper
+        mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
+        cp -a "${R_STAGE_0}/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
+
+        # Create Retro Home xsession
+        cat <<'EOM' > "${R}/usr/local/bin/retro-home"
+#!/usr/bin/env bash
+export __GL_YIELD=USLEEP
+export SDL_MOUSE_RELATIVE=0
+export DISPLAY=:0.0
+export WAYLAND_DISPLAY=wayland-0
+
+# Disable screen blanking, DPMS and screensaver
+xset -dpms
+xset s noblank
+xset s off
+
+if [ "$(id -u)" -eq 0 ]; then
+    xsetroot -solid rgb:67/67/67
+    feh --bg-scale /usr/share/backgrounds/Retro-Home-Wallpaper.png
+    /usr/bin/ludo -ludos
+    chown -R ludo:ludo /storage/{.cache,.config,.local}
+else
+    /usr/bin/ludo -ludos
+fi
 EOM
-    chmod 755 "${R}/usr/local/sbin/adduser.local"
+        chmod 755 "${R}/usr/local/bin/retro-home"
 
-    nspawn adduser --gecos Ludo --add_extra_groups --disabled-password --home /storage --gid 1000 --uid 1000 ludo
-    nspawn usermod -a -G adm,sudo -p "${PASSWD}" ludo
+        mkdir -p "${R}/usr/share/xsessions"
+        cp -a "${R}/usr/share/applications/ludo.desktop" "${R}/usr/share/xsessions/retro-home.desktop"
+        sed -i s'|Icon=ludo|Icon=retro-home|' "${R}/usr/share/xsessions/retro-home.desktop"
+        sed -i 's|Exec=ludo|Exec=retro-home|' "${R}/usr/share/xsessions/retro-home.desktop"
+        sed -i 's|Name=Ludo|Name=Retro Home|' "${R}/usr/share/xsessions/retro-home.desktop"
 
-    # Create directozries Ludo requires
-    for DOT_DIR in .cache/connman .cache/services .config/ludo .local/ludo .local/share/ludo .ludo .update; do
-        mkdir -p "${R}/storage/${DOT_DIR}"
-    done
+        # Enable auto-login to run Retro Home
+        cat <<'EOM' > "${R}/etc/lightdm/lightdm.conf"
+[SeatDefaults]
+autologin-user=root
+autologin-user-timeout=0
+autologin-session=retro-home
+EOM
 
-    for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv; do
-        touch "${R}/storage/${CONF_FILE}"
-    done
+        # Create gschema override
+        cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_retro-home.gschema.override"
+[x.dm.slick-greeter]
+background='/usr/share/backgrounds/Retro-Home-Wallpaper.png'
+background-color='#676767'
+draw-grid=true
+draw-user-backgrounds=false
+enable-hidpi='auto'
+font-name='M+ 1p Medium 11'
+icon-theme-name='ubuntu-mono-yaru'
+high-contrast=false
+show-hostname=true
+logo='/usr/share/pixmaps/ludo.png'
+onscreen-keyboard=false
+#other-monitors-logo=''
+play-ready-sound='/usr/share/sounds/Yaru/stereo/system-ready.oga'
+screen-reader=false
+show-power=true
+show-a11y=false
+show-keyboard=true
+show-clock=true
+show-quit=true
+theme-name='Yaru'
+xft-antialias=true
+xft-dpi=96
+xft-hintstyle='hintslight'
+xft-rgba='rgb'
 
-    for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
-        mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
-    done
+[org.gnome.desktop.background:GNOME-Flashback]
+color-shading-type='vertical'
+picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
+primary-color='#676767'
+secondary-color='#676767'
 
-    chown -Rv 1000:1000 "${R}/storage"
+[org.gnome.desktop.datetime:GNOME-Flashback]
+automatic-timezone=true
 
-    echo "ludo   ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/ludo" > "${R}/etc/sudoers.d/090-ludo"
-    chmod -v 0440 "${R}/etc/sudoers.d/090-ludo"
-    # PolicyKit object
-    #org.freedesktop.systemd1.manage-units
+[org.gnome.desktop.interface:GNOME-Flashback]
+cursor-theme='Yaru'
+document-font-name='M+ 1p Medium 11'
+enable-hot-corners=false
+font-name='M+ 1p Medium 11'
+gtk-theme='Yaru'
+icon-theme='ubuntu-mono-yaru'
+monospace-font-name='M+ 1mn Medium 14'
+
+[org.gnome.desktop.lockdown:GNOME-Flashback]
+disable-printing=true
+disable-print-setup=true
+disable-user-switching=true
+
+[org.gnome.desktop.media-handling:GNOME-Flashback]
+automount-open=false
+
+[org.gnome.desktop.privacy:GNOME-Flashback]
+remember-app-usage=false
+remember-recent-files=false
+report-technical-problems=false
+send-software-usage-stats=false
+
+[org.gnome.desktop.screensaver:GNOME-Flashback]
+color-shading-type='vertical'
+lock-enabled=false
+picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
+primary-color='#676767'
+secondary-color='#676767'
+ubuntu-lock-on-suspend=false
+user-switch-enabled=false
+
+[org.gnome.desktop.session:GNOME-Flashback]
+idle-delay=0
+
+[org.gnome.desktop.sound:GNOME-Flashback]
+theme-name='Yaru'
+
+[org.gnome.desktop.wm.preferences:GNOME-Flashback]
+button-layout=':minimize,maximize,close'
+theme='Yaru'
+titlebar-font='M+ 1p Bold 11'
+titlebar-uses-system-font=false
+
+[org.gnome.gedit.preferences.editor]
+editor-font='M+ 1mn Medium 14'
+
+[org.gnome.gnome-flashback.desktop.background:GNOME-Flashback]
+fade=false
+
+[org.gnome.gnome-flashback.desktop.icons:GNOME-Flashback]
+show-home=false
+show-trash=false
+
+[org.gnome.metacity:GNOME-Flashback]
+alt-tab-thumbnails=true
+
+[org.gnome.metacity.theme:GNOME-Flashback]
+name='Yaru'
+
+[org.gnome.settings-deamon.plugins.power:GNOME-Flashback]
+idle-dim=false
+power-button-action='interactive'
+sleep-inactive-ac-timeout=0
+sleep-inactive-ac-type='nothing'
+sleep-inactive-battery-timeout=0
+sleep-inactive-battery-type='nothing'
+EOM
+
+        nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
+    fi
+
+    # Disable tracker
+    rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
+    rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
+    rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
+
+    cat <<'EOM' > "${R}/usr/share/applications/connman-gtk-flashback.desktop"
+[Desktop Entry]
+Type=Application
+Exec=connman-gtk
+Name=Connman Settings
+Categories=GTK;Utility;System;
+Keywords=connman;network;settings;wired;wifi;wi-fi;bluetooth;vpn;tethering
+X-GNOME-Settings-Panel=connman-gtk
+X-Unity-Settings-Panel=connman-gtk
+Icon=preferences-system-network
+EOM
 }
 
 function stage_06_clean() {
@@ -833,6 +839,7 @@ function stage_06_clean() {
     [ -L "${R}"/var/lib/dbus/machine-id ] || rm -f "${R}"/var/lib/dbus/machine-id
     echo '' > "${R}"/etc/machine-id
 
+    # Only required if Connman has been made the default network renderer
     cd "${R}/etc"
     ln -sf ../run/connman/resolv.conf resolv.conf
     cd -
