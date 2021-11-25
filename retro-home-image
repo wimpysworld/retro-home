@@ -136,11 +136,12 @@ EOM
     sed -i "1s|.*|127.0.0.1\tlocalhost retro-home-${REMIX}|" "${R}/etc/hosts"
 
     nspawn apt-get -y update
-    nspawn apt-get -y upgrade
-    nspawn apt-get -y dist-upgrade
 
     # Install Multicast DNS Service Discovery and first boot filesystem expansion
     nspawn apt-get -y install avahi-daemon cloud-initramfs-growroot
+
+    nspawn apt-get -y upgrade
+    nspawn apt-get -y dist-upgrade
 
     # Add standard Ubuntu userspace
     if [ "${SKIP_UBUNTU_STANDARD}" -eq 0 ]; then
