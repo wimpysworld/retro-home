@@ -311,8 +311,8 @@ function stage_05_config() {
     local DATE=""
     DATE=$(date +%m%H%M%S)
     local PASSWD=""
-    PASSWD=$(mkpasswd -m sha-512 retro "${DATE}")
-    nspawn addgroup --gid 1000 ludo
+    PASSWD=$(mkpasswd -m sha-512 ${USER_PASS} "${DATE}")
+    nspawn addgroup --gid 1000 ${USER_NAME}
 
     # Create Raspberry Pi specific groups.
     nspawn groupadd -f --system gpio
@@ -331,8 +331,8 @@ usermod -a -G adm,gpio,i2c,input,spi,video $1
 EOM
     chmod 755 "${R}/usr/local/sbin/adduser.local"
 
-    nspawn adduser --gecos Ludo --add_extra_groups --disabled-password --home /storage --gid 1000 --uid 1000 ludo
-    nspawn usermod -a -G adm,sudo -p "${PASSWD}" ludo
+    nspawn adduser --gecos ${USER_NAME^} --add_extra_groups --disabled-password --home ${USER_HOME} --gid 1000 --uid 1000 ${USER_NAME}
+    nspawn usermod -a -G adm,sudo -p "${PASSWD}" ${USER_NAME}
 
     # Disable Ubuntu Advantage Tools; not required
     nspawn systemctl disable ua-reboot-cmds.service
@@ -610,7 +610,7 @@ EOM
 
         chown -Rv 1000:1000 "${R}/storage"
 
-        echo "ludo   ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/ludo" > "${R}/etc/sudoers.d/090-ludo"
+        echo "${USER_NAME}   ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/ludo" > "${R}/etc/sudoers.d/090-ludo"
         chmod -v 0440 "${R}/etc/sudoers.d/090-ludo"
         # PolicyKit object
         #org.freedesktop.systemd1.manage-units
@@ -1059,6 +1059,9 @@ IMG_VER="21.10"
 IMG_RELEASE="impish"
 IMG_ARCH="armhf"
 IMG_OUT="retro-home-${REMIX}-${IMG_VER}${IMG_QUALITY}-${IMG_ARCH}.img"
+USER_NAME="ludo"
+USER_PASS="retro"
+USER_HOME="/storage"
 TMP_DIR=$(pwd)
 
 # Create caches
