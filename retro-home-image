@@ -660,10 +660,10 @@ xset s off
 if [ "$(id -u)" -eq 0 ]; then
     xsetroot -solid rgb:67/67/67
     feh --bg-scale /usr/share/backgrounds/Retro-Home-Wallpaper.png
-    /usr/bin/ludo -ludos
+    /usr/bin/ludo -ludos -v > /var/log/ludo.log
     chown -R ludo:ludo /storage/{.cache,.config,.local}
 else
-    /usr/bin/ludo -ludos
+    /usr/bin/ludo -ludos -v
 fi
 EOM
         chmod 755 "${R}/usr/local/bin/retro-home"
