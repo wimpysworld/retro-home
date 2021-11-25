@@ -7,6 +7,8 @@ LC_ALL=C
 # - Add Ludo icon to .faces
 # - Add a custom panel layout?
 # - Add Vivaldi browser?
+# - Add Joystick as mouse
+# - Add N64 core
 # - Integrate LudOS session with desktop session
 # - Disable GNOME suspend
 # - Disable Tracker; via systemd unit
