@@ -10,7 +10,6 @@ LC_ALL=C
 # - Add Joystick as mouse
 # - Add N64 core
 # - Integrate LudOS session with desktop session
-# - Disable GNOME suspend
 # - Disable Tracker; via systemd unit
 # - Disable TeXinfo icon
 
@@ -780,7 +779,7 @@ alt-tab-thumbnails=true
 [org.gnome.metacity.theme:GNOME-Flashback]
 name='Yaru'
 
-[org.gnome.settings-deamon.plugins.power:GNOME-Flashback]
+[org.gnome.settings-daemon.plugins.power:GNOME-Flashback]
 idle-dim=false
 power-button-action='interactive'
 sleep-inactive-ac-timeout=0
