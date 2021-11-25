@@ -27,41 +27,43 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
   * Based on [Ubuntu](https://ubuntu.com) and [Ludo](https://ludo.libretro.com/)
   * [Supported emulation](https://jean-andre-santoni.gitbook.io/ludo/emulated-consoles):
     * Arcade
-​​    * Atari 2600
-    * Atari 5200
-    * Atari 7800
-    * Atari Jaguar
-    * Atari Lynx
-​​    * Game Boy
-    * Game Boy Color
-    * Game Boy Advance
-    * Magnavox Odyssey2
+​​    * [Atari 2600 (VCS)](https://en.wikipedia.org/wiki/Atari_2600)
+    * [Atari 5200](https://en.wikipedia.org/wiki/Atari_5200)
+    * [Atari 7800](https://en.wikipedia.org/wiki/Atari_7800)
+    * [Atari Jaguar](https://en.wikipedia.org/wiki/Atari_Jaguar)
+    * [Atari Lynx](https://en.wikipedia.org/wiki/Atari_Lynx)
+    * [Bandai Wonder Swan](https://en.wikipedia.org/wiki/WonderSwan)
+    * [Bandai Wonder Swan Color](https://en.wikipedia.org/wiki/WonderSwan)
+    * [Coleco Vision](https://en.wikipedia.org/wiki/ColecoVision)
+    * [Magnavox Odyssey2](https://en.wikipedia.org/wiki/Magnavox_Odyssey_2)
     * Microsoft MSX
     * Microsoft MSX2
-    * Neo Geo Pocket
-    * Neo Geo Pocket Color
+​​    * Nintendo Game Boy
+    * Nintendo Game Boy Color
+    * Nintendo Game Boy Advance
+    * Nintendo DS
     * Nintendo Entertainment System
     * Super Nintendo Entertainment System
-    * Nintendo 64 (Experimental)
-    * Nintendo DS
+    * Nintendo 64 (*WIP*)
 ​​    * Nintendo Pokémon Mini
     * Nintendo Virtual Boy
-    * Sega 32X
-    * Sega Game Gear
-    * Sega Genesis / Megadrive
-    * Sega Master System
-    * Sega Mega CD
-    * Sega PICO
-​​    * Sega Saturn
-    * PC Engine
-    * PC Engine CD
-    * PC Engine SuperGrafx
-    * PC-FX
-​​    * PC-98
-    * Sony PlayStation
-    * Vectrex
-    * Wonder Swan
-    * Wonder Swan Color
+    * [Sega Game Gear](https://en.wikipedia.org/wiki/Game_Gear)
+    * [Sega Master System (Mark III)](https://en.wikipedia.org/wiki/Master_System)
+      * [Sega SG-1000](https://en.wikipedia.org/wiki/SG-1000)
+    * [Sega Mega Drive (Genesis)](https://en.wikipedia.org/wiki/Sega_Genesis)
+      * [Sega Mega CD](https://en.wikipedia.org/wiki/Sega_CD)
+      * [Sega 32X](https://en.wikipedia.org/wiki/32X)
+    * [Sega Pico](https://en.wikipedia.org/wiki/Sega_Pico)
+​​    * [Sega Saturn](https://en.wikipedia.org/wiki/Sega_Saturn)
+    * [SNK Neo Geo Pocket](https://en.wikipedia.org/wiki/Neo_Geo_Pocket)
+    * [SNK Neo Geo Pocket Color](https://en.wikipedia.org/wiki/Neo_Geo_Pocket_Color)
+​​    * [NEC PC-98](https://en.wikipedia.org/wiki/PC-9800_series)
+    * [NEC PC Engine TurboGrafx-16](https://en.wikipedia.org/wiki/TurboGrafx-16)
+      * [NEC PC Engine TurboGrafx-CD](https://en.wikipedia.org/wiki/TurboGrafx-16#Add-ons)
+    * [NEC PC Engine SuperGrafx](https://en.wikipedia.org/wiki/PC_Engine_SuperGrafx)
+    * [NEC PC-FX](https://en.wikipedia.org/wiki/PC-FX)
+    * [Sony PlayStation](https://en.wikipedia.org/wiki/PlayStation)
+    * [Vectrex](https://en.wikipedia.org/wiki/Vectrex)
   * Supported Raspberry Pi:
     * Raspberry Pi Compute Module 3 Lite
     * Raspberry Pi Compute Module 4 Lite
