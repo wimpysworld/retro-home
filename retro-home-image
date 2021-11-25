@@ -250,7 +250,7 @@ dtparam=audio=on
 dtparam=i2c_arm=on
 dtparam=spi=on
 
-# Enable the full KMS graphics overlay, as recommended by Ludo
+# Enable the "Fake" KMS graphics overlay; required to bring up audio
 dtoverlay=vc4-fkms-v3d
 gpu_mem=128
 start_x=1
@@ -269,7 +269,7 @@ hdmi_drive=2
 #dtoverlay=dwc2,dr_mode=host
 EOM
 
-    echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc consoleblank=0 vt.global_cursor_default=0 quiet splash" > "${B}/cmdline.txt"
+    echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc consoleblank=0 vt.global_cursor_default=0 snd_bcm2835.enable_compat_alsa=1 quiet splash" > "${B}/cmdline.txt"
 
     cat <<'EOM' > "${R}/etc/fstab"
 LABEL=writable      /               ext4    defaults,noatime,x-systemd.growfs   0   0
