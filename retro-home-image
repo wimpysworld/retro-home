@@ -9,6 +9,7 @@ LC_ALL=C
 # - Add Vivaldi browser?
 # - Add Joystick as mouse
 # - Add N64 core
+# - Add Saturn core
 # - Integrate LudOS session with desktop session
 # - Disable Tracker; via systemd unit
 # - Disable TeXinfo icon
