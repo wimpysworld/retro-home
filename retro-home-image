@@ -10,7 +10,6 @@ LC_ALL=C
 # - Add N64 core
 # - Add Saturn core
 # - Integrate LudOS session with desktop session
-# - Disable Tracker; via systemd unit
 # - Disable TeXinfo icon
 
 # Display help usage
@@ -829,10 +828,10 @@ EOM
         nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
     fi
 
-    # Disable tracker
-    rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
-    rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
-    rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
+        # Disable tracker
+        rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
+        rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
+        rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
 
     cat <<'EOM' > "${R}/usr/share/applications/connman-gtk-flashback.desktop"
 [Desktop Entry]
