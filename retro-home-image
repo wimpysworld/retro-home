@@ -10,7 +10,6 @@ LC_ALL=C
 # - Add N64 core
 # - Add Saturn core
 # - Integrate LudOS session with desktop session
-# - Disable TeXinfo icon
 
 # Display help usage
 function usage () {
@@ -826,14 +825,15 @@ sleep-inactive-battery-type='nothing'
 EOM
 
         nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
-    fi
 
         # Disable tracker
         rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
         rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
         rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
 
-    cat <<'EOM' > "${R}/usr/share/applications/connman-gtk-flashback.desktop"
+        mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
+        # Add Connman Settings menu entry
+        cat <<'EOM' > "${R}/usr/share/gnome-flashback-metacity/applications/connman-gtk.desktop"
 [Desktop Entry]
 Type=Application
 Exec=connman-gtk
@@ -844,6 +844,23 @@ X-GNOME-Settings-Panel=connman-gtk
 X-Unity-Settings-Panel=connman-gtk
 Icon=preferences-system-network
 EOM
+
+        # Hide the TeXInfo menu entry
+        cat <<'EOM' > "${R}/usr/share/gnome-flashback-metacity/applications/info.desktop"
+[Desktop Entry]
+Name=TeXInfo
+Comment=The viewer for TexInfo documents
+Exec=info
+Icon=dialog-information
+Type=Application
+Categories=Utility;Documentation;ConsoleOnly;
+Terminal=true
+X-Desktop-File-Install-Version=0.24
+NoDisplay=true
+EOM
+
+        nspawn update-desktop-database
+    fi
 }
 
 function stage_06_clean() {
