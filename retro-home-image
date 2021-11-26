@@ -329,8 +329,8 @@ usermod -a -G adm,gpio,i2c,input,spi,video $1
 EOM
     chmod 755 "${R}/usr/local/sbin/adduser.local"
 
-    nspawn adduser --gecos ${USER_NAME^} --add_extra_groups --disabled-password --home ${USER_HOME} --gid 1000 --uid 1000 ${USER_NAME}
-    nspawn usermod -a -G adm,sudo -p "${PASSWD}" ${USER_NAME}
+    nspawn adduser --gecos "${USER_NAME^}" --add_extra_groups --disabled-password --home "${USER_HOME}" --gid 1000 --uid 1000 "${USER_NAME}"
+    nspawn usermod -a -G adm,sudo -p "${PASSWD}" "${USER_NAME}"
 
     # Disable Ubuntu Advantage Tools; not required
     nspawn systemctl disable ua-reboot-cmds.service
