@@ -4,12 +4,11 @@ LC_ALL=C
 # TODO
 # - Add Plymouth splash
 # - Add 'ludo' user authentication for Samba
-# - Add Ludo icon to .faces
 # - Add Vivaldi browser?
-# - Add Joystick as mouse
+# - Add Joystick as mouse?
 # - Add N64 core
 # - Add Saturn core
-# - Integrate LudOS session with desktop session
+# - Improve Retro Home session integration with desktop session
 
 # Display help usage
 function usage () {
