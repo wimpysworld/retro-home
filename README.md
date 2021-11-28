@@ -96,9 +96,9 @@ ourselves the first alpha images are ready for wider evaluation.
     * `git clone https://github.com/wimpysworld/retro-home.git`
 
 It is best to run the `retro-home-image` on an Ubuntu 20.04 x86 64-bit
-workstation, ideally running in a VM via [Quickemu](https://github.com/quickemu-project/quickemu)
+workstation, ideally running in a VM via [Quickemu](https://github.com/quickemu-project/quickemu). If using a fresh [Quickemu](https://github.com/quickemu-project/quickemu) VM you will need to set the `disk_size` parameter large enough to complete the build (around 26G). This can be achieved by adding `disk_size="32G"` to `ubuntu-mate-focal.conf` before running `quickemu` to create the VM. Alternatively you could mount external storage into the container for the build area. You'll also need at least to `sudo apt install git`.
 
-This following will build a Retro Home armhf image for Raspberry Pi.
+The following incantation will build a Retro Home armhf image for Raspberry Pi.
 
 ```bash
 sudo ./retro-home-image --device raspi
