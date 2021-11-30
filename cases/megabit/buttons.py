@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-import RPi.GPIO as GPIO
 import psutil
 import subprocess
 import time
 
+from gpiozero import Button
 from subprocess import DEVNULL
 
 POWER = 3
@@ -18,16 +18,15 @@ def process_kill(process_name: str):
 
 
 if __name__ == "__main__":
-	GPIO.setmode(GPIO.BCM)
-	GPIO.setup(POWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-	GPIO.setup(RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	power_button = Button(POWER)
+	reset_button = Button(RESET)
 
 	while True:
-		if (GPIO.input(RESET) == False):
+		if reset_button.is_pressed:
 			process_kill("ludo")
 			subprocess.Popen(['reboot'], stdout=DEVNULL, stderr=DEVNULL)
 			break
-		elif (GPIO.input(POWER) == False):
+		elif power_button.is_pressed:
 			process_kill("ludo")
 			subprocess.Popen(['poweroff'], stdout=DEVNULL, stderr=DEVNULL)
 			break
