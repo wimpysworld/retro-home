@@ -4,18 +4,20 @@ import RPi.GPIO as GPIO
 import time
 import os
 
-power = 3
-reset = 4
+POWER = 3
+RESET = 4
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(power, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(reset, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+if __name__ == "__main__":
 
-while True:
-	if (GPIO.input(reset) == False):
-		os.system("sudo reboot -h now")
-		break
-	elif (GPIO.input(power) == False):
-		os.system("sudo shutdown -h now")
-		break
-	time.sleep(0.50)
+	GPIO.setmode(GPIO.BCM)
+	GPIO.setup(POWER, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+	GPIO.setup(RESET, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+	while True:
+		if (GPIO.input(RESET) == False):
+			os.system("sudo reboot -h now")
+			break
+		elif (GPIO.input(POWER) == False):
+			os.system("sudo shutdown -h now")
+			break
+		time.sleep(0.50)
