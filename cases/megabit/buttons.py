@@ -2,8 +2,10 @@
 
 import RPi.GPIO as GPIO
 import psutil
+import subprocess
 import time
-import os
+
+from subprocess import DEVNULL
 
 POWER = 3
 RESET = 4
@@ -23,10 +25,10 @@ if __name__ == "__main__":
 	while True:
 		if (GPIO.input(RESET) == False):
 			process_kill("ludo")
-			os.system("reboot")
+			subprocess.Popen(['reboot'], stdout=DEVNULL, stderr=DEVNULL)
 			break
 		elif (GPIO.input(POWER) == False):
 			process_kill("ludo")
-			os.system("poweroff")
+			subprocess.Popen(['poweroff'], stdout=DEVNULL, stderr=DEVNULL)
 			break
 		time.sleep(0.50)
