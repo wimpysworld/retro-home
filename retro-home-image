@@ -19,15 +19,23 @@ function usage () {
   echo "Supported (or planned) devices are:"
   echo "  raspi:            Rasberry Pi 2, 3 and 4"
   echo "  gamehat:          Waveshare Game HAT"
+  echo "  gamepi20:         Waveshare GamePi20"
+  echo "  gamepi43:         Waveshare GamePi43"
   echo "  gpi:              RetroFlag GPi Case"
   echo "  gpimate:          RetroFlag GPi Case with GPiMate for CM3+Lite"
   echo "  gpimateplus:      RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
+  echo "  gamepm280:        Waveshare GPM280"
   echo "  nespi:            RetroFlag NESPi Case+"
   echo "  megapi:           RetroFlag MEGAPi Case"
+  echo "  minin64           Megabit Mini N64"
+  echo "  minips1           Megabit Mini PS1 (Non-NFC)"
   echo "  monster:          Monster Arcade Controller Kit"
   echo "  picade:           Pimoroni Picade"
   echo "  picadeconsole:    Pimoroni Picade Console"
+  echo "  pistation         RetroFlag PiStation Case"
+  echo "  pistationlcd      RetroFlag PiStation Case with LCD"
   echo "  superpi:          RetroFlag SUPERPi Case"
+  echo "  superpi4:         RetroFlag SUPERPi 4 Case"
 }
 
 function not_implemented() {
@@ -1091,8 +1099,20 @@ case "${REMIX}" in
         echo "[+] Specified Pimoroni Picade Console"
         not_implemented
         shift;;
+    pistation)
+        echo "[+] Specified RetroFlag PiStation Case"
+        not_implemented
+        shift;;
+    pistationlcd)
+        echo "[+] Specified RetroFlag PiStation Case with LCD"
+        not_implemented
+        shift;;
     superpi)
         echo "[+] Specified RetroFlag SUPERPi Case"
+        not_implemented
+        shift;;
+    superpi4)
+        echo "[+] Specified RetroFlag SUPERPi 4 Case"
         not_implemented
         shift;;
     *)
