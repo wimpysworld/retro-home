@@ -15,9 +15,9 @@ if __name__ == "__main__":
 
 	while True:
 		if (GPIO.input(RESET) == False):
-			os.system("sudo reboot -h now")
+			os.system("reboot")
 			break
 		elif (GPIO.input(POWER) == False):
-			os.system("sudo shutdown -h now")
+			os.system("poweroff")
 			break
 		time.sleep(0.50)
