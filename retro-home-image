@@ -284,7 +284,8 @@ EOM
 
     nspawn apt-get -y install libraspberrypi0 libraspberrypi-bin \
     linux-firmware-raspi2 linux-headers-raspi linux-image-raspi \
-    linux-modules-extra-raspi pi-bluetooth raspi-config rpi-eeprom
+    linux-modules-extra-raspi pi-bluetooth python3-lgpio \
+    raspi-config rpi-eeprom
 
     local NEW_KERNEL=$(ls -1 "${R}"/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
     if [ -z "${NEW_KERNEL}" ]; then
