@@ -316,8 +316,8 @@ function stage_05_config() {
     local DATE=""
     DATE=$(date +%m%H%M%S)
     local PASSWD=""
-    PASSWD=$(mkpasswd -m sha-512 ${USER_PASS} "${DATE}")
-    nspawn addgroup --gid 1000 ${USER_NAME}
+    PASSWD=$(mkpasswd -m sha-512 "${USER_PASS}" "${DATE}")
+    nspawn addgroup --gid 1000 "${USER_NAME}"
 
     # Create Raspberry Pi specific groups.
     nspawn groupadd -f --system gpio
