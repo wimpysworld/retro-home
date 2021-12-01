@@ -1155,9 +1155,9 @@ case "${REMIX}" in
         shift;;
     *)
         if [ -z "${REMIX}" ]; then
-        echo "[!] ERROR: Please specifiy a target device"
+            echo "[!] ERROR: Please specifiy a target device"
         else
-        echo "[!] ERROR: ${REMIX} is not a valid target device"
+            echo "[!] ERROR: ${REMIX} is not a valid target device"
         fi
         usage
         exit 1;;
