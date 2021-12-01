@@ -3,7 +3,7 @@
 import psutil
 import subprocess
 import time
-from gpiozero import Button, LED
+from gpiozero import Button
 from signal import pause
 from subprocess import DEVNULL
 
