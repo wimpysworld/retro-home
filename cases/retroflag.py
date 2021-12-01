@@ -15,8 +15,7 @@ def process_kill(process_name: str):
 
 
 def button_dispatch(action: str):
-	if POWER_LED is not None:
-		power_led.blink()
+	power_led.blink()
 	print(action)
 	process_kill('ludo')
 	time.sleep(2)
@@ -38,9 +37,8 @@ if __name__ == "__main__":
 
 	power_button = Button(POWER)
 	reset_button = Button(RESET, hold_time=1)
-	if POWER_LED is not None:
-		power_led = LED(POWER_LED)
-		power_led.on()
+	power_led = LED(POWER_LED)
+	power_led.on()
 
 	reset_button.when_held = safe_reboot
 	power_button.when_pressed = safe_poweroff
