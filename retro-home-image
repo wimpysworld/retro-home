@@ -284,8 +284,7 @@ EOM
 
     nspawn apt-get -y install libraspberrypi0 libraspberrypi-bin \
     linux-firmware-raspi2 linux-headers-raspi linux-image-raspi \
-    linux-modules-extra-raspi pi-bluetooth python3-lgpio \
-    raspi-config rpi-eeprom
+    linux-modules-extra-raspi pi-bluetooth raspi-config rpi-eeprom
 
     local NEW_KERNEL=$(ls -1 "${R}"/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
     if [ -z "${NEW_KERNEL}" ]; then
@@ -870,6 +869,44 @@ EOM
 
         nspawn update-desktop-database
     fi
+
+    local CASE_SUPPORT=""
+
+    case ${REMIX} in
+        megabit)
+            nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
+            CASE_SUPPORT="/usr/local/bin/megabit.py"
+            cp -v cases/megabit.py "${R}${CASE_SUPPORT}"
+            cat <<EOM >> "${B}/config.txt"
+enable_uart=1
+EOM
+            ;;
+        retroflag)
+            nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
+            CASE_SUPPORT="/usr/local/bin/retroflag.py"
+            cp -v cases/retroflag.py "${R}${CASE_SUPPORT}"
+            cat <<EOM >> "${B}/config.txt"
+enable_uart=1
+EOM
+            ;;
+    esac
+
+    if [ -n "${CASE_SUPPORT}" ]; then
+        cat <<EOM > "${R}/usr/lib/systemd/system/retro-home-case-support.service"
+[Unit]
+Description=Retro Home ${REMIX} case support
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=${CASE_SUPPORT}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOM
+    fi
+    nspawn systemctl enable retro-home-case-support.service
 }
 
 function stage_06_clean() {
@@ -1076,13 +1113,13 @@ case "${REMIX}" in
     minin64)
         # https://megabitnes.com/store/n64-pi4/
         echo "[+] Specified Megabit Mini N64"
-        not_implemented
+        REMIX="megabit"
         shift;;
     minips1)
         # https://megabitnes.com/store/mini-ps1-case-non-nfc/
         # https://megabitnes.com/non-nfc/
         echo "[+] Specified Megabit Mini PS1 (Non-NFC)"
-        not_implemented
+        REMIX="megabit"
         shift;;
     monster)
         echo "[+] Specified Monster Arcade Controller Kit"
