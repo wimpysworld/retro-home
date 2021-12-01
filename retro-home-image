@@ -1136,7 +1136,15 @@ IMG_OUT="retro-home-${REMIX}-${IMG_VER}${IMG_QUALITY}-${IMG_ARCH}.img"
 USER_NAME="ludo"
 USER_PASS="retro"
 USER_HOME="/storage"
-TMP_DIR=$(pwd)
+
+# Determine where to cache & build the images
+if [ -n "${SUDO_USER}" ]; then
+    SUDO_HOME=$(eval echo "~${SUDO_USER}")
+else
+    SUDO_HOME="${HOME}"
+fi
+TMP_DIR="${SUDO_HOME}/Pi"
+mkdir -p "${TMP_DIR}" 2>/dev/null
 
 # Create caches
 for LOOP in 0 1 2 3 4 5 6 7 8 9; do
