@@ -1108,7 +1108,7 @@ case "${REMIX}" in
         shift;;
     megapi)
         echo "[+] Specified RetroFlag MEGAPi Case"
-        not_implemented
+        REMIX="retroflag"
         shift;;
     minin64)
         # https://megabitnes.com/store/n64-pi4/
@@ -1127,7 +1127,7 @@ case "${REMIX}" in
         shift;;
     nespi)
         echo "[+] Specified RetroFlag NESPi Case+"
-        not_implemented
+        REMIX="retroflag"
         shift;;
     picade)
         echo "[+] Specified Pimoroni Picade"
@@ -1139,7 +1139,7 @@ case "${REMIX}" in
         shift;;
     pistation)
         echo "[+] Specified RetroFlag PiStation Case"
-        not_implemented
+        REMIX="retroflag"
         shift;;
     pistationlcd)
         echo "[+] Specified RetroFlag PiStation Case with LCD"
@@ -1147,11 +1147,11 @@ case "${REMIX}" in
         shift;;
     superpi)
         echo "[+] Specified RetroFlag SUPERPi Case"
-        not_implemented
+        REMIX="retroflag"
         shift;;
     superpi4)
         echo "[+] Specified RetroFlag SUPERPi 4 Case"
-        not_implemented
+        REMIX="retroflag"
         shift;;
     *)
         if [ -z "${REMIX}" ]; then
