@@ -20,7 +20,7 @@ def button_dispatch(action: str):
 	print(action)
 	process_kill('ludo')
 	time.sleep(2)
-	subprocess.Popen([action.split()], stdout=DEVNULL, stderr=DEVNULL)
+	subprocess.Popen([action], stdout=DEVNULL, stderr=DEVNULL)
 
 
 def safe_reboot():
