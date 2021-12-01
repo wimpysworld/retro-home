@@ -19,15 +19,23 @@ function usage () {
   echo "Supported (or planned) devices are:"
   echo "  raspi:            Rasberry Pi 2, 3 and 4"
   echo "  gamehat:          Waveshare Game HAT"
+  echo "  gamepi20:         Waveshare GamePi20"
+  echo "  gamepi43:         Waveshare GamePi43"
   echo "  gpi:              RetroFlag GPi Case"
   echo "  gpimate:          RetroFlag GPi Case with GPiMate for CM3+Lite"
   echo "  gpimateplus:      RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
+  echo "  gamepm280:        Waveshare GPM280"
   echo "  nespi:            RetroFlag NESPi Case+"
   echo "  megapi:           RetroFlag MEGAPi Case"
+  echo "  minin64           Megabit Mini N64"
+  echo "  minips1           Megabit Mini PS1 (Non-NFC)"
   echo "  monster:          Monster Arcade Controller Kit"
   echo "  picade:           Pimoroni Picade"
   echo "  picadeconsole:    Pimoroni Picade Console"
+  echo "  pistation         RetroFlag PiStation Case"
+  echo "  pistationlcd      RetroFlag PiStation Case with LCD"
   echo "  superpi:          RetroFlag SUPERPi Case"
+  echo "  superpi4:         RetroFlag SUPERPi 4 Case"
 }
 
 function not_implemented() {
@@ -285,7 +293,8 @@ EOM
 
     nspawn apt-get -y install libraspberrypi0 libraspberrypi-bin \
     linux-firmware-raspi2 linux-headers-raspi linux-image-raspi \
-    linux-modules-extra-raspi pi-bluetooth raspi-config rpi-eeprom
+    linux-modules-extra-raspi pi-bluetooth python3-lgpio \
+    raspi-config rpi-eeprom
 
     local NEW_KERNEL=$(ls -1 "${R}"/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
     if [ -z "${NEW_KERNEL}" ]; then
@@ -317,8 +326,8 @@ function stage_05_config() {
     local DATE=""
     DATE=$(date +%m%H%M%S)
     local PASSWD=""
-    PASSWD=$(mkpasswd -m sha-512 ${USER_PASS} "${DATE}")
-    nspawn addgroup --gid 1000 ${USER_NAME}
+    PASSWD=$(mkpasswd -m sha-512 "${USER_PASS}" "${DATE}")
+    nspawn addgroup --gid 1000 "${USER_NAME}"
 
     # Create Raspberry Pi specific groups.
     nspawn groupadd -f --system gpio
@@ -1101,8 +1110,20 @@ case "${REMIX}" in
         echo "[+] Specified Pimoroni Picade Console"
         not_implemented
         shift;;
+    pistation)
+        echo "[+] Specified RetroFlag PiStation Case"
+        not_implemented
+        shift;;
+    pistationlcd)
+        echo "[+] Specified RetroFlag PiStation Case with LCD"
+        not_implemented
+        shift;;
     superpi)
         echo "[+] Specified RetroFlag SUPERPi Case"
+        not_implemented
+        shift;;
+    superpi4)
+        echo "[+] Specified RetroFlag SUPERPi 4 Case"
         not_implemented
         shift;;
     *)

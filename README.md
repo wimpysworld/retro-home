@@ -74,6 +74,7 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
     * Raspberry Pi 4 Model B  (**Recommended**)
     * Raspberry Pi 400
     * Raspberry Pi Zero 2 W
+  * Boot from USB
   * Automatic first boot file system expansion
   * WiFi and Bluetooth management
   * Integrated Samba and SSH server for copying over ROMS
@@ -104,7 +105,7 @@ This following will build a Retro Home armhf image for Raspberry Pi.
 sudo ./retro-home-image --device raspi
 ```
 
-You can tweak some variable towards the bottom of the `retro-home-image` script.
+You can tweak some variables towards the bottom of the `retro-home-image` script.
 However, **Ludo currently only publishes pre-built binaries for `armhf`**, so
 changing the target architecture is not recommended.
 
@@ -217,3 +218,16 @@ devices.
 
 To shutdown or reboot Retro Home from the desktop environment, click the cog
 icon in the top right of the panel.
+
+## Reference
+
+### GPIO
+
+As of Linux kernel 5.11, the old methods of communicating with the header pins
+on the Raspberry Pi will no longer work. This means that packages such as
+RPi.GPIO will no longer function properly with newer kernels.
+
+  * [The Pins They Are A-Changin’](https://waldorf.waveform.org.uk/2021/the-pins-they-are-a-changin.html)
+  * [The lg archive](http://abyz.me.uk/lg/)
+    * lg is an archive of programs for Linux Single Board Computers which allows control of the General Purpose Input Outputs.
+  * [Raspberry Pi GPIO Tutorial](https://blogjawn.stufftoread.com/raspberry-pi-gpio-tutorial.html)
