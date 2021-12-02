@@ -892,9 +892,10 @@ EOM
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="/usr/local/bin/gpi.py"
             cp -v cases/gpi.py "${R}${CASE_SUPPORT}"
+            # https://github.com/tsoliman/Retroflag-GPi-case
             # https://github.com/kristijandraca/GPi_Case_patch
             # https://support.retroflag.com/
-            cp -v cases/overlays/dpi24.dtbo "${B}/overlays/"
+            cp -v cases/overlays/dpi24-gpi.dtbo "${B}/overlays/"
             cp -v cases/overlays/pwm-audio-pi-zero.dtbo "${B}/overlays/"
             cat <<EOM >> "${B}/config.txt"
 # if you plug your tv at the same time as your rpi and that the rpi switches from the hdmi or give a low resolution because tv had no enough time to initialize it
@@ -909,7 +910,7 @@ cec_osd_name=retro-home
 avoid_safe_mode=1
 
 display_rotate=1
-dtoverlay=dpi24
+dtoverlay=dpi24-gpi
 overscan_left=0
 overscan_right=0
 overscan_top=0
