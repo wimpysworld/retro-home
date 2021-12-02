@@ -689,7 +689,7 @@ esac
 
 # Install apt-cacher-ng on the host and this script will use it.
 APT_CACHE_IP=$(ip route get 1.1.1.1 | head -n 1 | cut -d' ' -f 7)
-IMG_QUALITY="-alpha4"
+IMG_QUALITY="-alpha5"
 IMG_VER="21.10"
 IMG_RELEASE="impish"
 IMG_ARCH="armhf"
