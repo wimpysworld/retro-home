@@ -121,19 +121,8 @@ function stage_01_bootstrap() {
     nspawn /debootstrap/debootstrap \
         --second-stage
 
-    cat <<EOM >"${R}/etc/apt/sources.list"
-deb http://ports.ubuntu.com/ ${IMG_RELEASE} main restricted universe multiverse
-deb-src http://ports.ubuntu.com/ ${IMG_RELEASE} main restricted universe multiverse
-
-deb http://ports.ubuntu.com/ ${IMG_RELEASE}-updates main restricted universe multiverse
-deb-src http://ports.ubuntu.com/ ${IMG_RELEASE}-updates main restricted universe multiverse
-
-deb http://ports.ubuntu.com/ ${IMG_RELEASE}-security main restricted universe multiverse
-deb-src http://ports.ubuntu.com/ ${IMG_RELEASE}-security main restricted universe multiverse
-
-deb http://ports.ubuntu.com/ ${IMG_RELEASE}-backports main restricted universe multiverse
-deb-src http://ports.ubuntu.com/ ${IMG_RELEASE}-backports main restricted universe multiverse
-EOM
+    cp "root/etc/apt/sources.list" "${R}/etc/apt/"
+    sed -i "s|RELEASE|${IMG_RELEASE}|g" "${R}/etc/apt/sources.list"
 
     nspawn hostnamectl --static set-hostname "retro-home-${REMIX}"
     echo "retro-home-${REMIX}" > "${R}/etc/hostname"
@@ -217,21 +206,10 @@ function stage_04_kernel() {
     export R="${R_STAGE_4}"
     sync_from "${B_STAGE_3}" "${R_STAGE_3}"
 
-    cat <<'EOM' > "${B}/README"
-An overview of the files on the /boot/firmware partition (the 1st partition
-on the SD card) used by the Ubuntu boot process (roughly in order) is as
-follows:
-
-* bootcode.bin   - this is the second stage bootloader loaded by all pis with
-                   the exception of the pi4 (where this is replaced by flash
-                   memory)
-* config.txt     - the configuration file read by the boot process
-* start*.elf     - the third stage bootloader, which handles device-tree
-                   modification and which loads...
-* vmlinuz        - the Linux kernel
-* cmdline.txt    - the Linux kernel command line
-* initrd.img     - the initramfs
-EOM
+    cp "boot/README" "${B}/"
+    cp "boot/config.txt" "${B}/"
+    cp "boot/cmdline.txt" "${B}/"
+    cp "root/etc/fstab" "${R}/etc/"
 
     # No uboot since 20.10
     if [ "${IMG_ARCH}"  == "arm64" ]; then
@@ -239,47 +217,7 @@ EOM
     else
         ARM64=""
     fi
-
-    cat <<EOM > "${B}/config.txt"
-[pi4]
-max_framebuffers=2
-
-[all]
-${ARM64}
-kernel=vmlinuz
-cmdline=cmdline.txt
-initramfs initrd.img followkernel
-
-# Enable the audio output, I2C and SPI interfaces on the GPIO header
-dtparam=audio=on
-dtparam=i2c_arm=on
-dtparam=spi=on
-
-# Enable the "Fake" KMS graphics overlay; required to bring up audio
-dtoverlay=vc4-fkms-v3d
-gpu_mem=128
-start_x=1
-
-# Comment out the following line if the edges of the desktop appear outside
-# the edges of your display
-disable_overscan=1
-
-# If you have issues with audio, you may try uncommenting the following line
-# which forces the HDMI output into HDMI mode instead of DVI (which doesn't
-# support audio output)
-hdmi_drive=2
-
-# If you have a CM4, uncomment the following line to enable the USB2 outputs
-# on the IO board (assuming your CM4 is plugged into such a board)
-#dtoverlay=dwc2,dr_mode=host
-EOM
-
-    echo "net.ifnames=0 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc consoleblank=0 vt.global_cursor_default=0 snd_bcm2835.enable_compat_alsa=1 quiet splash" > "${B}/cmdline.txt"
-
-    cat <<'EOM' > "${R}/etc/fstab"
-LABEL=writable      /               ext4    defaults,noatime,x-systemd.growfs   0   0
-LABEL=system-boot   /boot/firmware  vfat    defaults                            0   1
-EOM
+    sed -i "s|ARM64|${ARM64}|" "${B}/config.txt"
 
     nspawn apt-get -y install libraspberrypi0 libraspberrypi-bin \
     linux-firmware-raspi2 linux-headers-raspi linux-image-raspi \
@@ -324,15 +262,7 @@ function stage_05_config() {
     nspawn groupadd -f --system input
     nspawn groupadd -f --system spi
 
-    cat <<'EOM' > "${R}/usr/local/sbin/adduser.local"
-#!/bin/sh
-# This script is executed as the final step when calling `adduser`
-# USAGE:
-#   adduser.local USER UID GID HOME
-
-# Add user to the Raspberry Pi specific groups
-usermod -a -G adm,gpio,i2c,input,spi,video $1
-EOM
+    cp "root/usr/local/sbin/adduser.local" "${R}/usr/local/sbin/"
     chmod 755 "${R}/usr/local/sbin/adduser.local"
 
     nspawn adduser --gecos "${USER_NAME^}" --add_extra_groups --disabled-password --home "${USER_HOME}" --gid 1000 --uid 1000 "${USER_NAME}"
@@ -352,68 +282,18 @@ EOM
 
     # Regenerate ssh host keys on first boot
     if  [ -d "${R}/etc/ssh" ]; then
-        cat <<'EOM' > "${R}/usr/lib/systemd/system/ssh-regenerate-hostkeys.service"
-[Unit]
-Description=Regenerate SSH host keys
-Before=ssh.service
-ConditionPathExists=!/etc/ssh/ssh_host_rsa_key
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/ssh-keygen -A
-
-[Install]
-WantedBy=multi-user.target
-EOM
+        cp "/root/usr/lib/systemd/system/ssh-regenerate-hostkeys.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable ssh-regenerate-hostkeys.service
     fi
 
     if [ "${SKIP_LUDO}" -eq 0 ]; then
-        cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-sshd-handler.service"
-[Unit]
-Description=Disable sshd if LudOS has it disabled
-After=ssh.service
-ConditionPathExists=!/storage/.cache/services/sshd.conf
-
-[Service]
-Type=oneshot
-ExecStart=systemctl stop ssh
-
-[Install]
-WantedBy=multi-user.target
-EOM
+        cp "root/usr/lib/systemd/system/ludos-sshd-handler.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable ludos-sshd-handler.service
 
-        cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-samba-handler.service"
-[Unit]
-Description=Disable nmbd and smbd if LudOS has them disabled
-After=nmbd.service
-After=smbd.service
-ConditionPathExists=!/storage/.cache/services/samba.conf
-
-[Service]
-Type=oneshot
-ExecStart=systemctl stop nmbd
-ExecStart=systemctl stop smbd
-
-[Install]
-WantedBy=multi-user.target
-EOM
+        cp "root/usr/lib/systemd/system/ludos-samba-handler.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable ludos-samba-handler.service
 
-        cat <<'EOM' > "${R}/usr/lib/systemd/system/ludos-bluez-handler.service"
-[Unit]
-Description=Disable Bluetooth if LudOS has it disabled
-After=bluetooth.target
-ConditionPathExists=!/storage/.cache/services/bluez.conf
-
-[Service]
-Type=oneshot
-ExecStart=systemctl stop bluetooth
-
-[Install]
-WantedBy=multi-user.target
-EOM
+        cp "root/usr/lib/systemd/system/ludos-bluez-handler.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable ludos-bluez-handler.service
 
         # Disable systemd-networkd et al; we're using connman
@@ -424,180 +304,10 @@ EOM
         nspawn systemctl disable systemd-resolved.service
         #rm ${R}/etc/dhcp/dhclient-enter-hooks.d/resolved
 
-        cat <<'EOM' > "${R}/etc/ludo.toml"
-video_fullscreen = true
-cores_dir = "/usr/lib/ludo"
-assets_dir = "/usr/share/ludo/assets"
-database_dir = "/usr/share/ludo/database"
-playlists_dir = "/storage/Retro/playlists"
-savefiles_dir = "/storage/Retro/savefiles"
-savestates_dir = "/storage/Retro/savestates"
-screenshots_dir = "/storage/Retro/screenshots"
-system_dir = "/storage/Retro/system"
-thumbnail_dir = "/storage/Retro/thumbnails"
-bluetooth_service = true
-samba_service = true
-ssh_service = true
-EOM
+        cp "root/etc/ludo.toml" "${R}/etc/"
 
-        cat <<EOM > "${R}/etc/samba/smb.conf"
-#
-# Sample configuration file for the Samba suite for Retro Home.
-#
-#
-# You should read the smb.conf(5) manual page in order to understand the
-# options listed here. Whenever you modify this file you should run the command
-# "testparm" to check that you have not made any basic syntactic errors.
-
-[global]
-  netbios name = retro-home-${REMIX}
-  server string = Retro Home (${REMIX})
-  workgroup = Retro Home
-  browseable = yes
-  writeable = yes
-  printable = no
-  deadtime = 30
-  mangled names = no
-  name resolve order = host bcast
-  printcap name = /dev/null
-  load printers = no
-  encrypt passwords = true
-  enable core files = no
-  passdb backend = smbpasswd
-  smb encrypt = disabled
-  fruit:model = Xserve
-
-  # samba share options
-  map to guest = Bad User
-  guest account = root
-  security = user
-
-  # samba tuning options
-  socket options = TCP_NODELAY IPTOS_LOWDELAY SO_SNDBUF=65535 SO_RCVBUF=65535
-  min receivefile size = 16384
-  aio read size = 16384
-  aio write size = 16384
-  use sendfile = yes
-
-  # The following are default values for the master selection process
-  # local master = yes
-  # preferred master = auto
-  # domain master = auto
-  # os level = 20
-
-  # "strict allocate = yes" breaks large network transfers to external hdd
-  # Force this to "no" in case "yes" becomes the default in future
-  strict allocate = no
-
-  allocation roundup size = 0
-
-# Using the following configurations as a template allows you to add
-# writeable shares of disks and paths under /storage
-
-[Update]
-  path = /storage/.update
-  available = yes
-  browseable = yes
-  public = yes
-  writeable = yes
-  create mask = 0644
-  force create mode = 0644
-  force directory mode = 0755
-  force user = ludo
-  force group = ludo
-  root preexec = mkdir -p /storage/.update
-
-[ROMs]
-  path = /storage/Retro/roms
-  available = yes
-  browseable = yes
-  public = yes
-  writeable = yes
-  create mask = 0644
-  force create mode = 0644
-  force directory mode = 0755
-  force user = ludo
-  force group = ludo
-  root preexec = mkdir -p /storage/Retro/roms
-
-[Savestates]
-  path = /storage/Retro/savestates
-  available = yes
-  browseable = yes
-  public = yes
-  writeable = yes
-  create mask = 0644
-  force create mode = 0644
-  force directory mode = 0755
-  force user = ludo
-  force group = ludo
-  root preexec = mkdir -p /storage/Retro/savestates
-
-[Savefiles]
-  path = /storage/Retro/savefiles
-  available = yes
-  browseable = yes
-  public = yes
-  writeable = yes
-  create mask = 0644
-  force create mode = 0644
-  force directory mode = 0755
-  force user = ludo
-  force group = ludo
-  root preexec = mkdir -p /storage/Retro/savefiles
-
-[Screenshots]
-  path = /storage/Retro/screenshots
-  available = yes
-  browseable = yes
-  public = yes
-  writeable = yes
-  create mask = 0644
-  force create mode = 0644
-  force directory mode = 0755
-  force user = ludo
-  force group = ludo
-  root preexec = mkdir -p /storage/Retro/screenshots
-
-[System]
-  path = /storage/Retro/system
-  available = yes
-  browseable = yes
-  public = yes
-  writeable = yes
-  create mask = 0644
-  force create mode = 0644
-  force directory mode = 0755
-  force user = ludo
-  force group = ludo
-  root preexec = mkdir -p /storage/Retro/system
-
-[Playlists]
-  path = /storage/Retro/playlists
-  available = yes
-  browseable = yes
-  public = yes
-  writeable = yes
-  create mask = 0644
-  force create mode = 0644
-  force directory mode = 0755
-  force user = ludo
-  force group = ludo
-  root preexec = mkdir -p /storage/Retro/playlists
-
-[Thumbnails]
-  path = /storage/Retro/thumbnails
-  available = yes
-  browseable = yes
-  public = yes
-  writeable = yes
-  create mask = 0644
-  force create mode = 0644
-  force directory mode = 0755
-  force user = ludo
-  force group = ludo
-  root preexec = mkdir -p /storage/Retro/thumbnails
-EOM
+        cp "root/etc/samba/smb.conf" "${R}/etc/samba/"
+        sed -i "s|REMIX|${REMIX}|g" "${R}/etc/samba/smb.conf"
 
         # Create directozries Ludo requires
         for DOT_DIR in .cache/connman .cache/services .config/ludo .local/ludo .local/share/ludo .ludo .update; do
@@ -652,201 +362,28 @@ EOM
         nspawn gtk-update-icon-cache /usr/share/icons/ubuntu-mono-yaru/
 
         # Composite the Retro Home wallpaper
-        wget -c "https://linuxconfig.org/wp-content/uploads/2020/03/Focal-Fossa_Plain_WP_1920x1080_GREY.png" -O "${R_STAGE_0}/Yaru-Grey.png"
-        composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Home-Wallpaper.png"
+        #wget -c "https://linuxconfig.org/wp-content/uploads/2020/03/Focal-Fossa_Plain_WP_1920x1080_GREY.png" -O "${R_STAGE_0}/Yaru-Grey.png"
+        #composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Home-Wallpaper.png"
+
         # Add the Retro Home wallpaper
         mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
-        cp -a "${R_STAGE_0}/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
+        cp -a "root/usr/share/backgrounds/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
 
         # Create Retro Home xsession
-        cat <<'EOM' > "${R}/usr/local/bin/retro-home"
-#!/usr/bin/env bash
-export __GL_YIELD=USLEEP
-export SDL_MOUSE_RELATIVE=0
-
-# Disable screen blanking, DPMS and screensaver
-xset -dpms
-xset s noblank
-xset s off
-
-if [ "$(id -u)" -eq 0 ]; then
-    # Clean up after the display manager
-    xprop -root \
-        -remove AT_SPI_BUS \
-        -remove _NET_NUMBER_OF_DESKTOPS \
-        -remove _NET_DESKTOP_NAMES \
-        -remove _NET_CURRENT_DESKTOP 2> /dev/null
-    xsetroot -solid rgb:67/67/67
-    feh --bg-scale /usr/share/backgrounds/Retro-Home-Wallpaper.png
-    /usr/bin/ludo -ludos -v &> /var/log/ludo.log
-    chown -R ludo:ludo /storage/.config &
-    chown ludo:ludo /storage/.xsession-errors* &
-    chown -R ludo:ludo /storage/.cache &
-    chown -R ludo:ludo /storage/.local &
-else
-    /usr/bin/ludo -ludos -v
-fi
-EOM
+        cp "root/usr/local/bin/retro-home" "${R}/usr/local/bin/"
         chmod 755 "${R}/usr/local/bin/retro-home"
 
         mkdir -p "${R}/usr/share/xsessions"
-        cp -a "${R}/usr/share/applications/ludo.desktop" "${R}/usr/share/xsessions/retro-home.desktop"
-        sed -i s'|Icon=ludo|Icon=retro-home|' "${R}/usr/share/xsessions/retro-home.desktop"
-        sed -i 's|Exec=ludo|Exec=retro-home|' "${R}/usr/share/xsessions/retro-home.desktop"
-        sed -i 's|Name=Ludo|Name=Retro Home|' "${R}/usr/share/xsessions/retro-home.desktop"
+        cp "root/usr/share/applications/retro-home.desktop" "${R}/usr/share/xsessions/"
 
         # Enable auto-login to run Retro Home
-        cat <<'EOM' > "${R}/etc/lightdm/lightdm.conf"
-[SeatDefaults]
-autologin-user=root
-autologin-user-timeout=0
-autologin-session=retro-home
-EOM
+        cp "root/etc/lightdm/lightdm.conf" "${R}/etc/lightdm/"
 
         # Create custom panel layout
-        cat <<'EOM' > "${R}/usr/share/gnome-panel/layouts/retro-home.layout"
-[Toplevel top-panel]
-expand=true
-orientation=top
-size=24
-
-[Object menu-bar]
-object-iid=org.gnome.gnome-panel.menu::menu-bar
-toplevel-id=top-panel
-pack-index=0
-
-[Object show-desktop]
-object-iid=org.gnome.gnome-panel.wncklet::show-desktop
-toplevel-id=top-panel
-pack-index=1
-
-[Object window-list]
-object-iid=org.gnome.gnome-panel.wncklet::window-list
-toplevel-id=top-panel
-pack-index=2
-
-[Object workspace-switcher]
-object-iid=org.gnome.gnome-panel.wncklet::workspace-switcher
-toplevel-id=top-panel
-pack-type=end
-pack-index=1
-
-[Object indicators]
-object-iid=IndicatorAppletCompleteFactory::IndicatorAppletComplete
-toplevel-id=top-panel
-pack-type=end
-pack-index=0
-EOM
+        cp "root/usr/share/gnome-panel/layouts/retro-home.layout" "${R}/usr/share/gnome-panel/layouts/"
 
         # Create gschema override
-        cat <<'EOM' > "${R}/usr/share/glib-2.0/schemas/90_retro-home.gschema.override"
-[x.dm.slick-greeter]
-background='/usr/share/backgrounds/Retro-Home-Wallpaper.png'
-background-color='#676767'
-draw-grid=true
-draw-user-backgrounds=false
-enable-hidpi='auto'
-font-name='M+ 1p Medium 11'
-icon-theme-name='ubuntu-mono-yaru'
-high-contrast=false
-show-hostname=true
-logo='/usr/share/pixmaps/ludo.png'
-onscreen-keyboard=false
-#other-monitors-logo=''
-play-ready-sound='/usr/share/sounds/Yaru/stereo/system-ready.oga'
-screen-reader=false
-show-power=false
-show-a11y=false
-show-keyboard=true
-show-clock=true
-show-quit=true
-theme-name='Yaru'
-xft-antialias=true
-xft-dpi=96
-xft-hintstyle='hintslight'
-xft-rgba='rgb'
-
-[org.gnome.desktop.background:GNOME-Flashback]
-color-shading-type='vertical'
-picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
-primary-color='#676767'
-secondary-color='#676767'
-
-[org.gnome.desktop.datetime:GNOME-Flashback]
-automatic-timezone=true
-
-[org.gnome.desktop.interface:GNOME-Flashback]
-cursor-theme='Yaru'
-document-font-name='M+ 1p Medium 11'
-enable-hot-corners=false
-font-name='M+ 1p Medium 11'
-gtk-theme='Yaru'
-icon-theme='ubuntu-mono-yaru'
-monospace-font-name='M+ 1mn Medium 14'
-
-[org.gnome.desktop.lockdown:GNOME-Flashback]
-disable-printing=true
-disable-print-setup=true
-disable-user-switching=true
-
-[org.gnome.desktop.media-handling:GNOME-Flashback]
-automount-open=false
-
-[org.gnome.desktop.privacy:GNOME-Flashback]
-remember-app-usage=false
-remember-recent-files=false
-report-technical-problems=false
-send-software-usage-stats=false
-
-[org.gnome.desktop.screensaver:GNOME-Flashback]
-color-shading-type='vertical'
-lock-enabled=false
-picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
-primary-color='#676767'
-secondary-color='#676767'
-ubuntu-lock-on-suspend=false
-user-switch-enabled=false
-
-[org.gnome.desktop.session:GNOME-Flashback]
-idle-delay=0
-
-[org.gnome.desktop.sound:GNOME-Flashback]
-theme-name='Yaru'
-
-[org.gnome.desktop.wm.preferences:GNOME-Flashback]
-button-layout=':minimize,maximize,close'
-theme='Yaru'
-titlebar-font='M+ 1p Bold 11'
-titlebar-uses-system-font=false
-
-[org.gnome.gedit.preferences.editor]
-editor-font='M+ 1mn Medium 14'
-
-[org.gnome.gnome-flashback.desktop.background:GNOME-Flashback]
-fade=false
-
-[org.gnome.gnome-flashback.desktop.icons:GNOME-Flashback]
-show-home=false
-show-trash=false
-
-[org.gnome.metacity:GNOME-Flashback]
-alt-tab-thumbnails=true
-
-[org.gnome.metacity.theme:GNOME-Flashback]
-name='Yaru'
-
-[org.gnome.gnome-panel.general:GNOME-Flashback]
-default-layout='retro-home'
-
-[org.gnome.settings-daemon.plugins.power:GNOME-Flashback]
-idle-dim=false
-power-button-action='interactive'
-sleep-inactive-ac-timeout=0
-sleep-inactive-ac-type='nothing'
-sleep-inactive-battery-timeout=0
-sleep-inactive-battery-type='nothing'
-EOM
-
+        cp "root/usr/share/glib-2.0/schemas/90_retro-home.gschema.override" "${R}/usr/share/glib-2.0/schemas/"
         nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
 
         # Disable tracker
@@ -855,33 +392,9 @@ EOM
         rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
 
         mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
-        # Add Connman Settings menu entry
-        cat <<'EOM' > "${R}/usr/share/gnome-flashback-metacity/applications/connman-gtk.desktop"
-[Desktop Entry]
-Type=Application
-Exec=connman-gtk
-Name=Connman Settings
-Categories=GTK;Utility;System;
-Keywords=connman;network;settings;wired;wifi;wi-fi;bluetooth;vpn;tethering
-X-GNOME-Settings-Panel=connman-gtk
-X-Unity-Settings-Panel=connman-gtk
-Icon=preferences-system-network
-EOM
-
-        # Hide the TeXInfo menu entry
-        cat <<'EOM' > "${R}/usr/share/gnome-flashback-metacity/applications/info.desktop"
-[Desktop Entry]
-Name=TeXInfo
-Comment=The viewer for TexInfo documents
-Exec=info
-Icon=dialog-information
-Type=Application
-Categories=Utility;Documentation;ConsoleOnly;
-Terminal=true
-X-Desktop-File-Install-Version=0.24
-NoDisplay=true
-EOM
-
+        # Add Connman Settings menu entry and hide the TeXInfo menu entry
+        cp "root/usr/share/gnome-flashback-metacity/applications/connman-gtk.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
+        cp "root/usr/share/gnome-flashback-metacity/applications/info.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
         nspawn update-desktop-database
     fi
 
@@ -890,13 +403,13 @@ EOM
     case ${REMIX} in
         gpi)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
-            CASE_SUPPORT="/usr/local/bin/gpi.py"
-            cp -v cases/gpi.py "${R}${CASE_SUPPORT}"
+            CASE_SUPPORT="gpi.py"
+            cp -v "/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
             # https://github.com/tsoliman/Retroflag-GPi-case
             # https://github.com/kristijandraca/GPi_Case_patch
             # https://support.retroflag.com/
-            cp -v cases/overlays/dpi24-gpi.dtbo "${B}/overlays/"
-            cp -v cases/overlays/pwm-audio-pi-zero.dtbo "${B}/overlays/"
+            cp -v boot/overlays/dpi24-gpi.dtbo "${B}/overlays/"
+            cp -v boot/overlays/pwm-audio-pi-zero.dtbo "${B}/overlays/"
             cat <<EOM >> "${B}/config.txt"
 # if you plug your tv at the same time as your rpi and that the rpi switches from the hdmi or give a low resolution because tv had no enough time to initialize it
 boot_delay=3
@@ -932,17 +445,17 @@ EOM
             ;;
         megabit)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
-            CASE_SUPPORT="/usr/local/bin/megabit.py"
-            cp -v cases/megabit.py "${R}${CASE_SUPPORT}"
+            CASE_SUPPORT="megabit.py"
+            cp -v "/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
             cat <<EOM >> "${B}/config.txt"
 enable_uart=1
 EOM
             ;;
         retroflag)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
-            CASE_SUPPORT="/usr/local/bin/retroflag.py"
-            cp -v cases/retroflag.py "${R}${CASE_SUPPORT}"
-            cp -v cases/overlays/RetroFlag_pw_io.dtbo "${B}/overlays/"
+            CASE_SUPPORT="retroflag.py"
+            cp -v "/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
+            cp -v boot/overlays/RetroFlag_pw_io.dtbo "${B}/overlays/"
             cat <<EOM >> "${B}/config.txt"
 enable_uart=1
 dtoverlay=RetroFlag_pw_io.dtbo
@@ -951,21 +464,10 @@ EOM
     esac
 
     if [ -n "${CASE_SUPPORT}" ]; then
-        cat <<EOM > "${R}/usr/lib/systemd/system/retro-home-case-support.service"
-[Unit]
-Description=Retro Home ${REMIX} case support
-After=local-fs.target
-
-[Service]
-Type=simple
-ExecStart=${CASE_SUPPORT}
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-EOM
+        cp "root/usr/lib/systemd/system/retro-home-case-support.service" "${R}/usr/lib/systemd/system/"
+        sed -i "s|CASE_SUPPORT|${CASE_SUPPORT}|g" "${R}/usr/lib/systemd/system/retro-home-case-support.service"
+        nspawn systemctl enable retro-home-case-support.service
     fi
-    nspawn systemctl enable retro-home-case-support.service
 }
 
 function stage_06_clean() {

@@ -1,0 +1,2 @@
+LABEL=writable      /               ext4    defaults,noatime,x-systemd.growfs   0   0
+LABEL=system-boot   /boot/firmware  vfat    defaults                            0   1

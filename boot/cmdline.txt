@@ -1,0 +1,1 @@
+net.ifnames=0 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 elevator=deadline rootwait fixrtc consoleblank=0 vt.global_cursor_default=0 snd_bcm2835.enable_compat_alsa=1 quiet splash

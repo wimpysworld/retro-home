@@ -1,0 +1,11 @@
+[Unit]
+Description=Disable sshd if LudOS has it disabled
+After=ssh.service
+ConditionPathExists=!/storage/.cache/services/sshd.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop ssh
+
+[Install]
+WantedBy=multi-user.target

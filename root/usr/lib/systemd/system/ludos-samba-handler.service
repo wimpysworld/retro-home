@@ -1,0 +1,13 @@
+[Unit]
+Description=Disable nmbd and smbd if LudOS has them disabled
+After=nmbd.service
+After=smbd.service
+ConditionPathExists=!/storage/.cache/services/samba.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop nmbd
+ExecStart=systemctl stop smbd
+
+[Install]
+WantedBy=multi-user.target

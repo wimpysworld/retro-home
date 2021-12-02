@@ -1,0 +1,7 @@
+#!/bin/sh
+# This script is executed as the final step when calling `adduser`
+# USAGE:
+#   adduser.local USER UID GID HOME
+
+# Add user to the Raspberry Pi specific groups
+usermod -a -G adm,gpio,i2c,input,spi,video $1
