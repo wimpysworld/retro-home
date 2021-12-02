@@ -892,8 +892,42 @@ EOM
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="/usr/local/bin/gpi.py"
             cp -v cases/gpi.py "${R}${CASE_SUPPORT}"
-#           cat <<EOM >> "${B}/config.txt"
-#EOM
+            # https://github.com/kristijandraca/GPi_Case_patch
+            # https://support.retroflag.com/
+            cp -v cases/overlays/dpi24.dtbo "${B}/overlays/"
+            cp -v cases/overlays/pwm-audio-pi-zero.dtbo "${B}/overlays/"
+            cat <<EOM >> "${B}/config.txt"
+# if you plug your tv at the same time as your rpi and that the rpi switches from the hdmi or give a low resolution because tv had no enough time to initialize it
+boot_delay=3
+
+# uncomment if you don't want the rainbow at startup
+disable_splash=1
+
+# default CEC name
+cec_osd_name=retro-home
+
+avoid_safe_mode=1
+
+display_rotate=1
+dtoverlay=dpi24
+overscan_left=0
+overscan_right=0
+overscan_top=0
+overscan_bottom=0
+framebuffer_width=320
+framebuffer_height=240
+enable_dpi_lcd=1
+display_default_lcd=1
+dpi_group=2
+dpi_mode=87
+dpi_output_format=0x6016
+#hdmi_timings=320 0 28 18 28 480 0 2 2 4 0 0 0 60 0 32000000 6
+hdmi_timings=240 1 38 10 20 320 1 20 4 4 0 0 0 60 0 6400000 1
+dtoverlay=pwm-2chan,pin=18,func=2,pin2=19,func2=2
+disable_pvt=1
+disable_audio_dither=1
+dtoverlay=pwm-audio-pi-zero
+EOM
             ;;
         megabit)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
