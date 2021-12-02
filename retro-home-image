@@ -8,7 +8,6 @@ LC_ALL=C
 # - Add Joystick as mouse?
 # - Add N64 core
 # - Add Saturn core
-# - Improve Retro Home session integration with desktop session
 
 # Display help usage
 function usage () {
@@ -678,8 +677,11 @@ if [ "$(id -u)" -eq 0 ]; then
         -remove _NET_CURRENT_DESKTOP 2> /dev/null
     xsetroot -solid rgb:67/67/67
     feh --bg-scale /usr/share/backgrounds/Retro-Home-Wallpaper.png
-    /usr/bin/ludo -ludos -v > /var/log/ludo.log
-    chown -R ludo:ludo /storage/{.cache,.config,.local}
+    /usr/bin/ludo -ludos -v &> /var/log/ludo.log
+    chown -R ludo:ludo /storage/.config &
+    chown ludo:ludo /storage/.xsession-errors* &
+    chown -R ludo:ludo /storage/.cache &
+    chown -R ludo:ludo /storage/.local &
 else
     /usr/bin/ludo -ludos -v
 fi
