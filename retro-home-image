@@ -655,8 +655,6 @@ EOM
 #!/usr/bin/env bash
 export __GL_YIELD=USLEEP
 export SDL_MOUSE_RELATIVE=0
-export DISPLAY=:0.0
-export WAYLAND_DISPLAY=wayland-0
 
 # Disable screen blanking, DPMS and screensaver
 xset -dpms
