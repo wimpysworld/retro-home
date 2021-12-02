@@ -1,0 +1,4 @@
+
+# config.txt additions for Megabit cases - https://megabitnes.com/
+
+enable_uart=1
