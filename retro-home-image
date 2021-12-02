@@ -192,7 +192,7 @@ function stage_03_micro_desktop() {
 
     if [ "${SKIP_DESKTOP}" -eq 0 ]; then
         # mutter-common provides gschema that prevents g-c-c from crashing
-        nspawn apt-get -y install --no-install-recommends connman-gtk \
+        nspawn apt-get -y install --no-install-recommends blueman connman-gtk \
         dconf-editor gedit gnome-session-flashback gnome-control-center \
         file-roller fonts-mplus indicator-applet indicator-application \
         indicator-session librsvg2-2 librsvg2-bin librsvg2-common \
