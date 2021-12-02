@@ -661,6 +661,7 @@ EOM
         # Create Retro Home xsession
         cat <<'EOM' > "${R}/usr/local/bin/retro-home"
 #!/usr/bin/env bash
+export __GL_YIELD=USLEEP
 export SDL_MOUSE_RELATIVE=0
 
 # Disable screen blanking, DPMS and screensaver
