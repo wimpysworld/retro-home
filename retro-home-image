@@ -605,9 +605,18 @@ EOM
             mkdir -p "${R}/storage/${DOT_DIR}"
         done
 
-        for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv; do
+        # Link the ludo configuration in /root to the `ludo` user.
+        # The retro-home "session manager" keeps permissions in check
+        mkdir -p "${R}/root/.config/"
+        nspawn ln -sf /storage/.config/ludo /root/.config/ludo
+
+        for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv .xsession-errors; do
             touch "${R}/storage/${CONF_FILE}"
         done
+
+        # Link .xsession-errors in /root to the `ludo` user.
+        # The retro-home "session manager" keeps permissions in check
+        nspawn ln -sf /storage/.xsession-errors /root/.xsession-errors
 
         for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
             mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
