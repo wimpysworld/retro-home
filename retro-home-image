@@ -661,6 +661,12 @@ xset s noblank
 xset s off
 
 if [ "$(id -u)" -eq 0 ]; then
+    # Clean up after the display manager
+    xprop -root \
+        -remove AT_SPI_BUS \
+        -remove _NET_NUMBER_OF_DESKTOPS \
+        -remove _NET_DESKTOP_NAMES \
+        -remove _NET_CURRENT_DESKTOP 2> /dev/null
     xsetroot -solid rgb:67/67/67
     feh --bg-scale /usr/share/backgrounds/Retro-Home-Wallpaper.png
     /usr/bin/ludo -ludos -v > /var/log/ludo.log
