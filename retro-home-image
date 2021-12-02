@@ -372,7 +372,6 @@ function stage_05_config() {
         # Create Retro Home xsession
         cp "root/usr/local/bin/retro-home" "${R}/usr/local/bin/"
         chmod 755 "${R}/usr/local/bin/retro-home"
-
         mkdir -p "${R}/usr/share/xsessions"
         cp "root/usr/share/applications/retro-home.desktop" "${R}/usr/share/xsessions/"
 
@@ -391,8 +390,8 @@ function stage_05_config() {
         rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
         rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
 
-        mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
         # Add Connman Settings menu entry and hide the TeXInfo menu entry
+        mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
         cp "root/usr/share/gnome-flashback-metacity/applications/connman-gtk.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
         cp "root/usr/share/gnome-flashback-metacity/applications/info.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
         nspawn update-desktop-database
