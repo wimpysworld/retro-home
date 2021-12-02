@@ -95,7 +95,7 @@ function stage_01_bootstrap() {
     rm -rf "${R_STAGE_1}"/*
 
     # Required tools on the host
-    apt-get -y install binfmt-support debootstrap git \
+    apt-get -y install binfmt-support debootstrap device-tree-compiler git \
     graphicsmagick-imagemagick-compat iproute2 qemu-user-static rsync \
     systemd-container ubuntu-keyring whois xz-utils
 
