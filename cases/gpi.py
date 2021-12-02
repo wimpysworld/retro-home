@@ -15,6 +15,7 @@ def process_kill(process_name: str):
 
 
 def button_dispatch(action: str):
+	power_led.blink()
 	print(action)
 	process_kill('ludo')
 	time.sleep(2)
