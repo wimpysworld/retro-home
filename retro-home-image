@@ -888,6 +888,13 @@ EOM
     local CASE_SUPPORT=""
 
     case ${REMIX} in
+        gpi)
+            nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
+            CASE_SUPPORT="/usr/local/bin/gpi.py"
+            cp -v cases/gpi.py "${R}${CASE_SUPPORT}"
+#           cat <<EOM >> "${B}/config.txt"
+#EOM
+            ;;
         megabit)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="/usr/local/bin/megabit.py"
@@ -1103,20 +1110,20 @@ case "${REMIX}" in
         echo "[+] Specified RetroFlag GPi Case"
         echo "[!] The RetroFlag GPi Case is only supported with:"
         echo "      - Raspberry Pi Zero 2 W"
-        not_implemented
+        REMIX="gpi"
         shift;;
     gpimate)
         # https://retrogamerestore.com/store/gpimate/
         SKIP_DESKTOP=1
         echo "[+] Specified RetroFlag GPi Case with GPiMate for CM3+Lite"
-        not_implemented
+        REMIX="gpi"
         shift;;
     gpimateplus)
         SKIP_DESKTOP=1
         # https://retrogamerestore.com/store/gpimateplus/
         # https://github.com/martinx72/GPiMatePlusHowTo
         echo "[+] Specified RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
-        not_implemented
+        REMIX="gpi"
         shift;;
     gpm280)
         SKIP_DESKTOP=1
