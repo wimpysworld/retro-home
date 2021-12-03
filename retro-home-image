@@ -158,6 +158,9 @@ function stage_02_ludo() {
         # Install xdg-utils now, but prevent perl proliferation
         nspawn apt-get -y install --no-install-recommends xdg-utils
 
+        # Display manager
+        nspawn apt-get -y install --no-install-recommends lightdm slick-greeter
+
         # LudOS requirements
         nspawn apt-get -y install bluez connman feh ssh
         nspawn apt-get -y install --no-install-recommends samba
@@ -167,9 +170,6 @@ function stage_02_ludo() {
         cp "${R_STAGE_0}/ludo.deb" "${R}/ludo.deb"
         nspawn apt-get -y install /ludo.deb
         rm -f "${R}/ludo.deb"
-
-        # Display manager
-        nspawn apt-get -y install --no-install-recommends lightdm slick-greeter
     fi
 }
 
