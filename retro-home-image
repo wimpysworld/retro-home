@@ -411,6 +411,16 @@ function stage_05_config() {
             dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/pwm-audio-pi-zero-gpi.dtbo" boot/overlays/pwm-audio-pi-zero-gpi-overlay.dts
             cat boot/config-gpi.txt >> "${B}/config.txt"
             ;;
+        gpimateplus)
+            nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
+            CASE_SUPPORT="gpi.py"
+            cp -v "/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
+            # https://github.com/martinx72/GPiMatePlusHowTo
+            # https://retropie.org.uk/forum/topic/31555/no-sound-retroflag-gpi-case-with-pi-zero-w-2-solved
+            dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/dpi24-gpi.dtbo" boot/overlays/dpi24-gpi-overlay.dts
+            dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/disable-pcie.dtbo" boot/overlays/disable-pcie-overlay.dts
+            cat boot/config-gpimateplus.txt >> "${B}/config.txt"
+            ;;
         megabit)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="megabit.py"
@@ -622,8 +632,8 @@ case "${REMIX}" in
         SKIP_DESKTOP=1
         # https://retrogamerestore.com/store/gpimateplus/
         # https://github.com/martinx72/GPiMatePlusHowTo
-        echo "[+] Specified RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
-        REMIX="gpi"
+        echo "[+] Specified RetroFlag GPi Case with GPiMatePlus for CM4+Lite"
+        REMIX="gpimateplus"
         shift;;
     gpm280)
         SKIP_DESKTOP=1
