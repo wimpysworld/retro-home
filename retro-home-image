@@ -73,6 +73,7 @@ function nspawn() {
     # Make sure the container has a machine-id
     systemd-machine-id-setup --root "${R}" --print
 
+    echo "Running: ${@}"
     # Bind mount resolv.conf and the firmware, set the hostname and spawn
     systemd-nspawn \
       --resolv-conf=off \
