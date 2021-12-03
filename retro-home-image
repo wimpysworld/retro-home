@@ -282,7 +282,7 @@ function stage_05_config() {
 
     # Regenerate ssh host keys on first boot
     if  [ -d "${R}/etc/ssh" ]; then
-        cp "/root/usr/lib/systemd/system/ssh-regenerate-hostkeys.service" "${R}/usr/lib/systemd/system/"
+        cp "root/usr/lib/systemd/system/ssh-regenerate-hostkeys.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable ssh-regenerate-hostkeys.service
     fi
 
@@ -373,7 +373,7 @@ function stage_05_config() {
         cp "root/usr/local/bin/retro-home" "${R}/usr/local/bin/"
         chmod 755 "${R}/usr/local/bin/retro-home"
         mkdir -p "${R}/usr/share/xsessions"
-        cp "root/usr/share/applications/retro-home.desktop" "${R}/usr/share/xsessions/"
+        cp "root/usr/share/xsessions/retro-home.desktop" "${R}/usr/share/xsessions/"
 
         # Enable auto-login to run Retro Home
         cp "root/etc/lightdm/lightdm.conf" "${R}/etc/lightdm/"
@@ -403,7 +403,7 @@ function stage_05_config() {
         gpi)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="gpi.py"
-            cp -v "/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
+            cp -v "root/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
             # https://github.com/tsoliman/Retroflag-GPi-case
             # https://github.com/kristijandraca/GPi_Case_patch
             # https://support.retroflag.com/
@@ -414,7 +414,7 @@ function stage_05_config() {
         gpimateplus)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="gpi.py"
-            cp -v "/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
+            cp -v "root/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
             # https://github.com/martinx72/GPiMatePlusHowTo
             # https://retropie.org.uk/forum/topic/31555/no-sound-retroflag-gpi-case-with-pi-zero-w-2-solved
             dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/dpi24-gpi.dtbo" boot/overlays/dpi24-gpi-overlay.dts
@@ -424,13 +424,13 @@ function stage_05_config() {
         megabit)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="megabit.py"
-            cp -v "/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
+            cp -v "root/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
             cat boot/config-megabit.txt >> "${B}/config.txt"
             ;;
         retroflag)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="retroflag.py"
-            cp -v "/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
+            cp -v "root/usr/local/bin/${CASE_SUPPORT}" "${R}/usr/local/bin/${CASE_SUPPORT}"
             cp -v boot/overlays/RetroFlag_pw_io.dtbo "${B}/overlays/"
             cat boot/config-retroflag.txt >> "${B}/config.txt"
             ;;
