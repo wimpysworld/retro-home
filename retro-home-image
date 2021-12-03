@@ -617,9 +617,7 @@ case "${REMIX}" in
         shift;;
     gpi)
         SKIP_DESKTOP=1
-        echo "[+] Specified RetroFlag GPi Case"
-        echo "[!] The RetroFlag GPi Case is only supported with:"
-        echo "      - Raspberry Pi Zero 2 W"
+        echo "[+] Specified RetroFlag GPi Case with Raspberry Pi Zero 2 W"
         REMIX="gpi"
         shift;;
     gpimate)
