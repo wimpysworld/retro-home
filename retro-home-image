@@ -379,6 +379,9 @@ function stage_05_config() {
         # Enable auto-login to run Retro Home
         cp "root/etc/lightdm/lightdm.conf" "${R}/etc/lightdm/"
 
+    fi
+
+    if [ "${SKIP_DESKTOP}" -eq 0 ]; then
         # Create custom panel layout
         cp "root/usr/share/gnome-panel/layouts/retro-home.layout" "${R}/usr/share/gnome-panel/layouts/"
 
