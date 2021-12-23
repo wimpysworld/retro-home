@@ -1,0 +1,11 @@
+[Unit]
+Description=Regenerate SSH host keys
+Before=ssh.service
+ConditionPathExists=!/etc/ssh/ssh_host_rsa_key
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ssh-keygen -A
+
+[Install]
+WantedBy=multi-user.target

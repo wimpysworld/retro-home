@@ -1,0 +1,11 @@
+[Unit]
+Description=Retro Home case support
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/CASE_SUPPORT
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

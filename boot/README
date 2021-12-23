@@ -1,0 +1,13 @@
+An overview of the files on the /boot/firmware partition (the 1st partition
+on the SD card) used by the Ubuntu boot process (roughly in order) is as
+follows:
+
+* bootcode.bin   - this is the second stage bootloader loaded by all pis with
+                   the exception of the pi4 (where this is replaced by flash
+                   memory)
+* config.txt     - the configuration file read by the boot process
+* start*.elf     - the third stage bootloader, which handles device-tree
+                   modification and which loads...
+* vmlinuz        - the Linux kernel
+* cmdline.txt    - the Linux kernel command line
+* initrd.img     - the initramfs

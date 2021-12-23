@@ -1,0 +1,13 @@
+video_fullscreen = true
+cores_dir = "/usr/lib/ludo"
+assets_dir = "/usr/share/ludo/assets"
+database_dir = "/usr/share/ludo/database"
+playlists_dir = "/storage/Retro/playlists"
+savefiles_dir = "/storage/Retro/savefiles"
+savestates_dir = "/storage/Retro/savestates"
+screenshots_dir = "/storage/Retro/screenshots"
+system_dir = "/storage/Retro/system"
+thumbnail_dir = "/storage/Retro/thumbnails"
+bluetooth_service = true
+samba_service = true
+ssh_service = true

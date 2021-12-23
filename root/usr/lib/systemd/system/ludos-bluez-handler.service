@@ -1,0 +1,11 @@
+[Unit]
+Description=Disable Bluetooth if LudOS has it disabled
+After=bluetooth.target
+ConditionPathExists=!/storage/.cache/services/bluez.conf
+
+[Service]
+Type=oneshot
+ExecStart=systemctl stop bluetooth
+
+[Install]
+WantedBy=multi-user.target
