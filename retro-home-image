@@ -183,9 +183,9 @@ function stage_03_micro_desktop() {
         # mutter-common provides gschema that prevents g-c-c from crashing
         nspawn apt-get -y install --no-install-recommends blueman connman-gtk \
         dconf-editor gedit gnome-session-flashback gnome-control-center \
-        file-roller fonts-mplus indicator-applet indicator-application \
-        indicator-session librsvg2-2 librsvg2-bin librsvg2-common \
-        mutter-common pulseaudio sakura transmission-gtk \
+        gnome-disk-utility file-roller fonts-mplus indicator-applet \
+        indicator-application indicator-session librsvg2-2 librsvg2-bin \
+        librsvg2-common mutter-common pulseaudio sakura transmission-gtk \
         yaru-theme-gtk yaru-theme-icon yaru-theme-sound
 
         #wget -qc "https://downloads.vivaldi.com/stable/vivaldi-stable_4.3.2439.71-1_${IMG_ARCH}.deb" -O "${R_STAGE_0}/vivaldi-stable.deb"
@@ -742,4 +742,4 @@ stage_04_kernel
 stage_05_config
 stage_06_clean
 stage_07_image
-#stage_08_compress_and_hash
+stage_08_compress_and_hash
