@@ -72,7 +72,7 @@ function nspawn() {
         echo "Acquire::http { Proxy \"http://${APT_CACHE_IP}:3142\"; }" > "${R}/etc/apt/apt.conf.d/90cache"
     else
     #or this is a VM guest and the host is running it
-        if nc -z 10.0.2.2 3143 && [ -d "${R}/etc/apt/apt.conf.d" ]; then
+        if nc -z 10.0.2.2 3142 && [ -d "${R}/etc/apt/apt.conf.d" ]; then
             echo "Acquire::http { Proxy \"http://10.0.2.2:3142\"; }" > "${R}/etc/apt/apt.conf.d/90cache"
         fi
     # TODO ? handle a parameter for external/other apt proxy address if there is one
