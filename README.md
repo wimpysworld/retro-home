@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center"><b>Your Home for Retro Gaming</b></p>
-<!-- <div align="center"><img src=".github/screenshot.jpg" alt="Retro Home Screenshot" /></div> -->
+<div align="center"><img src=".github/screenshot.png" alt="Retro Home Screenshot" width="960" height="540" /></div>
 <p align="center">Made with 💝 for <img src=".github/ubuntu.png" align="top" width="18" /></p>
 
 ## Introduction
