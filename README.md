@@ -14,10 +14,10 @@
 
 Retro Home is made possible thanks to [Ludo](https://ludo.libretro.com/).
 
+> Ludo is a minimalist frontend for emulators
+
   * Ask questions and provide **[feedback via our Discord](https://discord.gg/GeHJGD9)** 💬
   * Submit **[bug reports via GitHub](https://github.com/wimpysworld/retro-home/issues)** 🐛
-
-> Ludo is a minimalist frontend for emulators
 
 This repository hosts downloadable images of Retro Home and the script that
 builds Retro Home images for Raspberry Pi devices along with the associated
