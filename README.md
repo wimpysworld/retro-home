@@ -4,15 +4,14 @@
   Retro Home
 </h1>
 
-<p align="center"><b>Your Home for Retro Gaming</b></p>
+<p align="center"><b>Your Home for Retro Gaming 🕹</b></p>
 <div align="center"><img src=".github/screenshot.png" alt="Retro Home Screenshot" width="960" height="540" /></div>
 <p align="center">Made with 💝 for <img src=".github/ubuntu.png" align="top" width="18" /></p>
 
 ## Introduction
 
-**Retro Home is your home for retro gaming 🕹**
-
-Retro Home is made possible thanks to [Ludo](https://ludo.libretro.com/).
+**Retro Home is retro-gaming operating system for Raspberry Pi** and is made possible
+thanks to [Ubuntu](https://ubuntu.com/raspberry-pi) and [Ludo](https://ludo.libretro.com/).
 
 > Ludo is a minimalist frontend for emulators
 
@@ -21,7 +20,7 @@ Retro Home is made possible thanks to [Ludo](https://ludo.libretro.com/).
 
 This repository hosts downloadable images of Retro Home and the script that
 builds Retro Home images for Raspberry Pi devices along with the associated
-documentation to help get you retro gaming in style.
+documentation to get you retro-gaming in style.
 
 We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/GeHJGD9)
 
