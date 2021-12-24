@@ -27,7 +27,7 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
   * Based on [Ubuntu](https://ubuntu.com) and [Ludo](https://ludo.libretro.com/)
   * [Supported emulation](https://jean-andre-santoni.gitbook.io/ludo/emulated-consoles):
     * Arcade
-​​    * [Atari 2600 (VCS)](https://en.wikipedia.org/wiki/Atari_2600)
+    * [Atari 2600 (VCS)](https://en.wikipedia.org/wiki/Atari_2600)
     * [Atari 5200](https://en.wikipedia.org/wiki/Atari_5200)
     * [Atari 7800](https://en.wikipedia.org/wiki/Atari_7800)
     * [Atari Jaguar](https://en.wikipedia.org/wiki/Atari_Jaguar)
@@ -38,14 +38,14 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
     * [Magnavox Odyssey2](https://en.wikipedia.org/wiki/Magnavox_Odyssey_2)
     * Microsoft MSX
     * Microsoft MSX2
-​​    * Nintendo Game Boy
+    * Nintendo Game Boy
     * Nintendo Game Boy Color
     * Nintendo Game Boy Advance
     * Nintendo DS
     * Nintendo Entertainment System
     * Super Nintendo Entertainment System
     * Nintendo 64 (*WIP*)
-​​    * Nintendo Pokémon Mini
+    * Nintendo Pokémon Mini
     * Nintendo Virtual Boy
     * [Sega Game Gear](https://en.wikipedia.org/wiki/Game_Gear)
     * [Sega Master System (Mark III)](https://en.wikipedia.org/wiki/Master_System)
@@ -54,10 +54,10 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
       * [Sega Mega CD](https://en.wikipedia.org/wiki/Sega_CD)
       * [Sega 32X](https://en.wikipedia.org/wiki/32X)
     * [Sega Pico](https://en.wikipedia.org/wiki/Sega_Pico)
-​​    * [Sega Saturn](https://en.wikipedia.org/wiki/Sega_Saturn)
+    * [Sega Saturn](https://en.wikipedia.org/wiki/Sega_Saturn)
     * [SNK Neo Geo Pocket](https://en.wikipedia.org/wiki/Neo_Geo_Pocket)
     * [SNK Neo Geo Pocket Color](https://en.wikipedia.org/wiki/Neo_Geo_Pocket_Color)
-​​    * [NEC PC-98](https://en.wikipedia.org/wiki/PC-9800_series)
+    * [NEC PC-98](https://en.wikipedia.org/wiki/PC-9800_series)
     * [NEC PC Engine TurboGrafx-16](https://en.wikipedia.org/wiki/TurboGrafx-16)
       * [NEC PC Engine TurboGrafx-CD](https://en.wikipedia.org/wiki/TurboGrafx-16#Add-ons)
     * [NEC PC Engine SuperGrafx](https://en.wikipedia.org/wiki/PC_Engine_SuperGrafx)
