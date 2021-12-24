@@ -14,16 +14,20 @@
 
 Retro Home is made possible thanks to [Ludo](https://ludo.libretro.com/).
 
+  * Ask questions and provide **[feedback via our Discord](https://discord.gg/GeHJGD9)** 💬
+  * Submit **[bug reports via GitHub](https://github.com/wimpysworld/retro-home/issues)** 🐛
+
 > Ludo is a minimalist frontend for emulators
 
-This repository hosts the script that builds Retro Home images for Raspberry Pi
-devices and the associated documentation to help get you retro gaming in style.
+This repository hosts downloadable images of Retro Home and the script that
+builds Retro Home images for Raspberry Pi devices along with the associated
+documentation to help get you retro gaming in style.
 
 We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/GeHJGD9)
 
 ### Features
 
-  * Optimized images for Raspberry Pi 2, 3 and 4.
+  * Optimized images for Raspberry Pi 2, 3, 4 and 400.
   * Based on [Ubuntu](https://ubuntu.com) and [Ludo](https://ludo.libretro.com/)
   * [Supported emulation](https://jean-andre-santoni.gitbook.io/ludo/emulated-consoles):
     * Arcade
@@ -64,7 +68,7 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
     * [NEC PC-FX](https://en.wikipedia.org/wiki/PC-FX)
     * [Sony PlayStation](https://en.wikipedia.org/wiki/PlayStation)
     * [Vectrex](https://en.wikipedia.org/wiki/Vectrex)
-  * Supported Raspberry Pi:
+  * Supported Raspberry Pi models:
     * Raspberry Pi Compute Module 3 Lite
     * Raspberry Pi Compute Module 4 Lite
     * Raspberry Pi 2 Model B
@@ -78,18 +82,24 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
   * Automatic first boot file system expansion
   * WiFi and Bluetooth management
   * Integrated Samba and SSH server for copying over ROMS
-  * Optional *micro desktop*, based on [GNOME Flashback](https://wiki.gnome.org/Projects/GnomeFlashback)
+  * [GNOME Flashback](https://wiki.gnome.org/Projects/GnomeFlashback) based micro desktop *(not on handhelds)*
 
 ## Downloads
 
-  * *"Coming soon..."*
+Alpha images of Retro Home are [available for download from the GitHub releases](https://github.com/wimpysworld/retro-home/releases).
 
-No, really. It will be soon. We're just working through some testing to satisfy
-ourselves the first alpha images are ready for wider evaluation.
+The alpha images work for most emulators and are suitable for having
+retro-gaming 🕹 fun and testing to provide your [feedback to the project](https://discord.gg/GeHJGD9).
 
-### Putting Ludo on a Raspberry Pi
+### Putting Retro Home on a Raspberry Pi
 
-  * tbd
+  * [Download Retro Home](https://github.com/wimpysworld/retro-home/releases)
+  * Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to put the image on microSD card.
+  * Select **Use custom** from the Operating System drop down
+![pi-imager-00](.github/pi-imager-00.png)
+  * Select the target microSD card.
+![pi-imager-01](.github/pi-imager-01.png)
+  * Click **Write**
 
 ## Building Images
 
