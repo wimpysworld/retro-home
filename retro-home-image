@@ -606,12 +606,16 @@ case "${REMIX}" in
         shift;;
     gamehat)
         #https://www.waveshare.com/wiki/Game_HAT
+        #pathced driver for > 4.15 kernel 
+        # https://github.com/cmitu/mk_arcade_joystick_rpi/tree/retropie
+        # reffered by https://github.com/RetroPie/RetroPie-Setup/blob/master/scriptmodules/supplementary/mkarcadejoystick.sh
         SKIP_DESKTOP=1
         echo "[+] Specified Waveshare Game HAT"
         not_implemented
         shift;;
     gamepi20)
         #https://www.waveshare.com/wiki/GamePi20
+        #SAME driver as above just additional SCREEN over i2c
         SKIP_DESKTOP=1
         echo "[+] Specified Waveshare GamePi20"
         not_implemented
@@ -672,7 +676,7 @@ case "${REMIX}" in
         REMIX="retroflag"
         shift;;
     picade)
-        #https://get.pimoroni.com/picadehat
+        #https://github.com/pimoroni/picade-hat
         echo "[+] Specified Pimoroni Picade"
         not_implemented
         shift;;
