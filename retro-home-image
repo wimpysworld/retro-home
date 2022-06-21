@@ -162,11 +162,8 @@ function stage_02_ludo() {
         nspawn apt-get -y install bluez connman feh ssh
         nspawn apt-get -y install --no-install-recommends samba
 
-        local LUDO_VER="0.16.10"
-        wget -qc "https://github.com/libretro/ludo/releases/download/v${LUDO_VER}/ludo_${LUDO_VER}-1_armhf.deb" -O "${R_STAGE_0}/ludo.deb"
-        cp "${R_STAGE_0}/ludo.deb" "${R}/ludo.deb"
-        nspawn apt-get -y install /ludo.deb
-        rm -f "${R}/ludo.deb"
+        nspawn wget -O- https://raw.githubusercontent.com/wimpysworld/deb-get/main/deb-get | bash -s install deb-get
+        nspawn deb-get install ludo
     fi
 }
 
@@ -186,10 +183,8 @@ function stage_03_micro_desktop() {
 
         # Add the Raspberry Pi specific tweaks
         nspawn apt-get -y install ubuntu-raspi-settings
-        #wget -qc "https://downloads.vivaldi.com/stable/vivaldi-stable_4.3.2439.71-1_${IMG_ARCH}.deb" -O "${R_STAGE_0}/vivaldi-stable.deb"
-        #cp "${R_STAGE_0}/vivaldi-stable.deb" "${R}/vivaldi-stable.deb"
-        #nspawn apt-get -y install /vivaldi-stable.deb
-        #rm -f "${R}/vivaldi-stable.deb"
+
+        nspawn deb-get install vivaldi-stable
 
         # # https://gist.github.com/ruario/19a28d98d29d34ec9b184c42e5f8bf29
         # if [ -e "widevine-flash-20211119_${IMG_ARCH}.tgz" ]; then
