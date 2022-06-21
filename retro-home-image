@@ -677,11 +677,12 @@ case "${REMIX}" in
         shift;;
     picade)
         #https://github.com/pimoroni/picade-hat
+        #recommend hot_plug enabled
         echo "[+] Specified Pimoroni Picade"
         not_implemented
         shift;;
     picadeconsole)
-        ##https://get.pimoroni.com/picadehat
+        #Same as the previous one screen attached with hdmi, recommend hot_plug enabled
         echo "[+] Specified Pimoroni Picade Console"
         not_implemented
         shift;;
