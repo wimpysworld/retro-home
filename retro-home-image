@@ -354,12 +354,6 @@ function stage_05_config() {
         # Make an Ludo icon for Slick Greeter
         convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
 
-        # Generate ubuntu-mono-yaru icon theme
-        cp -a "${R}/usr/share/icons/ubuntu-mono-light" "${R}/usr/share/icons/ubuntu-mono-yaru"
-        sed -i s'|Ubuntu-Mono-Light|Ubuntu-Mono-Yaru|' "${R}/usr/share/icons/ubuntu-mono-yaru/index.theme"
-        sed -i s'|Inherits=Humanity|Inherits=Yaru,Humanity|' "${R}/usr/share/icons/ubuntu-mono-yaru/index.theme"
-        nspawn gtk-update-icon-cache /usr/share/icons/ubuntu-mono-yaru/
-
         # Composite the Retro Home wallpaper
         #wget -c "https://linuxconfig.org/wp-content/uploads/2020/03/Focal-Fossa_Plain_WP_1920x1080_GREY.png" -O "${R_STAGE_0}/Yaru-Grey.png"
         #composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Home-Wallpaper.png"
