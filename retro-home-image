@@ -402,8 +402,10 @@ function stage_05_config() {
             # https://github.com/tsoliman/Retroflag-GPi-case
             # https://github.com/kristijandraca/GPi_Case_patch
             # https://support.retroflag.com/
-            dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/dpi24-gpi.dtbo" boot/overlays/dpi24-gpi-overlay.dts
-            dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/pwm-audio-pi-zero-gpi.dtbo" boot/overlays/pwm-audio-pi-zero-gpi-overlay.dts
+            #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/dpi24-gpi.dtbo" boot/overlays/dpi24-gpi-overlay.dts
+            #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/pwm-audio-pi-zero-gpi.dtbo" boot/overlays/pwm-audio-pi-zero-gpi-overlay.dts
+            cp boot/overlays/dpi24-gpi.dtbo "${B}/overlays/"
+            cp boot/overlays/pwm-audio-pi-zero.dtbo "${B}/overlays/pwm-audio-pi-zero-gpi.dtbo"
             cat boot/config-gpi.txt >> "${B}/config.txt"
             ;;
         gpimateplus)
