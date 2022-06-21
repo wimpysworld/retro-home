@@ -214,6 +214,19 @@ dtoverlay=dwc2"
     fi
     sed -i "s|ARM64|${ARM64}|" "${B}/config.txt"
 
+    # Adds lz4 and z3fold modules to initramfs.
+    # - https://ubuntu.com/blog/how-low-can-you-go-running-ubuntu-desktop-on-a-2gb-raspberry-pi-4
+    echo lz4    >> "${R}/etc/initramfs-tools/modules"
+    echo z3fold >> "${R}/etc/initramfs-tools/modules"
+
+    # Swap
+    # - https://git.launchpad.net/livecd-rootfs/tree/live-build/ubuntu/hooks/099-ubuntu-image-customization.chroot
+    mkdir -p "${R}/usr/lib/systemd/system/swap.target.wants/"
+    cp "root/usr/lib/systemd/system/mkswap.service" "${R}/usr/lib/systemd/system/mkswap.service"
+    nspawn systemctl enable mkswap.service
+    cp "root/usr/lib/systemd/system/swapfile.swap" "${R}/usr/lib/systemd/system/swapfile.swap"
+    nspawn systemctl enable swapfile.swap
+
     nspawn apt-get -y install libraspberrypi0 libraspberrypi-bin \
     linux-firmware-raspi linux-headers-raspi linux-image-raspi \
     linux-modules-extra-raspi pi-bluetooth raspi-config rpi-eeprom
