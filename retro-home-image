@@ -226,9 +226,9 @@ dtoverlay=dwc2"
     # - https://git.launchpad.net/livecd-rootfs/tree/live-build/ubuntu/hooks/099-ubuntu-image-customization.chroot
     mkdir -p "${R}/usr/lib/systemd/system/swap.target.wants/"
     cp "root/usr/lib/systemd/system/mkswap.service" "${R}/usr/lib/systemd/system/mkswap.service"
-    nspawn systemctl enable mkswap.service
+    nspawn ln -s /usr/lib/systemd/system/mkswap.service /usr/lib/systemd/system/swap.target.wants/mkswap.service
     cp "root/usr/lib/systemd/system/swapfile.swap" "${R}/usr/lib/systemd/system/swapfile.swap"
-    nspawn systemctl enable swapfile.swap
+    nspawn ln -s /usr/lib/systemd/system/swapfile.swap /usr/lib/systemd/system/swap.target.wants/swapfile.swap
 
     nspawn apt-get -y install libraspberrypi0 libraspberrypi-bin \
     linux-firmware-raspi linux-headers-raspi linux-image-raspi \
