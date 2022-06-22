@@ -319,7 +319,7 @@ function stage_05_config() {
         # Link the ludo configuration in /root to the `ludo` user.
         # The retro-home "session manager" keeps permissions in check
         mkdir -p "${R}/root/.config/"
-        #nspawn ln -sf /storage/.config/ludo /root/.config/ludo
+        nspawn ln -sf /storage/.config/ludo /root/.config/ludo
 
         for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv .xsession-errors; do
             touch "${R}/storage/${CONF_FILE}"
@@ -327,7 +327,7 @@ function stage_05_config() {
 
         # Link .xsession-errors in /root to the `ludo` user.
         # The retro-home "session manager" keeps permissions in check
-        #nspawn ln -sf /storage/.xsession-errors /root/.xsession-errors
+        nspawn ln -sf /storage/.xsession-errors /root/.xsession-errors
 
         for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
             mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
@@ -366,14 +366,14 @@ function stage_05_config() {
         cp -a "root/usr/share/backgrounds/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
 
         # Create Retro Home xsession
-        #cp "root/usr/local/bin/retro-home" "${R}/usr/local/bin/"
-        #chmod 755 "${R}/usr/local/bin/retro-home"
-        #mkdir -p "${R}/usr/share/xsessions"
-        #cp "root/usr/share/xsessions/retro-home.desktop" "${R}/usr/share/xsessions/"
+        cp "root/usr/local/bin/retro-home" "${R}/usr/local/bin/"
+        chmod 755 "${R}/usr/local/bin/retro-home"
+        mkdir -p "${R}/usr/share/xsessions"
+        cp "root/usr/share/xsessions/retro-home.desktop" "${R}/usr/share/xsessions/"
 
         # Enable auto-login to run Retro Home
-        #cp "root/etc/lightdm/lightdm.conf" "${R}/etc/lightdm/"
-        cp "root/etc/lightdm/lightdm-gtk-greeter.conf" "${R}/etc/lightdm/"
+        cp "root/usr/share/lightdm/lightdm.conf.d/60-retro-home.conf" "${R}/usr/share/lightdm/lightdm.conf.d/"
+        cp "root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/30_retro-home.conf" "${R}/usr/share/lightdm/lightdm-gtk-greeter.conf.d/"
     fi
 
     if [ "${SKIP_DESKTOP}" -eq 0 ]; then
