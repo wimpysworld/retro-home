@@ -487,7 +487,8 @@ function stage_07_image() {
 
     # Build the image file
     local SIZE_IMG=""
-    SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'.' -f1)
+    SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'G' -f1)
+    SIZE_IMG=$(printf "%.0f" "${SIZE_IMG}")
     ((SIZE_IMG+=2))
     local SIZE_BOOT="256MiB"
 
