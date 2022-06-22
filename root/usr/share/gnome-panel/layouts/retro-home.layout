@@ -1,7 +1,7 @@
 [Toplevel top-panel]
 expand=true
 orientation=top
-size=24
+size=26
 
 [Object menu-bar]
 object-iid=org.gnome.gnome-panel.menu::menu-bar

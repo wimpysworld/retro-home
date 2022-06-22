@@ -12,8 +12,8 @@ cursor-theme='Yaru'
 document-font-name='M+ 1p Medium 11'
 enable-hot-corners=false
 font-name='M+ 1p Medium 11'
-gtk-theme='Yaru'
-icon-theme='Yaru'
+gtk-theme='Yaru-red'
+icon-theme='Yaru-red'
 monospace-font-name='M+ 1mn Medium 14'
 
 [org.gnome.desktop.lockdown:GNOME-Flashback]

@@ -179,7 +179,7 @@ function stage_03_micro_desktop() {
         gnome-disk-utility file-roller fonts-mplus indicator-applet \
         indicator-application indicator-session librsvg2-2 librsvg2-bin \
         librsvg2-common mutter-common pulseaudio sakura transmission-gtk \
-        yaru-theme-gtk yaru-theme-icon yaru-theme-sound
+        yaru-theme-gtk yaru-theme-icon yaru-theme-sound yaru-theme-unity
 
         # Add the Raspberry Pi specific tweaks
         nspawn apt-get -y install ubuntu-raspi-settings
