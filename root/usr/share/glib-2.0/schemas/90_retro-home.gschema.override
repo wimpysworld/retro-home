@@ -14,7 +14,7 @@ enable-hot-corners=false
 font-name='M+ 1p Medium 11'
 gtk-theme='Yaru-red'
 icon-theme='Yaru-red'
-monospace-font-name='M+ 1mn Medium 14'
+monospace-font-name='M+ 1m Medium 13'
 
 [org.gnome.desktop.lockdown:GNOME-Flashback]
 disable-printing=true
@@ -52,7 +52,7 @@ titlebar-font='M+ 1p Bold 11'
 titlebar-uses-system-font=false
 
 [org.gnome.gedit.preferences.editor]
-editor-font='M+ 1mn Medium 14'
+editor-font='M+ 1m Medium 13'
 
 [org.gnome.gnome-flashback.desktop.background:GNOME-Flashback]
 fade=false

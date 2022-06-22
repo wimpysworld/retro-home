@@ -178,7 +178,7 @@ function stage_03_micro_desktop() {
     if [ "${SKIP_DESKTOP}" -eq 0 ]; then
         # mutter-common provides gschema that prevents g-c-c from crashing
         nspawn apt-get -y install --no-install-recommends blueman connman-gtk \
-        dconf-editor gedit gnome-session-flashback gnome-control-center \
+        dconf-editor gcolor3 gedit gnome-session-flashback gnome-control-center \
         gnome-disk-utility file-roller fonts-mplus indicator-applet \
         indicator-application indicator-session librsvg2-2 librsvg2-bin \
         librsvg2-common mutter-common pulseaudio sakura transmission-gtk \
@@ -195,6 +195,7 @@ function stage_03_micro_desktop() {
         #     mkdir -p "${R}/etc/skel/.config/vivaldi/WidevineCdm"
         #     echo '{"Path":"/opt/WidevineCdm"}' > "${R}/etc/skel/.config/vivaldi/WidevineCdm/latest-component-updated-widevine-cdm"
         # fi
+        nspawn fc-cache -frsv
     fi
 }
 
@@ -306,6 +307,7 @@ function stage_05_config() {
         nspawn systemctl disable systemd-resolved.service
         #rm ${R}/etc/dhcp/dhclient-enter-hooks.d/resolved
 
+        cp -rv "root/etc/skel" "${R}/etc/"
         cp "root/etc/ludo.toml" "${R}/etc/"
 
         cp "root/etc/samba/smb.conf" "${R}/etc/samba/"
