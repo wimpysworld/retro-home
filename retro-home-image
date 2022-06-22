@@ -337,8 +337,8 @@ function stage_05_config() {
 
         chown -Rv 1000:1000 "${R}/storage"
 
-        #echo "${USER_NAME}   ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/ludo" > "${R}/etc/sudoers.d/090-ludo"
-        #chmod -v 0440 "${R}/etc/sudoers.d/090-ludo"
+        echo "${USER_NAME}   ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/ludo" > "${R}/etc/sudoers.d/090-ludo"
+        chmod -v 0440 "${R}/etc/sudoers.d/090-ludo"
         # PolicyKit object
         #org.freedesktop.systemd1.manage-units
 
@@ -375,7 +375,8 @@ function stage_05_config() {
 
         # Enable auto-login to run Retro Home
         cp "root/usr/share/lightdm/lightdm.conf.d/60-retro-home.conf" "${R}/usr/share/lightdm/lightdm.conf.d/"
-        cp "root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/30_retro-home.conf" "${R}/usr/share/lightdm/lightdm-gtk-greeter.conf.d/"
+        cp "root/usr/share/lightdm/lightdm.conf.d/61-retro-home-autologin.conf" "${R}/usr/share/lightdm/lightdm.conf.d/"
+        cp "root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/30-retro-home.conf" "${R}/usr/share/lightdm/lightdm-gtk-greeter.conf.d/"
     fi
 
     if [ "${SKIP_DESKTOP}" -eq 0 ]; then
