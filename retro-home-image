@@ -156,7 +156,7 @@ function stage_02_ludo() {
         nspawn apt-get -y install --no-install-recommends xdg-utils
 
         # Display manager
-        nspawn apt-get -y install --no-install-recommends lightdm slick-greeter
+        nspawn apt-get -y install --no-install-recommends lightdm lightdm-gtk-greeter
 
         # LudOS requirements
         nspawn apt-get -y install bluez connman feh ssh
@@ -370,6 +370,7 @@ function stage_05_config() {
 
         # Enable auto-login to run Retro Home
         #cp "root/etc/lightdm/lightdm.conf" "${R}/etc/lightdm/"
+        cp "root/etc/lightdm/lightdm-gtk-greeter.conf" "${R}/etc/lightdm/"
     fi
 
     if [ "${SKIP_DESKTOP}" -eq 0 ]; then
