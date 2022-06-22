@@ -31,7 +31,8 @@ dtoverlay=dwc2,dr_mode=host
 
 [all]
 
-# Enable the KMS ("fake" KMS) graphics overlay
+# Enable the KMS ("fake" KMS) graphics overlay. Ludo requires ALSA, see below:
+# https://github.com/wimpysworld/retro-home/issues/16
 dtoverlay=vc4-fkms-v3d
 
 # Autoload overlays for any recognized cameras or displays that are attached
