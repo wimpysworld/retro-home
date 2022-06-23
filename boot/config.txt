@@ -31,9 +31,9 @@ dtoverlay=dwc2,dr_mode=host
 
 [all]
 
-# Enable the KMS ("fake" KMS) graphics overlay. Ludo requires ALSA, see below:
-# https://github.com/wimpysworld/retro-home/issues/16
-dtoverlay=vc4-fkms-v3d
+# Enable the KMS ("full" KMS) graphics overlay, leaving GPU memory as the
+# default (the kernel is in control of graphics memory with full KMS)
+dtoverlay=vc4-kms-v3d
 
 # Autoload overlays for any recognized cameras or displays that are attached
 # to the CSI/DSI ports. Please note this is for libcamera support, *not* for
