@@ -196,16 +196,26 @@ function stage_03_micro_desktop() {
     sync_from "${B_STAGE_2}" "${R_STAGE_2}"
 
     if [ "${SKIP_DESKTOP}" -eq 0 ]; then
-        # mutter-common provides gschema that prevents g-c-c from crashing
-        nspawn apt-get -y install --no-install-recommends blueman connman-gtk \
-        dconf-editor gcolor3 gedit gnome-session-flashback gnome-control-center \
-        gnome-disk-utility file-roller fonts-mplus indicator-applet \
-        indicator-application indicator-session librsvg2-2 librsvg2-bin \
-        librsvg2-common mutter-common sakura transmission-gtk \
+        nspawn apt-get -y install --no-install-recommends language-pack-gnome-en
+
+        nspawn apt-get -y install --no-install-recommends connman-gtk \
+        file-roller fonts-mplus gedit gnome-bluetooth gnome-control-center \
+        gnome-control-center-faces gnome-disk-utility gnome-keyring \
+        gnome-session-flashback gnome-startup-applications librsvg2-2 \
+        librsvg2-bin librsvg2-common sakura transmission-gtk \
         yaru-theme-gtk yaru-theme-icon yaru-theme-sound yaru-theme-unity
 
-        # Add the Raspberry Pi specific tweaks
-        nspawn apt-get -y install ubuntu-raspi-settings
+        # Install gschemas that prevent gnome-control-center from crashing
+        nspawn apt-get -y install --no-install-recommends gnome-shell-common mutter-common
+
+        # Indicators
+        nspawn apt-get -y install --no-install-recommends gkbd-capplet gucharmap \
+        indicator-applet indicator-application indicator-bluetooth \
+        indicator-datetime indicator-keyboard indicator-session indicator-sound
+
+        # Dev tools
+        #nspawn apt-get -y install --no-install-recommends dconf-editor \
+        #gcolor3 lightdm-gtk-greeter-settings pavucontrol
 
         nspawn deb-get install vivaldi-stable
 
