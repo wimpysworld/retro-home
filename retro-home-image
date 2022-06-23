@@ -330,18 +330,9 @@ function stage_05_config() {
             mkdir -p "${R}/storage/${DOT_DIR}"
         done
 
-        # Link the ludo configuration in /root to the `ludo` user.
-        # The retro-home "session manager" keeps permissions in check
-        mkdir -p "${R}/root/.config/"
-        nspawn ln -sf /storage/.config/ludo /root/.config/ludo
-
         for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv .xsession-errors; do
             touch "${R}/storage/${CONF_FILE}"
         done
-
-        # Link .xsession-errors in /root to the `ludo` user.
-        # The retro-home "session manager" keeps permissions in check
-        nspawn ln -sf /storage/.xsession-errors /root/.xsession-errors
 
         for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
             mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
@@ -349,10 +340,9 @@ function stage_05_config() {
 
         chown -Rv 1000:1000 "${R}/storage"
 
-        echo "${USER_NAME}   ALL=(ALL:ALL) NOPASSWD:SETENV: /usr/bin/ludo" > "${R}/etc/sudoers.d/090-ludo"
-        chmod -v 0440 "${R}/etc/sudoers.d/090-ludo"
-        # PolicyKit object
-        #org.freedesktop.systemd1.manage-units
+        # Allow member of the 'sudo' to start and stop services
+        # - https://unix.stackexchange.com/questions/504806/systemd-start-as-unprivileged-user-in-a-group/557634#557634
+        cp root/etc/polkit-1/localauthority/50-local.d/service-auth.pkla "${R}/etc/polkit-1/localauthority/50-local.d/"
 
         # Generate retro-home icons
         wget -qc "https://raw.githubusercontent.com/wimpysworld/retro-home/master/.github/logo.svg" -O "${R_STAGE_0}/retro-home.svg"
