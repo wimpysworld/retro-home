@@ -162,10 +162,21 @@ function stage_02_ludo() {
         nspawn apt-get -y install bluez connman feh ssh
         nspawn apt-get -y install --no-install-recommends samba
 
+        # PipeWire
+        nspawn apt-get -y install gstreamer1.0-pipewire \
+        pipewire-audio-client-libraries wireplumber
+
+        # Bluetooth codecs
+        nspawn apt-get -y install libfdk-aac2 libldacbt-abr2 libldacbt-enc2 \
+        libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack
+
+        # deb-get
         nspawn apt-get -y install curl
         nspawn wget -q "https://raw.githubusercontent.com/wimpysworld/deb-get/0.2.9/deb-get" -O /usr/bin/deb-get
         chmod 755 "${R}/usr/bin/deb-get"
         nspawn deb-get install deb-get
+
+        # Ludo
         nspawn deb-get install ludo
     fi
 }
@@ -181,7 +192,7 @@ function stage_03_micro_desktop() {
         dconf-editor gcolor3 gedit gnome-session-flashback gnome-control-center \
         gnome-disk-utility file-roller fonts-mplus indicator-applet \
         indicator-application indicator-session librsvg2-2 librsvg2-bin \
-        librsvg2-common mutter-common pulseaudio sakura transmission-gtk \
+        librsvg2-common mutter-common sakura transmission-gtk \
         yaru-theme-gtk yaru-theme-icon yaru-theme-sound yaru-theme-unity
 
         # Add the Raspberry Pi specific tweaks
