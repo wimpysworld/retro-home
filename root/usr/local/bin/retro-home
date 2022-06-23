@@ -14,4 +14,5 @@ xprop -root \
     -remove _NET_CURRENT_DESKTOP 2> /dev/null
 xsetroot -solid rgb:67/67/67
 feh --bg-scale /usr/share/backgrounds/Retro-Home-Wallpaper.png
-/usr/bin/ludo -ludos -v &> /var/log/ludo.log
+hdmi-refresh &
+ludo -ludos -v &> "${HOME}"/.ludo.log

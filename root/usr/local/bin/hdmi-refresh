@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+#TODO: Put gaurds around this to only run on affected hardware/capture card
+HDMI=$(grep video=HDMI /var/log/syslog | tail -n1 | cut -d':' -f6 | cut -d' ' -f1)
+#1920x1080M@60
+echo "${HDMI}"
+SIZE=$(echo "${HDMI}" | cut -d'M' -f1)
+RATE=$(echo "${HDMI}" | cut -d'@' -f2)
+#echo ${SIZE}
+#echo ${RATE}
+
+sleep 10
+env DISPLAY=:0 xrandr --size ${SIZE} --rate ${RATE}

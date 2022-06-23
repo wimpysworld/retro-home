@@ -370,10 +370,12 @@ function stage_05_config() {
         cp -a "root/usr/share/backgrounds/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
 
         # Create Retro Home xsession
-        cp "root/usr/local/bin/retro-home" "${R}/usr/local/bin/"
-        chmod 755 "${R}/usr/local/bin/retro-home"
-        mkdir -p "${R}/usr/share/xsessions"
-        cp "root/usr/share/xsessions/retro-home.desktop" "${R}/usr/share/xsessions/"
+        cp root/usr/local/bin/retro-home "${R}/usr/local/bin/"
+        cp root/usr/local/bin/hdmi-refresh "${R}/usr/local/bin/"
+        chmod 755 "${R}"/usr/local/bin/retro-home
+        chmod 755 "${R}"/usr/local/bin/hdmi-refresh
+        mkdir -p "${R}"/usr/share/xsessions
+        cp root/usr/share/xsessions/retro-home.desktop "${R}"/usr/share/xsessions/
 
         # Enable auto-login to run Retro Home
         cp -v root/usr/share/lightdm/lightdm.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm.conf.d/
