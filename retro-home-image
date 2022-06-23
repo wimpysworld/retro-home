@@ -666,7 +666,7 @@ case "${REMIX}" in
         shift;;
     gamehat)
         #https://www.waveshare.com/wiki/Game_HAT
-        #pathced driver for > 4.15 kernel
+        #patched driver for > 4.15 kernel
         # https://github.com/cmitu/mk_arcade_joystick_rpi/tree/retropie
         # reffered by https://github.com/RetroPie/RetroPie-Setup/blob/master/scriptmodules/supplementary/mkarcadejoystick.sh
         SKIP_DESKTOP=1
