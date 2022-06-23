@@ -9,6 +9,7 @@ function usage () {
   echo
   echo "Supported (or planned) devices are:"
   echo "  raspi:            Rasberry Pi 2, 3 and 4"
+  echo "  deskpipro:        Rasberry Pi 2, 3 and 4"
   echo "  gamehat:          Waveshare Game HAT"
   echo "  gamepi20:         Waveshare GamePi20"
   echo "  gamepi43:         Waveshare GamePi43"
@@ -233,11 +234,21 @@ function stage_04_kernel() {
     export R="${R_STAGE_4}"
     sync_from "${B_STAGE_3}" "${R_STAGE_3}"
 
-    cp "boot/README" "${B}/"
-    cp "boot/config.txt" "${B}/"
-    cp "boot/cmdline.txt" "${B}/"
-    cp "root/etc/fstab" "${R}/etc/"
+    # Append case specific cmdline.txt & config.txt
+    cp -v "boot/README" "${B}/"
+    if [ -f case/${REMIX}/config.txt ]; then
+        cp -v case/${REMIX}/config.txt "${B}/"
+    else
+        cp "boot/config.txt" "${B}/"
+    fi
 
+    if [ -f case/${REMIX}/cmdline.txt ]; then
+        cp -v case/${REMIX}/cmdline.txt "${B}/"
+    else
+        cp "boot/cmdline.txt" "${B}/"
+    fi
+
+    # Apply ARM64 tweaks
     if [ "${IMG_ARCH}"  == "arm64" ]; then
         ARM64="# Config settings specific to arm64
 arm_64bit=1
@@ -246,6 +257,8 @@ dtoverlay=dwc2"
         ARM64=""
     fi
     sed -i "s|ARM64|${ARM64}|" "${B}/config.txt"
+
+    cp "root/etc/fstab" "${R}/etc/"
 
     # Adds lz4 and z3fold modules to initramfs.
     # - https://ubuntu.com/blog/how-low-can-you-go-running-ubuntu-desktop-on-a-2gb-raspberry-pi-4
@@ -423,6 +436,21 @@ function stage_05_config() {
     local CASE_SUPPORT=""
 
     case ${REMIX} in
+        deskpipro)
+            # https://github.com/DeskPi-Team/deskpi
+            # https://github.com/DeskPi-Team/deskpi/tree/master/drivers
+            # TODO:
+            # - Fan Control
+            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/c/fanStop.c
+            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/c/pwmControlFan.c
+            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/python/pwmControlFan.py
+            # - Safe Power Cutoff
+            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/c/safecutoffpower.c
+            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/python/safecutoffpower.py
+            # - IR Control
+            #   https://wiki.deskpi.com/deskpi/#how-to-use-ir-function-onboard
+            true
+            ;;
         gpi)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="gpi.py"
@@ -630,6 +658,11 @@ SKIP_UBUNTU_STANDARD=0
 case "${REMIX}" in
     raspi)
         echo "[+] Specified Rasberry Pi 2, 3, 4 or 400"
+        shift;;
+    deskpipro)
+        # https://wiki.deskpi.com/deskpi/
+        # https://github.com/DeskPi-Team/deskpi
+        echo "[+] Specified Desk Pi Pro"
         shift;;
     gamehat)
         #https://www.waveshare.com/wiki/Game_HAT
