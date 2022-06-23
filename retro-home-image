@@ -166,13 +166,18 @@ function stage_02_ludo() {
         nspawn systemctl enable iwd.service
         nspawn apt-get -y install --no-install-recommends samba
 
-        # PipeWire
-        nspawn apt-get -y install gstreamer1.0-pipewire \
-        pipewire-audio-client-libraries wireplumber
+        local AUDIO_SYSTEM="pipewire"
+        case "${AUDIO_SYSTEM}" in
+            pipewire)
+                nspawn apt-get -y install libcanberra-pulse pipewire-audio-client-libraries wireplumber
 
-        # Bluetooth codecs
-        nspawn apt-get -y install libfdk-aac2 libldacbt-abr2 libldacbt-enc2 \
-        libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack
+                # Bluetooth codecs
+                nspawn apt-get -y install libfdk-aac2 libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack
+                ;;
+            pulseaudio)
+                nspawn apt-get -y install libcanberra-pulse pulseaudio pulseaudio-module-bluetooth
+                ;;
+        esac
 
         # deb-get
         nspawn apt-get -y install curl
