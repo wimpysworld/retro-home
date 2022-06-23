@@ -1,3 +1,6 @@
+[net.connman.gtk]
+launch-to-tray=false
+
 [org.gnome.desktop.background:GNOME-Flashback]
 color-shading-type='vertical'
 picture-uri='file:///usr/share/backgrounds/Retro-Home-Wallpaper.png'
