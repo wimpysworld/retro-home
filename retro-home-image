@@ -376,9 +376,8 @@ function stage_05_config() {
         cp "root/usr/share/xsessions/retro-home.desktop" "${R}/usr/share/xsessions/"
 
         # Enable auto-login to run Retro Home
-        cp "root/usr/share/lightdm/lightdm.conf.d/60-retro-home.conf" "${R}/usr/share/lightdm/lightdm.conf.d/"
-        cp "root/usr/share/lightdm/lightdm.conf.d/61-retro-home-autologin.conf" "${R}/usr/share/lightdm/lightdm.conf.d/"
-        cp "root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/30-retro-home.conf" "${R}/usr/share/lightdm/lightdm-gtk-greeter.conf.d/"
+        cp -v root/usr/share/lightdm/lightdm.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm.conf.d/
+        cp -v root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm-gtk-greeter.conf.d/
     fi
 
     if [ "${SKIP_DESKTOP}" -eq 0 ]; then
