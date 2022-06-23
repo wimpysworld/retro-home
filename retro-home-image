@@ -159,7 +159,8 @@ function stage_02_ludo() {
         nspawn apt-get -y install --no-install-recommends lightdm lightdm-gtk-greeter
 
         # LudOS requirements
-        nspawn apt-get -y install bluez connman feh ssh
+        nspawn apt-get -y install bluez connman iwd ssh xli
+        nspawn systemctl enable iwd.service
         nspawn apt-get -y install --no-install-recommends samba
 
         # PipeWire
