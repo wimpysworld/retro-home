@@ -195,7 +195,6 @@ function stage_03_micro_desktop() {
         #     mkdir -p "${R}/etc/skel/.config/vivaldi/WidevineCdm"
         #     echo '{"Path":"/opt/WidevineCdm"}' > "${R}/etc/skel/.config/vivaldi/WidevineCdm/latest-component-updated-widevine-cdm"
         # fi
-        nspawn fc-cache -frsv
     fi
 }
 
@@ -457,6 +456,7 @@ function stage_06_clean() {
     nspawn apt-get -y autoremove
     nspawn apt-get -y autoclean
     nspawn apt-get -y clean
+    nspawn fc-cache -f -r -s -v
 
     rm -f "${B}"/{*.bak,*.old}
     rm -f "${R}"/boot/{*.bak,*.old}
