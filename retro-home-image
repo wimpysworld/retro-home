@@ -148,12 +148,15 @@ function stage_02_ludo() {
     sync_from "${B_STAGE_1}" "${R_STAGE_1}"
 
     if [ "${SKIP_LUDO}" -eq 0 ]; then
-        # X11 et all
-        nspawn apt-get -y install libgles1 libgles2 libglfw3 libosmesa6 \
-        libxvmc1 x11-xserver-utils x11-utils xserver-xorg
+        # Xorg; as small as possible
+        nspawn apt-get -y install --no-install-recommends xauth xdg-utils xserver-common
 
-        # Install xdg-utils now, but prevent perl proliferation
-        nspawn apt-get -y install --no-install-recommends xdg-utils
+        nspawn apt-get -y install libgl1-mesa-dri mesa-vulkan-drivers \
+        xserver-xorg-core xserver-xorg-input-all x11-utils x11-xserver-utils
+        #xserver-xorg-video-fbdev xserver-xorg-video-vesa
+
+        # GLFW; used by Ludo
+        nspawn apt-get -y install --install-suggests libglfw3
 
         # Display manager
         nspawn apt-get -y install --no-install-recommends lightdm lightdm-gtk-greeter
