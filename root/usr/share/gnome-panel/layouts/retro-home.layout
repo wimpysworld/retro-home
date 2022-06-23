@@ -8,20 +8,9 @@ object-iid=org.gnome.gnome-panel.menu::menu-bar
 toplevel-id=top-panel
 pack-index=0
 
-[Object show-desktop]
-object-iid=org.gnome.gnome-panel.wncklet::show-desktop
-toplevel-id=top-panel
-pack-index=1
-
 [Object window-list]
 object-iid=org.gnome.gnome-panel.wncklet::window-list
 toplevel-id=top-panel
-pack-index=2
-
-[Object workspace-switcher]
-object-iid=org.gnome.gnome-panel.wncklet::workspace-switcher
-toplevel-id=top-panel
-pack-type=end
 pack-index=1
 
 [Object indicators]
