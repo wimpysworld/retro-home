@@ -271,6 +271,9 @@ function stage_05_config() {
     export R="${R_STAGE_5}"
     sync_from "${B_STAGE_4}" "${R_STAGE_4}"
 
+    # Tweak skel before the user is created.
+    cp -rv "root/etc/skel" "${R}/etc/"
+
     # Create user and groups
     local DATE=""
     DATE=$(date +%m%H%M%S)
@@ -317,7 +320,6 @@ function stage_05_config() {
         nspawn systemctl disable systemd-resolved.service
         #rm ${R}/etc/dhcp/dhclient-enter-hooks.d/resolved
 
-        cp -rv "root/etc/skel" "${R}/etc/"
         cp "root/etc/ludo.toml" "${R}/etc/"
 
         cp "root/etc/samba/smb.conf" "${R}/etc/samba/"
