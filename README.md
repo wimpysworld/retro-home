@@ -215,6 +215,7 @@ devices.
   * Network Manager
   * Terminal Emulator
   * Text Editor
+  * Web Browser
 
 ### How do I access the desktop?
 
@@ -227,6 +228,16 @@ devices.
 
 To shutdown or reboot Retro Home from the desktop environment, click the cog
 icon in the top right of the panel.
+
+### Capture Card Quicks
+
+My capture cards sync at 1920x1200 @ 59.94Hz and this cause Ludo performance
+to really suffer. Once Ludo is running I reset the resolution and refresh rate
+as follows:
+
+```bash
+env DISPLAY=:0 xrandr -s 1920x1080 --rate 60
+```
 
 ## Reference
 
