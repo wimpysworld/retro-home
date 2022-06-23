@@ -309,9 +309,6 @@ function stage_05_config() {
     nspawn systemctl disable ua-timer.timer
     nspawn systemctl disable ua-license-check.path
 
-    # Disable apport
-    sed -i 's|enabled=1|enabled=0|' "${R}/etc/default/apport"
-
     # Supress kernel messages
     # - https://superuser.com/questions/351387/how-to-stop-kernel-messages-from-flooding-my-console
     echo "kernel.printk = 1 4 1 7" > "${R}/etc/sysctl.d/20-printk.conf"
@@ -350,7 +347,7 @@ function stage_05_config() {
             mkdir -p "${R}/storage/${DOT_DIR}"
         done
 
-        for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv .xsession-errors; do
+        for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv; do
             touch "${R}/storage/${CONF_FILE}"
         done
 
