@@ -214,6 +214,11 @@ function stage_03_micro_desktop() {
         librsvg2-bin librsvg2-common sakura transmission-gtk \
         yaru-theme-gtk yaru-theme-icon yaru-theme-sound yaru-theme-unity
 
+        # Disable tracker
+        rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
+        rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
+        rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
+
         # Install gschemas that prevent gnome-control-center from crashing
         nspawn apt-get -y install --no-install-recommends gnome-shell-common mutter-common
 
@@ -423,11 +428,6 @@ function stage_05_config() {
         # Create gschema override
         cp "root/usr/share/glib-2.0/schemas/90_retro-home.gschema.override" "${R}/usr/share/glib-2.0/schemas/"
         nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
-
-        # Disable tracker
-        rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
-        rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-extract-3.service"
-        rm "${R}/etc/systemd/user/gnome-session.target.wants/tracker-miner-fs-3.service"
 
         # Add Connman Settings menu entry and hide the TeXInfo menu entry
         mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
