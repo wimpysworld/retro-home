@@ -9,7 +9,7 @@ function usage () {
   echo
   echo "Supported (or planned) devices are:"
   echo "  raspi:            Rasberry Pi 2, 3 and 4"
-  echo "  deskpipro:        Rasberry Pi 2, 3 and 4"
+  echo "  raspi-lite:       Rasberry Pi 2, 3 and 4"
   echo "  gamehat:          Waveshare Game HAT"
   echo "  gamepi20:         Waveshare GamePi20"
   echo "  gamepi43:         Waveshare GamePi43"
@@ -161,7 +161,9 @@ function stage_02_ludo() {
         nspawn apt-get -y install --install-suggests libglfw3
 
         # Display manager
-        nspawn apt-get -y install --no-install-recommends lightdm lightdm-gtk-greeter
+        nspawn apt-get -y install --no-install-recommends fonts-mplus lightdm \
+        lightdm-gtk-greeter yaru-theme-gtk yaru-theme-icon yaru-theme-sound \
+        yaru-theme-unity
 
         # LudOS requirements
         nspawn apt-get -y install bluez connman iwd ssh xli
@@ -659,6 +661,10 @@ SKIP_UBUNTU_STANDARD=0
 case "${REMIX}" in
     raspi)
         echo "[+] Specified Rasberry Pi 2, 3, 4 or 400"
+        shift;;
+    raspi-lite)
+        echo "[+] Specified Rasberry Pi 2, 3, 4 or 400 (Lite)"
+        SKIP_DESKTOP=1
         shift;;
     deskpipro)
         # https://wiki.deskpi.com/deskpi/
