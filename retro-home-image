@@ -231,14 +231,9 @@ function stage_03_micro_desktop() {
         #nspawn apt-get -y install --no-install-recommends dconf-editor \
         #gcolor3 lightdm-gtk-greeter-settings pavucontrol
 
+        # Vivaldi Browser
+        #  - Widevine: https://gist.github.com/ruario/19a28d98d29d34ec9b184c42e5f8bf29
         nspawn deb-get install vivaldi-stable
-
-        # # https://gist.github.com/ruario/19a28d98d29d34ec9b184c42e5f8bf29
-        # if [ -e "widevine-flash-20211119_${IMG_ARCH}.tgz" ]; then
-        #     tar Cfx "${R}/" widevine-flash-20211119_armhf.tgz
-        #     mkdir -p "${R}/etc/skel/.config/vivaldi/WidevineCdm"
-        #     echo '{"Path":"/opt/WidevineCdm"}' > "${R}/etc/skel/.config/vivaldi/WidevineCdm/latest-component-updated-widevine-cdm"
-        # fi
     fi
 }
 
