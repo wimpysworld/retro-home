@@ -150,7 +150,8 @@ function stage_02_ludo() {
 
     if [ "${SKIP_LUDO}" -eq 0 ]; then
         # Xorg; as small as possible
-        nspawn apt-get -y install --no-install-recommends xauth xdg-utils xserver-common
+        nspawn apt-get -y install --no-install-recommends unclutter-xfixes \
+        xauth xdg-utils xserver-common
 
         nspawn apt-get -y install libgl1-mesa-dri mesa-vulkan-drivers \
         xserver-xorg-core xserver-xorg-input-all x11-utils x11-xserver-utils

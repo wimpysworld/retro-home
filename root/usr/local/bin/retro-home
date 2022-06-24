@@ -12,6 +12,8 @@ xprop -root \
     -remove _NET_NUMBER_OF_DESKTOPS \
     -remove _NET_DESKTOP_NAMES \
     -remove _NET_CURRENT_DESKTOP 2> /dev/null
+# Hide the mouse cursor
+unclutter-xfixes --fork
 xsetroot -solid rgb:67/67/67
 xli -onroot -fillscreen -gamma 2.2 /usr/share/backgrounds/Retro-Home-Wallpaper.png
 hdmi-refresh &
