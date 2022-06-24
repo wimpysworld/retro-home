@@ -439,8 +439,8 @@ function stage_05_config() {
     local CASE_SUPPORT=""
 
     # Overlay and case specific files
-    if [ -d case/${REMIX}/root ]; then
-        rsync -av case/${REMIX}/root/ "${R}"/
+    if [ -d "case/${REMIX}/root" ]; then
+        rsync -av --chown=root:root "case/${REMIX}/root/" "${R}"/
     fi
 
     case ${REMIX} in
