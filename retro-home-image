@@ -136,7 +136,8 @@ function stage_01_bootstrap() {
     nspawn apt-get -y dist-upgrade
 
     # First boot filesystem expansion
-    nspawn apt-get -y install cloud-initramfs-growroot
+    #  - Insure that cloud-image-utils do not get installed
+    nspawn apt-get -y install cloud-guest-utils cloud-initramfs-growroot
 
     # Add some of ubuntu-standard tools to the image
     if [ "${SKIP_UBUNTU_STANDARD}" -eq 0 ]; then
