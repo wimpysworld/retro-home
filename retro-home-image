@@ -10,6 +10,7 @@ function usage () {
   echo "Supported (or planned) devices are:"
   echo "  raspi:            Rasberry Pi 2, 3 and 4"
   echo "  raspi-lite:       Rasberry Pi 2, 3 and 4"
+  echo "  deskpipro:        Rasberry Pi 4"
   echo "  gamehat:          Waveshare Game HAT"
   echo "  gamepi20:         Waveshare GamePi20"
   echo "  gamepi43:         Waveshare GamePi43"
