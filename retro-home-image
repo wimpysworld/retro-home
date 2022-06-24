@@ -10,7 +10,7 @@ function usage () {
   echo "Supported (or planned) devices are:"
   echo "  raspi:            Rasberry Pi 2, 3 and 4"
   echo "  raspi-lite:       Rasberry Pi 2, 3 and 4"
-  echo "  deskpipro:        Rasberry Pi 4"
+  echo "  deskpipro:        DeskPi Pro (Rasberry Pi 4)"
   echo "  gamehat:          Waveshare Game HAT"
   echo "  gamepi20:         Waveshare GamePi20"
   echo "  gamepi43:         Waveshare GamePi43"
@@ -439,21 +439,21 @@ function stage_05_config() {
 
     local CASE_SUPPORT=""
 
+    # Overlay and case specific files
+    if [ -d case/${REMIX}/root ]; then
+        rsync -av case/${REMIX}/root/ "${R}"/
+    fi
+
     case ${REMIX} in
         deskpipro)
             # https://github.com/DeskPi-Team/deskpi
             # https://github.com/DeskPi-Team/deskpi/tree/master/drivers
-            # TODO:
-            # - Fan Control
-            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/c/fanStop.c
-            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/c/pwmControlFan.c
-            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/python/pwmControlFan.py
-            # - Safe Power Cutoff
-            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/c/safecutoffpower.c
-            #   https://github.com/DeskPi-Team/deskpi/blob/master/drivers/python/safecutoffpower.py
-            # - IR Control
-            #   https://wiki.deskpi.com/deskpi/#how-to-use-ir-function-onboard
-            true
+            nspawn apt-get -y install lirc python3-serial
+
+            # Configure lirc for DeskPi Pro
+            mv "${R}"/etc/lirc/lircd.conf.d/devinput.lircd.conf "${R}"/etc/lirc/lircd.conf.d/devinput.lircd.dist
+            sed -i 's|= devinput|= default|' "${R}"/etc/lirc/lirc_options.conf
+            sed -i 's|= auto|= /dev/lirc0|' "${R}"/etc/lirc/lirc_options.conf
             ;;
         gpi)
             nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
@@ -670,7 +670,7 @@ case "${REMIX}" in
     deskpipro)
         # https://wiki.deskpi.com/deskpi/
         # https://github.com/DeskPi-Team/deskpi
-        echo "[+] Specified Desk Pi Pro"
+        echo "[+] Specified DeskPi Pro (Raspberry Pi 4)"
         shift;;
     gamehat)
         #https://www.waveshare.com/wiki/Game_HAT

@@ -1,0 +1,13 @@
+# send signal to MCU before system shuting down.
+[Unit]
+Description=DeskPi Pro Power Off Service
+Conflicts=reboot.target
+Before=halt.target shutdown.target poweroff.target
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/poweroff.py
+
+[Install]
+WantedBy=halt.target shutdown.target poweroff.target

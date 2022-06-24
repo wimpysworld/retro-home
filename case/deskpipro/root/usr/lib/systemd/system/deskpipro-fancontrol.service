@@ -1,0 +1,11 @@
+[Unit]
+Description=DeskPi Pro Fan Control Service
+After=multi-user.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/fancontrol.py
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,2 @@
+# Bus 003 Device 004: ID 1a86:7523 QinHeng Electronics CH340 serial converter
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyCH340"

@@ -32,6 +32,10 @@ dtoverlay=vc4-kms-v3d
 
 ARM64
 
-# Desk Pi Pro
-# Enable the USB2 outputs on the IO board
+# DeskPi Pro
+
+# Enable the USB2 outputs on the IO board and enable host mode
 dtoverlay=dwc2,dr_mode=host
+
+# Enable IR
+dtoverlay=gpio-ir,gpio_pin=17
