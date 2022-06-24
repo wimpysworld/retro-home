@@ -402,10 +402,10 @@ function stage_05_config() {
         cp -a "root/usr/share/backgrounds/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
 
         # Create Retro Home xsession
-        cp root/usr/local/bin/retro-home "${R}/usr/local/bin/"
-        cp root/usr/local/bin/hdmi-refresh "${R}/usr/local/bin/"
-        chmod 755 "${R}"/usr/local/bin/retro-home
-        chmod 755 "${R}"/usr/local/bin/hdmi-refresh
+        for BIN in retro-home hdmi-refresh; do
+            cp "root/usr/local/bin/${BIN}" "${R}/usr/local/bin/"
+            chmod 755 "${R}/usr/local/bin/${BIN}"
+        done
         mkdir -p "${R}"/usr/share/xsessions
         cp root/usr/share/xsessions/retro-home.desktop "${R}"/usr/share/xsessions/
 
