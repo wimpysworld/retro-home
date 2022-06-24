@@ -95,9 +95,13 @@ function stage_01_bootstrap() {
     systemd-container ubuntu-keyring whois xz-utils
 
     # Bootstrap a minimal Ubuntu
-    #   --variant=minbase; if I ever need to go smaller
-    #   Include cloud-guest-utils; prevents cloud-image-utils, and therefore qemu-system-x86, being installed later
-    #   netplan.io is excluded; Ludo uses connman
+    #   Includes:
+    #     - avahi-daemon: Multicast DNS Service Discovery
+    #     - cloud-guest-utils: instead of cloud-image-utils which requires qemu
+    #     - nano: the best text editor ever
+    #   Excludes:
+    #     - netplan.io: Ludo uses connman
+    #     - ubuntu-advantage-tools: not required
 
     if pidof apt-cacher-ng; then
         REPO="http://localhost:3142/ports.ubuntu.com/"
@@ -109,9 +113,9 @@ function stage_01_bootstrap() {
         --arch="${IMG_ARCH}" \
         --cache-dir="${R_STAGE_0}" \
         --components=main,restricted,universe,multiverse \
-        --exclude=netplan.io,ubuntu-minimal \
+        --exclude=netplan.io,ubuntu-minimal,ubuntu-advantage-tools \
         --foreign \
-        --include=cloud-guest-utils \
+        --include=avahi-daemon,cloud-guest-utils,nano \
         "${IMG_RELEASE}" "${R}" "${REPO}"
     nspawn /debootstrap/debootstrap \
         --second-stage
@@ -119,7 +123,7 @@ function stage_01_bootstrap() {
     cp "root/etc/apt/sources.list" "${R}/etc/apt/"
     sed -i "s|RELEASE|${IMG_RELEASE}|g" "${R}/etc/apt/sources.list"
 
-    nspawn hostnamectl --static set-hostname "retro-home-${REMIX}"
+    #nspawn hostnamectl --static set-hostname "retro-home-${REMIX}"
     echo "retro-home-${REMIX}" > "${R}/etc/hostname"
     sed -i "1s|.*|127.0.0.1\tlocalhost retro-home-${REMIX}|" "${R}/etc/hosts"
 
@@ -128,16 +132,15 @@ function stage_01_bootstrap() {
     echo "LANG=C.UTF-8" > "${R}/etc/default/locale"
 
     nspawn apt-get -y update
-
-    # Install Multicast DNS Service Discovery and first boot filesystem expansion
-    nspawn apt-get -y install avahi-daemon cloud-initramfs-growroot
-
     nspawn apt-get -y upgrade
     nspawn apt-get -y dist-upgrade
 
-    # Add standard Ubuntu userspace
+    # First boot filesystem expansion
+    nspawn apt-get -y install cloud-initramfs-growroot
+
+    # Add some of ubuntu-standard tools to the image
     if [ "${SKIP_UBUNTU_STANDARD}" -eq 0 ]; then
-        nspawn apt-get -y install standard^
+        nspawn apt-get -y install --no-install-recommends ubuntu-standard
     fi
 
     nspawn apt-get -y autoclean
@@ -320,11 +323,6 @@ function stage_05_config() {
 
     nspawn adduser --gecos "${USER_NAME^}" --add_extra_groups --disabled-password --home "${USER_HOME}" --gid 1000 --uid 1000 "${USER_NAME}"
     nspawn usermod -a -G adm,sudo -p "${PASSWD}" "${USER_NAME}"
-
-    # Disable Ubuntu Advantage Tools; not required
-    nspawn systemctl disable ua-reboot-cmds.service
-    nspawn systemctl disable ua-timer.timer
-    nspawn systemctl disable ua-license-check.path
 
     # Supress kernel messages
     # - https://superuser.com/questions/351387/how-to-stop-kernel-messages-from-flooding-my-console
