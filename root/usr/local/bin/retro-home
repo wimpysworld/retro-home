@@ -7,13 +7,20 @@ xset -dpms
 xset s noblank
 xset s off
 
+# Clean up after the display manager
 xprop -root \
     -remove AT_SPI_BUS \
     -remove _NET_NUMBER_OF_DESKTOPS \
     -remove _NET_DESKTOP_NAMES \
     -remove _NET_CURRENT_DESKTOP 2> /dev/null
+
 # Hide the mouse cursor
 unclutter-xfixes --fork
+
+# TODO:
+#  - Set the background color based on Ludo preferences
+#  - Set analog and HDMI volume to 100%. Ludo can manage "app" volume independently.
+#  - Improve logging
 xsetroot -solid rgb:67/67/67
 xli -onroot -fillscreen -gamma 2.2 /usr/share/backgrounds/Retro-Home-Wallpaper.png
 hdmi-refresh &
