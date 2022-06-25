@@ -1,11 +1,12 @@
 [Unit]
 Description=DeskPi Pro Fan Control Service
-After=multi-user.target
+After=systemd-udev-settle.service
 
 [Service]
-Type=oneshot
-RemainAfterExit=true
-ExecStart=/usr/local/bin/fancontrol.py
+Type=simple
+ExecStart=/usr/local/bin/deskpipro-fancontrol.py
+Restart=on-failure
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target

@@ -444,7 +444,7 @@ function stage_05_config() {
         deskpipro)
             # https://github.com/DeskPi-Team/deskpi
             # https://github.com/DeskPi-Team/deskpi/tree/master/drivers
-            nspawn apt-get -y install lirc python3-serial
+            nspawn apt-get -y install lirc python3-serial python3-setproctitle
 
             # Configure lirc for DeskPi Pro
             mv "${R}"/etc/lirc/lircd.conf.d/devinput.lircd.conf "${R}"/etc/lirc/lircd.conf.d/devinput.lircd.dist
