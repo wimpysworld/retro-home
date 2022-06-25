@@ -384,6 +384,9 @@ function stage_05_config() {
         done
 
         chown -Rv 1000:1000 "${R}/storage"
+        # Make LibreElec/LudOS updates fail
+        chown -v root:root "${R}/storage/.update"
+        chmod 700 "${R}/storage/.update"
 
         # Allow members of the 'sudo' group to start/stop services
         # Required so ludos can enable/disable SSH, Bluetooth and Samba
