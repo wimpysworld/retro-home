@@ -335,6 +335,18 @@ function stage_05_config() {
         nspawn systemctl enable ssh-regenerate-hostkeys.service
     fi
 
+    # Generate retro-home icons
+    cp .github/logo.svg "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
+    for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
+        mkdir -p "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps"
+        convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/retro-home.png"
+    done
+
+    # Composite the Retro Home wallpaper
+    mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
+    composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper.png"
+    cp root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper-blank.png"
+
     if [ "${SKIP_LUDO}" -eq 0 ]; then
         cp "root/usr/lib/systemd/system/ludos-sshd-handler.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable ludos-sshd-handler.service
@@ -378,30 +390,14 @@ function stage_05_config() {
         # - https://unix.stackexchange.com/questions/504806/systemd-start-as-unprivileged-user-in-a-group/557634#557634
         cp root/etc/polkit-1/localauthority/50-local.d/service-auth.pkla "${R}/etc/polkit-1/localauthority/50-local.d/"
 
-        # Generate retro-home icons
-        wget -qc "https://raw.githubusercontent.com/wimpysworld/retro-home/master/.github/logo.svg" -O "${R_STAGE_0}/retro-home.svg"
-        cp "${R_STAGE_0}/retro-home.svg" "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
-        for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
-            mkdir -p "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps"
-            convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R_STAGE_0}/retro-home.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/retro-home.png"
-        done
-
         # Generate ludo icons
         for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
             convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
         done
         nspawn gtk-update-icon-cache /usr/share/icons/hicolor/
 
-        # Make an Ludo icon for Slick Greeter
+        # Make an Ludo icon for the Greeter
         convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
-
-        # Composite the Retro Home wallpaper
-        #wget -c "https://linuxconfig.org/wp-content/uploads/2020/03/Focal-Fossa_Plain_WP_1920x1080_GREY.png" -O "${R_STAGE_0}/Yaru-Grey.png"
-        #composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" "${R_STAGE_0}/Yaru-Grey.png" "${R_STAGE_0}/Retro-Home-Wallpaper.png"
-
-        # Add the Retro Home wallpaper
-        mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
-        cp -a "root/usr/share/backgrounds/Retro-Home-Wallpaper.png" "${R}/usr/share/backgrounds/"
 
         # Create Retro Home xsession
         for BIN in retro-home hdmi-refresh; do
