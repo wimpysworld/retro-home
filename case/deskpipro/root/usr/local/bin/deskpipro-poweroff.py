@@ -8,18 +8,17 @@
 
 
 import serial
+import setproctitle
 import sys
 
 
 if __name__ == '__main__':
+    setproctitle.setproctitle('deskpipro-poweroff')
     ser = serial.Serial("/dev/ttyCH340", 9600, timeout=30)
-    try:
-        if ser.isOpen():
-            ser.write(b'pwm_000')
-            ser.write(b'power_off')
-            ser.close()
-    except:
-        if ser.isOpen():
-            ser.close()
-
-    sys.exit()
+    if ser.isOpen():
+        ser.write(b'pwm_000')
+        ser.write(b'power_off')
+        ser.close()
+        sys.exit(0)
+    else:
+        sys.exit(1)

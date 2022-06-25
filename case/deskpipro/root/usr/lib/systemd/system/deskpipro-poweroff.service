@@ -7,7 +7,7 @@ DefaultDependencies=no
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/poweroff.py
+ExecStart=/usr/local/bin/deskpipro-poweroff.py
 
 [Install]
 WantedBy=halt.target shutdown.target poweroff.target
