@@ -1,5 +1,0 @@
-
-# config.txt additions for RetroFlag cases - https://www.retroflag.com/
-
-enable_uart=1
-dtoverlay=RetroFlag_pw_io.dtbo

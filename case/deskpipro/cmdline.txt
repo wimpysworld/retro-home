@@ -1,1 +1,0 @@
-zswap.enabled=1 zswap.zpool=z3fold zswap.compressor=lz4 dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 rootwait fixrtc quiet splash consoleblank=0 vt.global_cursor_default=0

@@ -24,18 +24,26 @@ disable_overscan=1
 # support audio output)
 hdmi_drive=2
 
+[cm4]
+# Enable the USB2 outputs on the IO board (assuming your CM4 is plugged into
+# such a board)
+dtoverlay=dwc2,dr_mode=host
+
 [all]
 
 # Enable the KMS ("full" KMS) graphics overlay, leaving GPU memory as the
 # default (the kernel is in control of graphics memory with full KMS)
 dtoverlay=vc4-kms-v3d
 
+# Autoload overlays for any recognized cameras or displays that are attached
+# to the CSI/DSI ports. Please note this is for libcamera support, *not* for
+# the legacy camera stack
+camera_auto_detect=1
+display_auto_detect=1
+
 ARM64
 
-# config.txt additions for DeskPi Pro case
+# config.txt additions for RetroFlag cases - https://www.retroflag.com/
 
-# Enable the USB2 outputs on the IO board and enable host mode
-dtoverlay=dwc2,dr_mode=host
-
-# Enable IR
-dtoverlay=gpio-ir,gpio_pin=17
+enable_uart=1
+dtoverlay=RetroFlag_pw_io.dtbo
