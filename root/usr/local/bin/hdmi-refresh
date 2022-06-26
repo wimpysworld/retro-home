@@ -3,9 +3,9 @@
 sleep 10
 
 # Work around a capture card issue. If the primary connected display reports
-# 1920x1200, reset to 1920x1080 to avoid significant performance issues.
+# 1920x1200, reset the refresh rate to avoid significant performance issues.
 PRIMARY_SIZE=$(env DISPLAY=:0 xrandr -q | grep "connected primary" | awk '{ print $4 }' | cut -d'+' -f1)
 case "${PRIMARY_SIZE}" in
-    1920x1200) env DISPLAY=:0 xrandr --size 1920x1080;;
+    1920x1200) env DISPLAY=:0 xrandr --rate 60;;
     *) echo "Primary connected HDMI is: ${PRIMARY_SIZE}";;
 esac
