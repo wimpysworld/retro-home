@@ -160,15 +160,26 @@ function stage_02_ludo() {
 
         nspawn apt-get -y install libgl1-mesa-dri mesa-vulkan-drivers \
         xserver-xorg-core xserver-xorg-input-all x11-utils x11-xserver-utils
-        #xserver-xorg-video-fbdev xserver-xorg-video-vesa
 
         # GLFW; used by Ludo
         nspawn apt-get -y install --install-suggests libglfw3
 
-        # Display manager
-        nspawn apt-get -y install --no-install-recommends fonts-mplus lightdm \
-        lightdm-gtk-greeter yaru-theme-gtk yaru-theme-icon yaru-theme-sound \
-        yaru-theme-unity
+        if [ "${SKIP_DESKTOP}" -eq 0 ]; then
+            # Display manager
+            nspawn apt-get -y install --no-install-recommends fonts-mplus lightdm \
+            lightdm-gtk-greeter yaru-theme-gtk yaru-theme-icon yaru-theme-sound \
+            yaru-theme-unity
+
+            # Enable auto-login to run Retro Home via LightDM
+            cp -v root/usr/share/lightdm/lightdm.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm.conf.d/
+            cp -v root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm-gtk-greeter.conf.d/
+        else
+            nspawn apt-get -y install --no-install-recommends fbi fonts-mplus xinit
+            cp "root/usr/lib/systemd/system/x11-autologin.service" "${R}/usr/lib/systemd/system/"
+            nspawn systemctl enable x11-autologin.service
+            cp "root/usr/local/bin/retro-home-splash" "${R}/usr/local/bin/"
+            chmod 755 "${R}/usr/local/bin/retro-home-splash"
+        fi
 
         # LudOS requirements
         nspawn apt-get -y install bluez connman iwd ssh xli
