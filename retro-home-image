@@ -178,14 +178,9 @@ function stage_02_ludo() {
         local AUDIO_SYSTEM="pipewire"
         case "${AUDIO_SYSTEM}" in
             pipewire)
-                nspawn apt-get -y install libcanberra-pulse pipewire-audio-client-libraries wireplumber
-
-                # Bluetooth codecs
-                nspawn apt-get -y install libfdk-aac2 libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack
-                ;;
+                nspawn apt-get -y install pipewire-audio-client-libraries wireplumber libfdk-aac2 libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack;;
             pulseaudio)
-                nspawn apt-get -y install libcanberra-pulse pulseaudio pulseaudio-module-bluetooth
-                ;;
+                nspawn apt-get -y install pulseaudio pulseaudio-module-bluetooth;;
         esac
 
         # deb-get
@@ -210,8 +205,8 @@ function stage_03_micro_desktop() {
         nspawn apt-get -y install --no-install-recommends connman-gtk \
         file-roller fonts-mplus gedit gnome-bluetooth gnome-control-center \
         gnome-control-center-faces gnome-disk-utility gnome-keyring \
-        gnome-session-flashback gnome-startup-applications librsvg2-2 \
-        librsvg2-bin librsvg2-common sakura transmission-gtk \
+        gnome-session-flashback gnome-startup-applications libcanberra-pulse \
+        librsvg2-2 librsvg2-bin librsvg2-common sakura transmission-gtk \
         yaru-theme-gtk yaru-theme-icon yaru-theme-sound yaru-theme-unity
 
         # Disable tracker
