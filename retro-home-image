@@ -140,9 +140,7 @@ function stage_01_bootstrap() {
     nspawn apt-get -y install cloud-guest-utils cloud-initramfs-growroot
 
     # Add some of ubuntu-standard tools to the image
-    if [ "${SKIP_UBUNTU_STANDARD}" -eq 0 ]; then
-        nspawn apt-get -y install --no-install-recommends ubuntu-standard
-    fi
+    nspawn apt-get -y install --no-install-recommends ubuntu-standard
 
     nspawn apt-get -y autoclean
     nspawn apt-get -y clean
@@ -658,7 +656,6 @@ fi
 
 SKIP_LUDO=0
 SKIP_DESKTOP=0
-SKIP_UBUNTU_STANDARD=0
 
 # Set variables based on chosen desktop environment
 case "${REMIX}" in
