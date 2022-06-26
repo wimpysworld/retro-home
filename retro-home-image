@@ -189,9 +189,9 @@ function stage_02_ludo() {
         local AUDIO_SYSTEM="pipewire"
         case "${AUDIO_SYSTEM}" in
             pipewire)
-                nspawn apt-get -y install pipewire-audio-client-libraries wireplumber libfdk-aac2 libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack;;
+                nspawn apt-get -y install pipewire-audio-client-libraries pulsemixer wireplumber libfdk-aac2 libopenaptx0 libspa-0.2-bluetooth libspa-0.2-jack;;
             pulseaudio)
-                nspawn apt-get -y install pulseaudio pulseaudio-module-bluetooth;;
+                nspawn apt-get -y install pulseaudio pulseaudio-module-bluetooth pulsemixer;;
         esac
 
         # deb-get
