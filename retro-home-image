@@ -290,6 +290,23 @@ function stage_03_micro_desktop() {
         # Vivaldi Browser
         #  - Widevine: https://gist.github.com/ruario/19a28d98d29d34ec9b184c42e5f8bf29
         nspawn deb-get install vivaldi-stable
+
+        # Create custom panel layout
+        cp "root/usr/share/gnome-panel/layouts/retro-home.layout" "${R}/usr/share/gnome-panel/layouts/"
+
+        # Create gschema override
+        cp "root/usr/share/glib-2.0/schemas/90_retro-home.gschema.override" "${R}/usr/share/glib-2.0/schemas/"
+        nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+        # Add Connman Settings menu entry and hide the TeXInfo menu entry
+        mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
+        cp "root/usr/share/gnome-flashback-metacity/applications/connman-gtk.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
+        cp "root/usr/share/gnome-flashback-metacity/applications/info.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
+
+        mkdir -p "${R}"/usr/share/xsessions
+        cp root/usr/share/xsessions/retro-home.desktop "${R}"/usr/share/xsessions/
+
+        nspawn update-desktop-database
     fi
 }
 
@@ -410,21 +427,6 @@ function stage_05_config() {
     mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
     composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper.png"
     cp root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper-blank.png"
-
-    if [ "${SKIP_DESKTOP}" -eq 0 ]; then
-        # Create custom panel layout
-        cp "root/usr/share/gnome-panel/layouts/retro-home.layout" "${R}/usr/share/gnome-panel/layouts/"
-
-        # Create gschema override
-        cp "root/usr/share/glib-2.0/schemas/90_retro-home.gschema.override" "${R}/usr/share/glib-2.0/schemas/"
-        nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
-
-        # Add Connman Settings menu entry and hide the TeXInfo menu entry
-        mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
-        cp "root/usr/share/gnome-flashback-metacity/applications/connman-gtk.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
-        cp "root/usr/share/gnome-flashback-metacity/applications/info.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
-        nspawn update-desktop-database
-    fi
 
     # Disable the existing motd scripts
     chmod -x "${R}/etc/update-motd.d/*"
