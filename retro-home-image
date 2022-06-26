@@ -286,6 +286,14 @@ dtoverlay=dwc2"
     linux-modules-extra-raspi pi-bluetooth raspi-config rpi-eeprom \
     ubuntu-raspi-settings
 
+    # Disable raspi-config, which allows switching the cpu governor by holding
+    # shift during boot.
+    # raspi-config introduces 1.7sec delay reaching the graphical.target
+    #   systemd-analyze time
+    #   systemd-analyze blame
+    #   systemctl list-dependencies graphical.target
+    nspawn systemctl disable raspi-config
+
     local NEW_KERNEL=$(ls -1 "${R}"/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
     if [ -z "${NEW_KERNEL}" ]; then
         echo "ERROR! Could not detect the new kernel version"
