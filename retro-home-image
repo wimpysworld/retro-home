@@ -371,8 +371,7 @@ dtoverlay=dwc2"
     ubuntu-raspi-settings
 
     # Disable raspi-config, which allows switching the cpu governor by holding
-    # shift during boot.
-    # raspi-config introduces 1.7sec delay reaching the graphical.target
+    # shift during boot; but introduces 1.7sec delay reaching the graphical.target
     #   systemd-analyze time
     #   systemd-analyze blame
     #   systemctl list-dependencies graphical.target
