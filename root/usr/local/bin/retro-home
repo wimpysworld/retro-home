@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-
+# TODO:
+#  - Set analog and HDMI volume to 100%. Ludo can manage "app" volume independently.
+#  - Improve logging
 xli -onroot -fillscreen -gamma 2.2 /usr/share/backgrounds/Retro-Home-Wallpaper.png
 
 # Disable screen blanking, DPMS and screensaver
@@ -10,9 +12,15 @@ xset s off
 # Hide the mouse cursor
 unclutter-xfixes --fork
 
-# TODO:
-#  - Set analog and HDMI volume to 100%. Ludo can manage "app" volume independently.
-#  - Improve logging
-#  - Make sure Ludo is always full screen
+# Rebuild the font-cache if it is incomplete
+if ! fc-list | grep -q mplus; then
+    fc-cache -frsv &
+fi
+
+# Make sure Ludo is always full screen
+sed 's/video_fullscreen = false/video_fullscreen = true/' "${HOME}/.config/ludo/settings.toml"
+
+# Work around capture card quirks
 hdmi-refresh &
-ludo -ludos -v &> "${HOME}"/.ludo.log
+
+ludo -ludos -v &> "${HOME}/.ludo.log"
