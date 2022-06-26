@@ -244,14 +244,14 @@ function stage_04_kernel() {
 
     # Append case specific cmdline.txt & config.txt
     cp -v "boot/README" "${B}/"
-    if [ -f case/${REMIX}/config.txt ]; then
-        cp -v case/${REMIX}/config.txt "${B}/"
+    if [ -f "case/${REMIX}/config.txt" ]; then
+        cp -v "case/${REMIX}/config.txt" "${B}/"
     else
         cp "boot/config.txt" "${B}/"
     fi
 
-    if [ -f case/${REMIX}/cmdline.txt ]; then
-        cp -v case/${REMIX}/cmdline.txt "${B}/"
+    if [ -f "case/${REMIX}/cmdline.txt" ]; then
+        cp -v "case/${REMIX}/cmdline.txt" "${B}/"
     else
         cp "boot/cmdline.txt" "${B}/"
     fi
