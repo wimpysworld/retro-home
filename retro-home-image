@@ -191,6 +191,67 @@ function stage_02_ludo() {
 
         # Ludo
         nspawn deb-get install ludo
+
+        # Ludo and related services config
+        cp "root/usr/lib/systemd/system/ludos-sshd-handler.service" "${R}/usr/lib/systemd/system/"
+        nspawn systemctl enable ludos-sshd-handler.service
+
+        cp "root/usr/lib/systemd/system/ludos-samba-handler.service" "${R}/usr/lib/systemd/system/"
+        nspawn systemctl enable ludos-samba-handler.service
+
+        cp "root/usr/lib/systemd/system/ludos-bluez-handler.service" "${R}/usr/lib/systemd/system/"
+        nspawn systemctl enable ludos-bluez-handler.service
+
+        # Disable systemd-networkd et al; we're using connman
+        # - https://www.naut.ca/blog/2018/12/12/disabling-systemd-networking/
+        nspawn systemctl stop systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
+        nspawn systemctl disable systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
+        nspawn systemctl stop systemd-resolved
+        nspawn systemctl disable systemd-resolved.service
+        #rm ${R}/etc/dhcp/dhclient-enter-hooks.d/resolved
+
+        cp "root/etc/ludo.toml" "${R}/etc/"
+
+        cp "root/etc/samba/smb.conf" "${R}/etc/samba/"
+        sed -i "s|REMIX|${REMIX}|g" "${R}/etc/samba/smb.conf"
+
+        # Create directories Ludo requires
+        for DOT_DIR in .cache/connman .cache/services .config/ludo .local/ludo .local/share/ludo .ludo .update; do
+            mkdir -p "${R}/storage/${DOT_DIR}"
+        done
+
+        for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv; do
+            touch "${R}/storage/${CONF_FILE}"
+        done
+
+        for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
+            mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
+        done
+
+        chown -Rv 1000:1000 "${R}/storage"
+        # Make LibreElec/LudOS updates fail; this is intended
+        chown -v root:root "${R}/storage/.update"
+        chmod 700 "${R}/storage/.update"
+
+        # Allow members of the 'sudo' group to start/stop services
+        # Required so ludos can enable/disable SSH, Bluetooth and Samba
+        # - https://unix.stackexchange.com/questions/504806/systemd-start-as-unprivileged-user-in-a-group/557634#557634
+        cp root/etc/polkit-1/localauthority/50-local.d/service-auth.pkla "${R}/etc/polkit-1/localauthority/50-local.d/"
+
+        # Generate ludo icons
+        for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
+            convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
+        done
+        nspawn gtk-update-icon-cache /usr/share/icons/hicolor/
+
+        # Make an Ludo icon for the Greeter
+        convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
+
+        # Create Retro Home xsession
+        for BIN in retro-home hdmi-refresh; do
+            cp "root/usr/local/bin/${BIN}" "${R}/usr/local/bin/"
+            chmod 755 "${R}/usr/local/bin/${BIN}"
+        done
     fi
 }
 
@@ -349,74 +410,6 @@ function stage_05_config() {
     mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
     composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper.png"
     cp root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper-blank.png"
-
-    if [ "${SKIP_LUDO}" -eq 0 ]; then
-        cp "root/usr/lib/systemd/system/ludos-sshd-handler.service" "${R}/usr/lib/systemd/system/"
-        nspawn systemctl enable ludos-sshd-handler.service
-
-        cp "root/usr/lib/systemd/system/ludos-samba-handler.service" "${R}/usr/lib/systemd/system/"
-        nspawn systemctl enable ludos-samba-handler.service
-
-        cp "root/usr/lib/systemd/system/ludos-bluez-handler.service" "${R}/usr/lib/systemd/system/"
-        nspawn systemctl enable ludos-bluez-handler.service
-
-        # Disable systemd-networkd et al; we're using connman
-        # - https://www.naut.ca/blog/2018/12/12/disabling-systemd-networking/
-        nspawn systemctl stop systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
-        nspawn systemctl disable systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
-        nspawn systemctl stop systemd-resolved
-        nspawn systemctl disable systemd-resolved.service
-        #rm ${R}/etc/dhcp/dhclient-enter-hooks.d/resolved
-
-        cp "root/etc/ludo.toml" "${R}/etc/"
-
-        cp "root/etc/samba/smb.conf" "${R}/etc/samba/"
-        sed -i "s|REMIX|${REMIX}|g" "${R}/etc/samba/smb.conf"
-
-        # Create directories Ludo requires
-        for DOT_DIR in .cache/connman .cache/services .config/ludo .local/ludo .local/share/ludo .ludo .update; do
-            mkdir -p "${R}/storage/${DOT_DIR}"
-        done
-
-        for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv; do
-            touch "${R}/storage/${CONF_FILE}"
-        done
-
-        for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
-            mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
-        done
-
-        chown -Rv 1000:1000 "${R}/storage"
-        # Make LibreElec/LudOS updates fail
-        chown -v root:root "${R}/storage/.update"
-        chmod 700 "${R}/storage/.update"
-
-        # Allow members of the 'sudo' group to start/stop services
-        # Required so ludos can enable/disable SSH, Bluetooth and Samba
-        # - https://unix.stackexchange.com/questions/504806/systemd-start-as-unprivileged-user-in-a-group/557634#557634
-        cp root/etc/polkit-1/localauthority/50-local.d/service-auth.pkla "${R}/etc/polkit-1/localauthority/50-local.d/"
-
-        # Generate ludo icons
-        for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
-            convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
-        done
-        nspawn gtk-update-icon-cache /usr/share/icons/hicolor/
-
-        # Make an Ludo icon for the Greeter
-        convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
-
-        # Create Retro Home xsession
-        for BIN in retro-home hdmi-refresh; do
-            cp "root/usr/local/bin/${BIN}" "${R}/usr/local/bin/"
-            chmod 755 "${R}/usr/local/bin/${BIN}"
-        done
-        mkdir -p "${R}"/usr/share/xsessions
-        cp root/usr/share/xsessions/retro-home.desktop "${R}"/usr/share/xsessions/
-
-        # Enable auto-login to run Retro Home
-        cp -v root/usr/share/lightdm/lightdm.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm.conf.d/
-        cp -v root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm-gtk-greeter.conf.d/
-    fi
 
     if [ "${SKIP_DESKTOP}" -eq 0 ]; then
         # Create custom panel layout
