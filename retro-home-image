@@ -671,6 +671,10 @@ case "${REMIX}" in
         # https://github.com/DeskPi-Team/deskpi
         echo "[+] Specified DeskPi Pro (Raspberry Pi 4)"
         shift;;
+    deskpipro-lite)
+        echo "[+] Specified DeskPi Pro (Raspberry Pi 4)"
+        SKIP_DESKTOP=1
+        shift;;
     gamehat)
         #https://www.waveshare.com/wiki/Game_HAT
         #patched driver for > 4.15 kernel
