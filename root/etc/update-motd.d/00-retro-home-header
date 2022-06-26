@@ -1,0 +1,5 @@
+#!/bin/sh
+
+[ -r /etc/os-release ] && . /etc/os-release
+
+printf "Welcome to Retro Home 🕹  \n\nBuilt with %s (%s %s %s)\n" "${PRETTY_NAME}" "$(uname -o)" "$(uname -r)" "$(uname -m)"

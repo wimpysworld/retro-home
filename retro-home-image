@@ -438,6 +438,12 @@ function stage_05_config() {
         nspawn update-desktop-database
     fi
 
+    # Disable the existing motd scripts
+    chmod -x "${R}/etc/update-motd.d/*"
+    # Add the Retro Home motd scripts and enable them
+    cp "root/etc/update-motd.d/*" "${R}/etc/update-motd.d/"
+    chmod 755 "${R}/etc/update-motd.d/*-retro-home*"
+
     local CASE_SUPPORT=""
 
     # Overlay and case specific files
