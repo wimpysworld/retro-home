@@ -366,6 +366,7 @@ dtoverlay=dwc2"
     #   systemd-analyze blame
     #   systemctl list-dependencies graphical.target
     nspawn systemctl disable raspi-config
+    nspawn systemctl disable systemctl disable getty@tty1
 
     local NEW_KERNEL=$(ls -1 "${R}"/boot/vmlinuz-* | tail -n1 | awk -F/ '{print $NF}' | cut -d'-' -f2-4)
     if [ -z "${NEW_KERNEL}" ]; then
