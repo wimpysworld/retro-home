@@ -313,6 +313,10 @@ dtoverlay=dwc2"
 
     cp -av "${R}/boot/vmlinuz-${NEW_KERNEL}" "${B}/vmlinuz"
     cp -av "${R}/boot/initrd.img-${NEW_KERNEL}" "${B}/initrd.img"
+
+    # Supress kernel messages
+    # - https://superuser.com/questions/351387/how-to-stop-kernel-messages-from-flooding-my-console
+    echo "kernel.printk = 1 4 1 7" > "${R}/etc/sysctl.d/20-printk.conf"
 }
 
 function stage_05_config() {
@@ -332,10 +336,6 @@ function stage_05_config() {
 
     nspawn adduser --gecos "${USER_NAME^}" --add_extra_groups --disabled-password --home "${USER_HOME}" --gid 1000 --uid 1000 "${USER_NAME}"
     nspawn usermod -a -G adm,sudo -p "${PASSWD}" "${USER_NAME}"
-
-    # Supress kernel messages
-    # - https://superuser.com/questions/351387/how-to-stop-kernel-messages-from-flooding-my-console
-    echo "kernel.printk = 1 4 1 7" > "${R}/etc/sysctl.d/20-printk.conf"
 
     # Regenerate ssh host keys on first boot
     if  [ -d "${R}/etc/ssh" ]; then
