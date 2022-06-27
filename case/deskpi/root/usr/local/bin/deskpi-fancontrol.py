@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Monitor the CPU temperature and adjust DeskPi Pro fan speed accordingly.
+# Monitor the CPU temperature and adjust DeskPi Pro/Lite fan speed accordingly.
 
 # Send commands to the MCU via QinHeng Electronics CH340 serial converter
 #   - pwm_xxx:   represents fan speed from 000 to 100; 050 = 50%
@@ -24,7 +24,7 @@ def signal_handler(signal_received, frame):
 
 
 if __name__ == '__main__':
-    setproctitle.setproctitle('deskpipro-fancontrol')
+    setproctitle.setproctitle('deskpi-fancontrol')
 
     # Initialise the signal handler to catch Ctrl+C
     signal.signal(signal.SIGINT, signal_handler)

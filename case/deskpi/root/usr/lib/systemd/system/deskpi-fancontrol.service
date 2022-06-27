@@ -1,10 +1,10 @@
 [Unit]
-Description=DeskPi Pro Fan Control Service
+Description=DeskPi Pro/Lite Fan Control Service
 After=systemd-udev-settle.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/deskpipro-fancontrol.py
+ExecStart=/usr/local/bin/deskpi-fancontrol.py
 Restart=on-failure
 RestartSec=5
 
