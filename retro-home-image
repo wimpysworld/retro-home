@@ -249,12 +249,6 @@ function stage_02_ludo() {
         # - https://unix.stackexchange.com/questions/504806/systemd-start-as-unprivileged-user-in-a-group/557634#557634
         cp root/etc/polkit-1/localauthority/50-local.d/service-auth.pkla "${R}/etc/polkit-1/localauthority/50-local.d/"
 
-        # Generate ludo icons
-        for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
-            convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
-        done
-        nspawn gtk-update-icon-cache /usr/share/icons/hicolor/
-
         # Make an Ludo icon for the Greeter
         convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
 
@@ -308,6 +302,13 @@ function stage_03_micro_desktop() {
         # Create gschema override
         cp "root/usr/share/glib-2.0/schemas/90_retro-home.gschema.override" "${R}/usr/share/glib-2.0/schemas/"
         nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
+
+        # Generate ludo icons
+        for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
+            mkdir -p "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps"
+            convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
+        done
+        nspawn gtk-update-icon-cache /usr/share/icons/hicolor/
 
         # Add Connman Settings menu entry and hide the TeXInfo menu entry
         mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
