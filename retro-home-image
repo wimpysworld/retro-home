@@ -177,6 +177,8 @@ function stage_02_ludo() {
             nspawn systemctl enable x11-autologin.service
             cp "root/usr/local/bin/retro-home-splash" "${R}/usr/local/bin/"
             chmod 755 "${R}/usr/local/bin/retro-home-splash"
+            cp "root/usr/lib/systemd/system/retro-home-splash.service" "${R}/usr/lib/systemd/system/"
+            nspawn systemctl enable retro-home-splash.service
         fi
 
         # LudOS requirements
