@@ -530,8 +530,6 @@ function stage_06_clean() {
     rm -f "${R}"/var/log/fontconfig.log
     rm -rf "${R}"/tmp/*
     rm -f "${R}"/var/crash/*
-    rm -f "${R}"/var/cache/apt/*
-    rm -rf "${R}"/var/cache/apt/archives/*
     rm -f "${R}"/var/cache/debconf/*-old
     rm -rf "${R}"/var/lib/apt/lists/*
     rm -f "${R}"/var/lib/dpkg/*-old
