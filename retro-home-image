@@ -9,8 +9,9 @@ function usage () {
   echo
   echo "Supported (or planned) devices are:"
   echo "  raspi:            Rasberry Pi 2, 3 and 4"
-  echo "  raspi-lite:       Rasberry Pi 2, 3 and 4"
-  echo "  deskpipro:        DeskPi Pro (Rasberry Pi 4)"
+  echo "  raspi-mini:       Rasberry Pi 2, 3 and 4 (mini)"
+  echo "  deskpi:           DeskPi Pro/Lite for Rasberry Pi 4"
+  echo "  deskpi-mini:      DeskPi Pro/Lite for Rasberry Pi 4 (mini)"
   echo "  gamehat:          Waveshare Game HAT"
   echo "  gamepi20:         Waveshare GamePi20"
   echo "  gamepi43:         Waveshare GamePi43"
@@ -459,7 +460,7 @@ function stage_05_config() {
     fi
 
     case ${REMIX} in
-        deskpipro)
+        deskpi*)
             # https://github.com/DeskPi-Team/deskpi
             # https://github.com/DeskPi-Team/deskpi/tree/master/drivers
             nspawn apt-get -y install --no-install-recommends lirc python3-serial python3-setproctitle
@@ -671,13 +672,13 @@ case "${REMIX}" in
         echo "[+] Specified Rasberry Pi 2, 3, 4 or 400 (Lite)"
         INCLUDE_DESKTOP="false"
         shift;;
-    deskpipro)
+    deskpi)
         # https://wiki.deskpi.com/deskpi/
         # https://github.com/DeskPi-Team/deskpi
-        echo "[+] Specified DeskPi Pro (Raspberry Pi 4)"
+        echo "[+] Specified DeskPi Pro/Lite for Raspberry Pi 4"
         shift;;
-    deskpipro-lite)
-        echo "[+] Specified DeskPi Pro (Raspberry Pi 4)"
+    deskpi-mini)
+        echo "[+] Specified DeskPi Pro/Lite for Raspberry Pi 4 (mini)"
         INCLUDE_DESKTOP="false"
         shift;;
     gamehat)
