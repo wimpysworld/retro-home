@@ -441,10 +441,12 @@ function stage_05_config() {
     cp root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper-blank.png"
 
     # Disable the existing motd scripts
-    chmod -x "${R}/etc/update-motd.d/*"
+    for MOTD in 00-header 10-help-text 50-motd-news 92-unattended-upgrades; do
+        chmod 644 "${R}/etc/update-motd.d/${MOTD}"
+    done
     # Add the Retro Home motd scripts and enable them
-    cp "root/etc/update-motd.d/*" "${R}/etc/update-motd.d/"
-    chmod 755 "${R}/etc/update-motd.d/*-retro-home*"
+    cp -v root/etc/update-motd.d/*-retro-home* "${R}/etc/update-motd.d/"
+    chmod 755 "${R}"/etc/update-motd.d/*-retro-home*
 
     local CASE_SUPPORT=""
 
