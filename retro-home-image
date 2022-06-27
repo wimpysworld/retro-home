@@ -668,8 +668,8 @@ case "${REMIX}" in
     raspi)
         echo "[+] Specified Rasberry Pi 2, 3, 4 or 400"
         shift;;
-    raspi-lite)
-        echo "[+] Specified Rasberry Pi 2, 3, 4 or 400 (Lite)"
+    raspi-mini)
+        echo "[+] Specified Rasberry Pi 2, 3, 4 or 400 (mini)"
         INCLUDE_DESKTOP="false"
         shift;;
     deskpi)
