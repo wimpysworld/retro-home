@@ -367,10 +367,10 @@ dtoverlay=dwc2"
     cp "root/usr/lib/systemd/system/swapfile.swap" "${R}/usr/lib/systemd/system/swapfile.swap"
     nspawn ln -s /usr/lib/systemd/system/swapfile.swap /usr/lib/systemd/system/swap.target.wants/swapfile.swap
 
-    nspawn apt-get -y install libraspberrypi0 libraspberrypi-bin \
-    linux-firmware-raspi linux-headers-raspi linux-image-raspi \
-    linux-modules-extra-raspi pi-bluetooth raspi-config rpi-eeprom \
-    ubuntu-raspi-settings
+    nspawn apt-get -y install --no-install-recommends flash-kernel \
+    libraspberrypi0 libraspberrypi-bin linux-firmware-raspi \
+    linux-image-raspi linux-modules-extra-raspi pi-bluetooth raspi-config \
+    rpi-eeprom ubuntu-raspi-settings
 
     # Disable raspi-config, which allows switching the cpu governor by holding
     # shift during boot; but introduces 1.7sec delay reaching the graphical.target
