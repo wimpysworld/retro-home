@@ -151,7 +151,7 @@ function stage_02_ludo() {
     export R="${R_STAGE_2}"
     sync_from "${B_STAGE_1}" "${R_STAGE_1}"
 
-    if [ "${SKIP_LUDO}" -eq 0 ]; then
+    if $(${INCLUDE_LUDO}); then
         # Xorg; as small as possible
         nspawn apt-get -y install --no-install-recommends unclutter-xfixes \
         xauth xdg-utils xserver-common
@@ -162,7 +162,7 @@ function stage_02_ludo() {
         # GLFW; used by Ludo
         nspawn apt-get -y install --install-suggests libglfw3
 
-        if [ "${SKIP_DESKTOP}" -eq 0 ]; then
+        if $(${INCLUDE_DESKTOP}); then
             # Display manager
             nspawn apt-get -y install --no-install-recommends fonts-mplus lightdm \
             lightdm-gtk-greeter yaru-theme-gtk yaru-theme-icon yaru-theme-sound \
@@ -269,7 +269,7 @@ function stage_03_micro_desktop() {
     export R="${R_STAGE_3}"
     sync_from "${B_STAGE_2}" "${R_STAGE_2}"
 
-    if [ "${SKIP_DESKTOP}" -eq 0 ]; then
+    if $(${INCLUDE_DESKTOP}); then
         nspawn apt-get -y install --no-install-recommends language-pack-gnome-en
 
         nspawn apt-get -y install --no-install-recommends connman-gtk \
@@ -654,8 +654,8 @@ else
     done
 fi
 
-SKIP_LUDO=0
-SKIP_DESKTOP=0
+INCLUDE_DESKTOP="true"
+INCLUDE_LUDO="true"
 
 # Set variables based on chosen desktop environment
 case "${REMIX}" in
@@ -664,7 +664,7 @@ case "${REMIX}" in
         shift;;
     raspi-lite)
         echo "[+] Specified Rasberry Pi 2, 3, 4 or 400 (Lite)"
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         shift;;
     deskpipro)
         # https://wiki.deskpi.com/deskpi/
@@ -673,43 +673,43 @@ case "${REMIX}" in
         shift;;
     deskpipro-lite)
         echo "[+] Specified DeskPi Pro (Raspberry Pi 4)"
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         shift;;
     gamehat)
         #https://www.waveshare.com/wiki/Game_HAT
         #patched driver for > 4.15 kernel
         # https://github.com/cmitu/mk_arcade_joystick_rpi/tree/retropie
         # reffered by https://github.com/RetroPie/RetroPie-Setup/blob/master/scriptmodules/supplementary/mkarcadejoystick.sh
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         echo "[+] Specified Waveshare Game HAT"
         not_implemented
         shift;;
     gamepi20)
         #https://www.waveshare.com/wiki/GamePi20
         #SAME driver as above just additional SCREEN over i2c
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         echo "[+] Specified Waveshare GamePi20"
         not_implemented
         shift;;
     gamepi43)
         #https://www.waveshare.com/wiki/GamePi43
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         echo "[+] Specified Waveshare GamePi43"
         not_implemented
         shift;;
     gpi)
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         echo "[+] Specified RetroFlag GPi Case with Raspberry Pi Zero 2 W"
         REMIX="gpi"
         shift;;
     gpimate)
         # https://retrogamerestore.com/store/gpimate/
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         echo "[+] Specified RetroFlag GPi Case with GPiMate for CM3+Lite"
         REMIX="gpi"
         shift;;
     gpimateplus)
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         # https://retrogamerestore.com/store/gpimateplus/
         # https://github.com/martinx72/GPiMatePlusHowTo
         echo "[+] Specified RetroFlag GPi Case with GPiMatePlus for CM4+Lite"
@@ -717,7 +717,7 @@ case "${REMIX}" in
         shift;;
     gpm280)
         #https://www.waveshare.com/wiki/GPM280
-        SKIP_DESKTOP=1
+        INCLUDE_DESKTOP="false"
         echo "[+] Specified Waveshare GPM280"
         not_implemented
         shift;;
