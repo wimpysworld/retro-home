@@ -460,7 +460,7 @@ function stage_05_config() {
         deskpipro)
             # https://github.com/DeskPi-Team/deskpi
             # https://github.com/DeskPi-Team/deskpi/tree/master/drivers
-            nspawn apt-get -y install lirc python3-serial python3-setproctitle
+            nspawn apt-get -y install --no-install-recommends lirc python3-serial python3-setproctitle
 
             # Configure lirc for DeskPi Pro
             mv "${R}"/etc/lirc/lircd.conf.d/devinput.lircd.conf "${R}"/etc/lirc/lircd.conf.d/devinput.lircd.dist
@@ -470,7 +470,7 @@ function stage_05_config() {
             nspawn systemctl enable deskpipro-poweroff.service
             ;;
         gpi)
-            nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
+            nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="gpi.py"
             # https://github.com/tsoliman/Retroflag-GPi-case
             # https://github.com/kristijandraca/GPi_Case_patch
@@ -479,7 +479,7 @@ function stage_05_config() {
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/pwm-audio-pi-zero-gpi.dtbo" case/${REMIX}/boot/overlays/pwm-audio-pi-zero-gpi-overlay.dts
             ;;
         gpimateplus)
-            nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
+            nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="gpi.py"
             # https://github.com/martinx72/GPiMatePlusHowTo
             # https://retropie.org.uk/forum/topic/31555/no-sound-retroflag-gpi-case-with-pi-zero-w-2-solved
@@ -487,11 +487,11 @@ function stage_05_config() {
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/disable-pcie.dtbo" case/${REMIX}/boot/overlays/disable-pcie-overlay.dts
             ;;
         megabit)
-            nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
+            nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="megabit.py"
             ;;
         retroflag)
-            nspawn apt-get -y install python3-gpiozero python3-lgpio python3-psutil
+            nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="retroflag.py"
             #NES PI 4
             # Add to cmdline.txt usb-storage.quirks=152D:0562:u
