@@ -196,7 +196,7 @@ function stage_02_ludo() {
         esac
 
         # deb-get
-        nspawn apt-get -y install curl wget
+        nspawn apt-get -y install --no-install-recommends curl wget
         nspawn wget -q "https://raw.githubusercontent.com/wimpysworld/deb-get/0.2.9/deb-get" -O /usr/bin/deb-get
         chmod 755 "${R}/usr/bin/deb-get"
         nspawn deb-get install deb-get
