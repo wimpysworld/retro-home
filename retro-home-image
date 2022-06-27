@@ -172,7 +172,7 @@ function stage_02_ludo() {
             cp -v root/usr/share/lightdm/lightdm.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm.conf.d/
             cp -v root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm-gtk-greeter.conf.d/
         else
-            nspawn apt-get -y install --no-install-recommends fbi fonts-mplus xinit
+            nspawn apt-get -y install --no-install-recommends fbi fontconfig fonts-mplus xinit
             cp "root/usr/lib/systemd/system/x11-autologin.service" "${R}/usr/lib/systemd/system/"
             nspawn systemctl enable x11-autologin.service
             cp "root/usr/local/bin/retro-home-splash" "${R}/usr/local/bin/"
