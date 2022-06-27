@@ -516,7 +516,7 @@ function stage_06_clean() {
     nspawn apt-get -y autoremove
     nspawn apt-get -y autoclean
     nspawn apt-get -y clean
-    nspawn fc-cache -f -r -s -v
+    nspawn fc-cache -sv
 
     rm -f "${B}"/{*.bak,*.old}
     rm -f "${R}"/boot/{*.bak,*.old}
