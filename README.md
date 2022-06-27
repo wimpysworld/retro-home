@@ -232,11 +232,20 @@ icon in the top right of the panel.
 ### Capture Card Quicks
 
 My capture cards sync at 1920x1200 @ 59.94Hz and this cause Ludo performance
-to really suffer. Once Ludo is running I reset the resolution and refresh rate
+to really suffer. Once Ludo is running I reset the refresh rate
 as follows:
 
 ```bash
-env DISPLAY=:0 xrandr -s 1920x1080 --rate 60
+env DISPLAY=:0 xrandr --rate 60
+```
+
+### Kernel headers
+
+If you need to build kernel modules you can install the kernel header for the
+Raspberry Pi kernel like so:
+
+```bash
+sudo apt-get install linux-headers-raspi
 ```
 
 ## Reference
