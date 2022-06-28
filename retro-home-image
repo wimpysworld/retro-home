@@ -556,25 +556,25 @@ function stage_07_image() {
     export R="${R_STAGE_6}"
 
     # Build the image file
-    local SIZE_IMG=""
-    SIZE_IMG=$(du -csh "${R}" | tail -n1 | cut -d'G' -f1)
-    SIZE_IMG=$(printf "%.0f" "${SIZE_IMG}")
-    ((SIZE_IMG+=2))
-    local SIZE_BOOT="256MiB"
-
-    # Remove old images.
-    rm -fv "${TMP_DIR}/${IMG_OUT}"
+    local SIZE_BOOT="256"
+    local SIZE_ROOT=0
+    local SIZE_IMG=0
+    local SIZE_PAD=0
+    # Calcualte image size accounting for boot parition + 5%
+    SIZE_ROOT=$(du -cs --block-size=MB "${R}" | tail -n1 | cut -d'M' -f1)
+    SIZE_PAD=$(( (SIZE_ROOT / 10) / 2 ))
+    SIZE_IMG=$((SIZE_BOOT + SIZE_ROOT + SIZE_PAD))
 
     # Create an empty file file.
-    dd if=/dev/zero of="${TMP_DIR}/${IMG_OUT}" bs=1MB count=1
-    dd if=/dev/zero of="${TMP_DIR}/${IMG_OUT}" bs=1MB count=0 seek=$(( SIZE_IMG * 1000 ))
+    rm -fv "${TMP_DIR}/${IMG_OUT}"
+    fallocate -l "${SIZE_IMG}"M "${TMP_DIR}/${IMG_OUT}"
 
     # Initialising: msdos
     parted -s "${TMP_DIR}/${IMG_OUT}" mktable msdos
     echo "Creating /boot/firmware partition"
-    parted -a optimal -s "${TMP_DIR}/${IMG_OUT}" mkpart primary fat32 1 "${SIZE_BOOT}"
+    parted -a optimal -s "${TMP_DIR}/${IMG_OUT}" mkpart primary fat32 1 "${SIZE_BOOT}MB"
     echo "Creating / partition"
-    parted -a optimal -s "${TMP_DIR}/${IMG_OUT}" mkpart primary ext4 "${SIZE_BOOT}" 100%
+    parted -a optimal -s "${TMP_DIR}/${IMG_OUT}" mkpart primary ext4 "${SIZE_BOOT}MB" 100%
     echo "Making partition 1 bootable"
     parted -s "${TMP_DIR}/${IMG_OUT}" set 1 boot on
 
