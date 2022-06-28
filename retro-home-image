@@ -114,7 +114,7 @@ function stage_01_bootstrap() {
         --arch="${IMG_ARCH}" \
         --cache-dir="${R_STAGE_0}" \
         --components=main,restricted,universe,multiverse \
-        --exclude=netplan.io,ubuntu-minimal,ubuntu-advantage-tools \
+        --exclude=netplan.io,ubuntu-minimal,ubuntu-advantage-tools,vim-tiny \
         --foreign \
         --include=avahi-daemon,cloud-guest-utils,nano \
         "${IMG_RELEASE}" "${R}" "${REPO}"
