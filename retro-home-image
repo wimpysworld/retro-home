@@ -207,7 +207,7 @@ function stage_02_ludo() {
         for SERVICE in bluetooth sshd smbd; do
             case "${SERVICE}" in
                 bluetooth) CONF_NAME="bluez";;
-                smbd)     CONF_NAME="samba";;
+                smbd)      CONF_NAME="samba";;
                 *)         CONF_NAME="${SERVICE}";;
             esac
             mkdir -p "${R}/etc/systemd/system/${SERVICE}.service.d"
@@ -248,6 +248,8 @@ function stage_02_ludo() {
         done
 
         chown -Rv 1000:1000 "${R}/storage"
+
+        #TODO: Make this a systemd unit
         # Make LibreElec/LudOS updates fail; this is intended
         chown -v root:root "${R}/storage/.update"
         chmod 700 "${R}/storage/.update"
@@ -323,9 +325,9 @@ function stage_03_micro_desktop() {
         cp "root/usr/share/gnome-flashback-metacity/applications/connman-gtk.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
         cp "root/usr/share/gnome-flashback-metacity/applications/info.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
 
+        # Create Retro Home xsession
         mkdir -p "${R}"/usr/share/xsessions
         cp root/usr/share/xsessions/retro-home.desktop "${R}"/usr/share/xsessions/
-
         nspawn update-desktop-database
     fi
 }
@@ -646,7 +648,7 @@ function stage_08_compress() {
 }
 
 if [ -z "${SUDO_USER}" ]; then
-  echo "ERROR! You must use sudo to run this script: sudo ./$(basename ${0})"
+  echo "ERROR! You must use sudo to run this script: sudo ./$(basename "${0}")"
   exit 1
 else
   SUDO_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
