@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+IMG=0
+while true; do
+    ((IMG+=1))
+    xli -onroot -fillscreen -gamma 2.2 "/usr/share/splash/splash-000${IMG}.png"
+    sleep 0.025
+    if pidof -q ludo; then
+        PID_SEC=$(expr "$(date +%s)" - "$(stat --format=%Y "/proc/$(pidof ludo)")")
+        if [ "${PID_SEC}" -ge 10 ]; then
+          break
+        fi
+    fi
+    if [ ${IMG} -ge 5 ]; then
+      IMG=0
+    fi
+done

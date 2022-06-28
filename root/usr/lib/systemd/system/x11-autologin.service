@@ -7,21 +7,19 @@ After=graphical.target systemd-user-sessions.service
 [Service]
 User=ludo
 WorkingDirectory=~
-
 PAMName=login
 Environment=XDG_SESSION_TYPE=x11
-TTYPath=/dev/tty7
 StandardInput=tty
+StandardOutput=journal
+TTYPath=/dev/tty7
+TTYVHangup=yes
+TTYVTDisallocate=yes
 UnsetEnvironment=TERM
-
 UtmpIdentifier=tty7
 UtmpMode=user
-
-StandardOutput=journal
 ExecStartPre=/usr/bin/chvt 7
 ExecStart=/usr/bin/startx /usr/local/bin/retro-home -- vt7 -keeptty -verbose 3 -logfile /storage/.Xorg.log
 Restart=always
-RestartSec=1
 
 [Install]
 WantedBy=graphical.target

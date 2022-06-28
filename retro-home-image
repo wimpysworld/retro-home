@@ -174,12 +174,38 @@ function stage_02_ludo() {
             cp -v root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm-gtk-greeter.conf.d/
         else
             nspawn apt-get -y install --no-install-recommends fbi fontconfig fonts-mplus xinit
+            mkdir -p "${R}/etc/udev/rules.d"
+            cp root/etc/udev/rules.d/30-fb0.rules "${R}/etc/udev/rules.d/30-fb0.rules"
+            cp root/usr/lib/systemd/system/splash-fbi.service "${R}/usr/lib/systemd/system/"
+            nspawn systemctl enable splash-fbi.service
             cp "root/usr/lib/systemd/system/x11-autologin.service" "${R}/usr/lib/systemd/system/"
             nspawn systemctl enable x11-autologin.service
-            cp "root/usr/local/bin/retro-home-splash" "${R}/usr/local/bin/"
-            chmod 755 "${R}/usr/local/bin/retro-home-splash"
-            cp "root/usr/lib/systemd/system/retro-home-splash.service" "${R}/usr/lib/systemd/system/"
-            nspawn systemctl enable retro-home-splash.service
+
+            SIZE_LOGO=256
+            SIZE_FRAME=384
+
+            # Make logo.png
+            convert -density 1200 -resize ${SIZE_LOGO}x${SIZE_LOGO} -background none .github/logo.svg /tmp/logo.png
+
+            # Make Retro Home background
+            mkdir -p "${R}/usr/share/splash"
+            convert -size 1920x1080 xc:black /tmp/background.png
+            composite -gravity center /tmp/logo.png /tmp/background.png "${R}/usr/share/splash/splash.png"
+
+            # Make frame.png
+            convert -size ${SIZE_FRAME}x${SIZE_FRAME} xc:black /tmp/frame.png
+            composite -gravity center /tmp/logo.png /tmp/frame.png /tmp/logo-framed.png
+            rm /tmp/frame.png
+            rm /tmp/logo.png
+
+            for ((i = 1 ; i < 6 ; i++)); do
+                composite -gravity south ".github/throbber-000${i}.png" /tmp/logo-framed.png "/tmp/logo-000${i}.png"
+                composite -gravity center "/tmp/logo-000${i}.png" /tmp/background.png "${R}/usr/share/splash/splash-000${i}.png"
+                rm "/tmp/logo-000${i}.png"
+            done
+            rm /tmp/logo-framed.png
+            rm /tmp/background.png
+            optipng -strip all -o7 "${R}/usr/share/splash/*.png"
         fi
 
         # LudOS requirements
@@ -262,8 +288,8 @@ function stage_02_ludo() {
         # Make an Ludo icon for the Greeter
         convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
 
-        # Create Retro Home xsession
-        for BIN in retro-home hdmi-refresh; do
+        # Add the retro-home script that launch LudOs
+        for BIN in hdmi-refresh retro-home splash-xli; do
             cp "root/usr/local/bin/${BIN}" "${R}/usr/local/bin/"
             chmod 755 "${R}/usr/local/bin/${BIN}"
         done

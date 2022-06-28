@@ -1,0 +1,2 @@
+# https://unix.stackexchange.com/a/186903
+KERNEL=="fb0", SYMLINK="fb0", TAG+="systemd"

@@ -1,0 +1,16 @@
+# https://unix.stackexchange.com/a/186903
+[Unit]
+Description=Framebuffer Splash
+After=local-fs.target dev-fb0.device getty@tty7.service
+Requires=dev-fb0.device
+DefaultDependencies=no
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/fbi --vt 7 --noverbose --autozoom /usr/share/splash/splash.png
+StandardOutput=append:/var/log/splash-fbi.log
+StandardError=append:/var/log/splash-fbi.log
+RemainAfterExit=yes
+
+[Install]
+WantedBy=basic.target

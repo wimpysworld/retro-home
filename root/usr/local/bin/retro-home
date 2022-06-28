@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# TODO:
-#  - Improve logging
-xli -onroot -fillscreen -gamma 2.2 /usr/share/backgrounds/Retro-Home-Wallpaper.png
+splash-xli &
 
 # Disable screen blanking, DPMS and screensaver
 xset -dpms
