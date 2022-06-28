@@ -92,8 +92,8 @@ function stage_01_bootstrap() {
 
     # Required tools on the host
     apt-get -y install binfmt-support debootstrap device-tree-compiler git \
-    graphicsmagick-imagemagick-compat iproute2 qemu-user-static rsync \
-    systemd-container ubuntu-keyring whois xz-utils
+    graphicsmagick-imagemagick-compat iproute2 optipng qemu-user-static rsync \
+    systemd-container ubuntu-keyring util-linux whois xz-utils
 
     # Bootstrap a minimal Ubuntu
     #   Includes:
