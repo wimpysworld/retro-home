@@ -9,17 +9,14 @@ xset s off
 # Hide the mouse cursor
 unclutter-xfixes --fork
 
-# Rebuild the font-cache if it is incomplete
-if ! fc-list | grep -q mplus; then
-    fc-cache -frsv &
-fi
-
 # Set volume for all sinks to 100%; use Ludo to control "actual" volume
 IFS=$'\n'
 for SINK in $(pulsemixer --list-sinks | grep Sink:); do
   ID=$(echo "${SINK}" | cut -d':' -f3 | cut -d',' -f1 | sed s'/ //g')
   pulsemixer --id "${ID}" --set-volume 100
 done
+
+xdg-user-dirs-update
 
 # Make sure Ludo is always full screen
 sed 's/video_fullscreen = false/video_fullscreen = true/' "${HOME}/.config/ludo/settings.toml"
