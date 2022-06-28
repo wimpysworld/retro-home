@@ -224,7 +224,7 @@ function stage_02_ludo() {
         cp "root/etc/ludo.toml" "${R}/etc/"
 
         # Configure Samba
-        mv "${R}root/etc/samba/smb.conf" "${R}/etc/samba/smb.conf.dist"
+        mv "${R}/etc/samba/smb.conf" "${R}/etc/samba/smb.conf.dist"
         echo -e "[global]\nconfig file = /usr/local/etc/samba/smb.conf\ndisable netbios = yes" > "${R}/etc/samba/smb.conf"
         mkdir -p "${R}/usr/local/etc/samba/"
         cp "root/usr/local/etc/samba/smb.conf" "${R}/usr/local/etc/samba/"
@@ -240,6 +240,8 @@ function stage_02_ludo() {
         for CONF_FILE in .cache/services/bluez.conf .cache/services/samba.conf .cache/services/sshd.conf .local/share/ludo/history.csv; do
             touch "${R}/storage/${CONF_FILE}"
         done
+        # Disable samba by default; can be enabled via Ludo Settings
+        rm "${R}/storage/.cache/services/samba.conf"
 
         for LUDO_DIR in playlists roms savefiles savestates screenshots system thumbnails; do
             mkdir -p "${R}/storage/Retro/${LUDO_DIR}"
