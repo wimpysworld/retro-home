@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 
-sleep 10
+while true; do
+  if pidof -q ludo; then
+    PID_SEC=$(expr "$(date +%s)" - "$(stat --format=%Y "/proc/$(pidof ludo)")")
+    if [ "${PID_SEC}" -ge 12 ]; then
+      break
+    fi
+  fi
+  sleep 0.50
+done
 
 # Work around a capture card issue. If the primary connected display reports
 # 1920x1200, reset the refresh rate to avoid significant performance issues.
