@@ -183,9 +183,8 @@ function stage_02_ludo() {
         fi
 
         # LudOS requirements
-        nspawn apt-get -y install --no-install-recommends bluez connman iwd \
-        samba ssh wireless-regdb xli
-        nspawn systemctl enable iwd.service
+        nspawn apt-get -y install --no-install-recommends bluez connman \
+        samba ssh wireless-regdb wpasupplicant xli
 
         local AUDIO_SYSTEM="pipewire"
         case "${AUDIO_SYSTEM}" in
