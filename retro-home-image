@@ -127,9 +127,8 @@ function stage_01_bootstrap() {
     cp "root/etc/apt/sources.list" "${R}/etc/apt/"
     sed -i "s|RELEASE|${IMG_RELEASE}|g" "${R}/etc/apt/sources.list"
 
-    #nspawn hostnamectl --static set-hostname "retro-home-${REMIX}"
-    echo "retro-home-${REMIX}" > "${R}/etc/hostname"
-    sed -i "1s|.*|127.0.0.1\tlocalhost retro-home-${REMIX}|" "${R}/etc/hosts"
+    echo "${REMIX}" > "${R}/etc/hostname"
+    sed -i "1s|.*|127.0.0.1\tlocalhost ${REMIX}|" "${R}/etc/hosts"
 
     # Set locale to C.UTF-8 by default.
     # https://git.launchpad.net/livecd-rootfs/tree/live-build/auto/build#n159
