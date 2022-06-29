@@ -13,4 +13,4 @@ StandardError=append:/var/log/splash-fbi.log
 RemainAfterExit=yes
 
 [Install]
-WantedBy=basic.target
+WantedBy=sysinit.target
