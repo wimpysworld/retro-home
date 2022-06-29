@@ -95,13 +95,16 @@ function stage_01_bootstrap() {
     graphicsmagick-imagemagick-compat iproute2 optipng qemu-user-static rsync \
     systemd-container ubuntu-keyring util-linux whois xz-utils
 
-    # Bootstrap a minimal Ubuntu
+    # Bootstrap a minimal Ubuntu. Ludo uses connman so that is bootstrapped
     #   Includes:
     #     - avahi-daemon: Multicast DNS Service Discovery
     #     - cloud-guest-utils: instead of cloud-image-utils which requires qemu
+    #     - connman: provides network management
     #     - nano: the best text editor ever
     #   Excludes:
-    #     - netplan.io: Ludo uses connman
+    #     - isc-dhcp-*: Replaced by connman
+    #     - netplan.io: Replaced by connman
+    #     - networkd-dispatcher: Replaced by connman
     #     - ubuntu-advantage-tools: not required
 
     if pidof apt-cacher-ng; then
@@ -114,9 +117,9 @@ function stage_01_bootstrap() {
         --arch="${IMG_ARCH}" \
         --cache-dir="${R_STAGE_0}" \
         --components=main,restricted,universe,multiverse \
-        --exclude=netplan.io,ubuntu-minimal,ubuntu-advantage-tools,vim-tiny \
+        --exclude=debconf-i18n,distro-info,dmsetup,eject,info,isc-dhcp-client,isc-dhcp-common,libnetplan0,netcat-openbsd,netplan.io,networkd-dispatcher,ubuntu-minimal,ubuntu-advantage-tools,vim-tiny,vim-common,xxd \
         --foreign \
-        --include=avahi-daemon,cloud-guest-utils,nano \
+        --include=avahi-daemon,cloud-guest-utils,connman,nano \
         "${IMG_RELEASE}" "${R}" "${REPO}"
     nspawn /debootstrap/debootstrap \
         --second-stage
@@ -132,19 +135,23 @@ function stage_01_bootstrap() {
     # https://git.launchpad.net/livecd-rootfs/tree/live-build/auto/build#n159
     echo "LANG=C.UTF-8" > "${R}/etc/default/locale"
 
+    # Disable systemd-networkd et al; we're using connman
+    # - https://www.naut.ca/blog/2018/12/12/disabling-systemd-networking/
+    nspawn systemctl disable systemd-networkd.socket systemd-networkd systemd-networkd-wait-online
+    nspawn systemctl disable systemd-resolved.service
+
+    # Disable cron; systemd timers have replaced cron
+    nspawn systemctl disable cron
+
     nspawn apt-get -y update
     nspawn apt-get -y upgrade
     nspawn apt-get -y dist-upgrade
 
-    # First boot filesystem expansion
+    # # Add some of ubuntu-standard tools & first boot filesystem expansion
     #  - Insure that cloud-image-utils do not get installed
-    nspawn apt-get -y install cloud-guest-utils cloud-initramfs-growroot
-
-    # Add some of ubuntu-standard tools to the image
-    nspawn apt-get -y install --no-install-recommends ubuntu-standard
-
-    nspawn apt-get -y autoclean
-    nspawn apt-get -y clean
+    nspawn apt-get -y install --no-install-recommends cloud-guest-utils \
+    cloud-initramfs-growroot dosfstools file hdparm lshw lsof man-db \
+    pciutils pci.ids psmisc usbutils usb.ids wget xz-utils
 }
 
 function stage_02_ludo() {
@@ -165,7 +172,7 @@ function stage_02_ludo() {
 
         if $(${INCLUDE_DESKTOP}); then
             # Display manager
-            nspawn apt-get -y install --no-install-recommends fonts-mplus lightdm \
+            nspawn apt-get -y install --no-install-recommends lightdm \
             lightdm-gtk-greeter yaru-theme-gtk yaru-theme-icon yaru-theme-sound \
             yaru-theme-unity
 
@@ -243,13 +250,6 @@ function stage_02_ludo() {
             echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/${CONF_NAME}.conf" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf"
         done
 
-        # Disable systemd-networkd et al; we're using connman
-        # - https://www.naut.ca/blog/2018/12/12/disabling-systemd-networking/
-        nspawn systemctl stop systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
-        nspawn systemctl disable systemd-networkd.socket systemd-networkd networkd-dispatcher systemd-networkd-wait-online
-        nspawn systemctl stop systemd-resolved
-        nspawn systemctl disable systemd-resolved.service
-
         cp "root/etc/ludo.toml" "${R}/etc/"
 
         # Configure Samba
@@ -309,10 +309,10 @@ function stage_03_micro_desktop() {
 
         nspawn apt-get -y install --no-install-recommends connman-gtk \
         file-roller fonts-mplus gedit gnome-bluetooth gnome-control-center \
-        gnome-control-center-faces gnome-disk-utility gnome-keyring \
-        gnome-session-flashback gnome-startup-applications libcanberra-pulse \
-        librsvg2-2 librsvg2-bin librsvg2-common sakura transmission-gtk \
-        yaru-theme-gtk yaru-theme-icon yaru-theme-sound yaru-theme-unity
+        gnome-control-center-faces gnome-disk-utility gnome-session-flashback \
+        gnome-startup-applications libcanberra-pulse librsvg2-2 librsvg2-bin \
+        librsvg2-common sakura transmission-gtk yaru-theme-gtk yaru-theme-icon \
+        yaru-theme-sound yaru-theme-unity
 
         # Disable tracker
         rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
