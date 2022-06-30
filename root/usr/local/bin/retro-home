@@ -19,7 +19,7 @@ done
 xdg-user-dirs-update
 
 # Make sure Ludo is always full screen
-sed 's/video_fullscreen = false/video_fullscreen = true/' "${HOME}/.config/ludo/settings.toml"
+sed -i 's/video_fullscreen = false/video_fullscreen = true/' "${HOME}/.config/ludo/settings.toml"
 
 # Work around capture card quirks
 hdmi-refresh &

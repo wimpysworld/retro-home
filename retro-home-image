@@ -290,8 +290,11 @@ function stage_02_ludo() {
         # Make an Ludo icon for the Greeter
         convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
 
+        # Add intofy-tools for watch-ludo-settings so it can react to settings changes
+        nspawn apt-get -y install --no-install-recommends inotify-tools
+
         # Add the retro-home script that launch LudOs
-        for BIN in hdmi-refresh retro-home splash-xli; do
+        for BIN in hdmi-refresh retro-home splash-xli watch-ludo-settings; do
             cp "root/usr/local/bin/${BIN}" "${R}/usr/local/bin/"
             chmod 755 "${R}/usr/local/bin/${BIN}"
         done

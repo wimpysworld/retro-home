@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# Usage: parse_config_vars <file>
+# No arrays, just read variables individually.
+# Preexisting variables will be overwritten.
+# https://forums.bunsenlabs.org/viewtopic.php?id=5570
+function parse_config_vars() {
+    local line key value entry_regex
+    entry_regex="^[[:blank:]]*([[:alpha:]_][[:alnum:]_-]*)[[:blank:]]*=[[:blank:]]*('[^']+'|\"[^\"]+\"|[^#[:blank:]]+)[[:blank:]]*(#.*)*$"
+    while read -r line; do
+        [[ -n ${line} ]] || continue
+        [[ ${line} =~ ${entry_regex} ]] || continue
+        key=${BASH_REMATCH[1]}
+        value=${BASH_REMATCH[2]#[\'\"]} # strip quotes
+        value=${value%[\'\"]}
+        declare -g "${key}"="${value}"
+    done < "$1"
+}
+
+function change_desktop_theme() {
+    local dark_mode="${1}"
+    case "${dark_mode}" in
+        true)
+            gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+            gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-red-dark'
+            gsettings set org.gnome.desktop.interface icon-theme 'Yaru-red-dark'
+            gsettings set org.gnome.gedit.preferences.editor scheme 'Yaru-dark'
+            ;;
+        false)
+            gsettings set org.gnome.desktop.interface color-scheme 'default'
+            gsettings set org.gnome.desktop.interface gtk-theme 'Yaru-red'
+            gsettings set org.gnome.desktop.interface icon-theme 'Yaru-red'
+            gsettings set org.gnome.gedit.preferences.editor scheme 'Yaru'
+            ;;
+    esac
+}
+
+readonly SETTINGS="${HOME}/.config/ludo/settings.toml"
+
+# Only run this process if settings.toml exists
+if [ -r "${SETTINGS}" ]; then
+    inotifywait -m -e close_write "${SETTINGS}" | while read inotify; do
+        parse_config_vars "${SETTINGS}"
+
+        # Only change the desktop theme is the schema exists
+        if [ -e /usr/share/glib-2.0/schemas/org.gnome.desktop.interface.gschema.xml ]; then
+            change_desktop_theme "${video_dark_mode}"
+        fi
+    done
+fi

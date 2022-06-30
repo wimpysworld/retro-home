@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Exec=/usr/local/bin/watch-ludo-settings
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en]=watch-ludo-settings
+Name=watch-ludo-settings
+Comment[en]=Monitor Ludo settings.toml
+Comment=Monitor Ludo settings.toml
