@@ -16,10 +16,11 @@ for SINK in $(pulsemixer --list-sinks | grep Sink:); do
   pulsemixer --id "${ID}" --set-volume 100
 done
 
-xdg-user-dirs-update
+xdg-user-dirs-update &
 
-# Make sure Ludo is always full screen
+# Make sure Ludo is always fullscreen and monitor settings.toml changes
 sed -i 's/video_fullscreen = false/video_fullscreen = true/' "${HOME}/.config/ludo/settings.toml"
+watch-ludo-settings &
 
 # Work around capture card quirks
 hdmi-refresh &
