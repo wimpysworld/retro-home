@@ -1,0 +1,13 @@
+[Unit]
+Description=Retro Home; Make sure LibreELEC updates fail
+After=local-fs.target
+DefaultDependencies=no
+ConditionPathExists=/storage/.update
+
+[Service]
+Type=simple
+ExecStartPre=chown -v root:root /storage/.update
+ExecStart=chmod 700 /storage/.update
+
+[Install]
+WantedBy=basic.target

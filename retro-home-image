@@ -287,10 +287,11 @@ function stage_02_ludo() {
 
         chown -Rv 1000:1000 "${R}/storage"
 
-        #TODO: Make this a systemd unit
         # Make LibreElec/LudOS updates fail; this is intended
         chown -v root:root "${R}/storage/.update"
         chmod 700 "${R}/storage/.update"
+        cp "root/usr/lib/systemd/system/retro-maint-ludo-update.service" "${R}/usr/lib/systemd/system/"
+        nspawn systemctl enable retro-maint-ludo-update.service
 
         # Allow members of the 'sudo' group to start/stop services
         # Required so ludos can enable/disable SSH, Bluetooth and Samba
