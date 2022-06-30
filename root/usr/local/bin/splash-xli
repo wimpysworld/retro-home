@@ -8,6 +8,7 @@ while true; do
     if pidof -q ludo; then
         PID_SEC=$(expr "$(date +%s)" - "$(stat --format=%Y "/proc/$(pidof ludo)")")
         if [ "${PID_SEC}" -ge 10 ]; then
+          xli -onroot -fillscreen -gamma 2.2 /usr/share/splash/splash.png
           break
         fi
     fi
