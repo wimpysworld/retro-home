@@ -9,5 +9,6 @@ screenshots_dir = "/storage/Retro/screenshots"
 system_dir = "/storage/Retro/system"
 thumbnail_dir = "/storage/Retro/thumbnails"
 bluetooth_service = true
-samba_service = true
+samba_service = false
 ssh_service = true
+video_dark_mode = true

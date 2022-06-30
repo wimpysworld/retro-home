@@ -11,12 +11,13 @@ secondary-color='#676767'
 automatic-timezone=true
 
 [org.gnome.desktop.interface:GNOME-Flashback]
+color-scheme='prefer-dark'
 cursor-theme='Yaru'
 document-font-name='M+ 1p Medium 11'
 enable-hot-corners=false
 font-name='M+ 1p Medium 11'
-gtk-theme='Yaru-red'
-icon-theme='Yaru-red'
+gtk-theme='Yaru-red-dark'
+icon-theme='Yaru-red-dark'
 monospace-font-name='M+ 1m Medium 13'
 
 [org.gnome.desktop.lockdown:GNOME-Flashback]
@@ -55,6 +56,7 @@ titlebar-font='M+ 1p Bold 11'
 titlebar-uses-system-font=false
 
 [org.gnome.gedit.preferences.editor]
+scheme='Yaru-dark'
 editor-font='M+ 1m Medium 13'
 
 [org.gnome.gnome-flashback.desktop.background:GNOME-Flashback]
