@@ -1,0 +1,12 @@
+[Unit]
+Description=Retro Home; use the bespoke Samba configuration
+After=local-fs.target
+DefaultDependencies=no
+ConditionPathExists=/usr/local/etc/samba/smb.conf
+
+[Service]
+Type=simple
+ExecStart=/bin/sh -c 'echo "[global]\nconfig file = /usr/local/etc/samba/smb.conf\ndisable netbios = yes" > /etc/samba/smb.conf'
+
+[Install]
+WantedBy=basic.target
