@@ -190,6 +190,8 @@ function stage_02_ludo() {
         nspawn systemctl enable splash-fbi.service
         cp "root/usr/lib/systemd/system/x11-autologin.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable x11-autologin.service
+        cp "root/usr/lib/systemd/system/retro-maint-fc-cache.service" "${R}/usr/lib/systemd/system/"
+        nspawn systemctl enable retro-maint-fc-cache.service
 
         SIZE_LOGO=256
         SIZE_FRAME=384
@@ -559,7 +561,6 @@ function stage_06_clean() {
     nspawn apt-get -y autoremove
     nspawn apt-get -y autoclean
     nspawn apt-get -y clean
-    nspawn fc-cache -sv
 
     rm -f "${B}"/{*.bak,*.old}
     rm -f "${R}"/boot/{*.bak,*.old}
@@ -577,6 +578,7 @@ function stage_06_clean() {
     rm -f "${R}"/var/crash/*
     rm -f "${R}"/var/cache/debconf/*-old
     rm -f "${R}"/var/cache/deb-get/*.json
+    rm -f "${R}"/var/cache/fontconfig/CACHEDIR.TAG
     rm -rf "${R}"/var/lib/apt/lists/*
     rm -f "${R}"/var/lib/dpkg/*-old
     [ -L "${R}"/var/lib/dbus/machine-id ] || rm -f "${R}"/var/lib/dbus/machine-id

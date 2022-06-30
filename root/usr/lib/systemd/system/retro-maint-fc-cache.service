@@ -1,0 +1,12 @@
+[Unit]
+Description=Retro Home; Make sure the font cache is generated
+After=local-fs.target
+DefaultDependencies=no
+ConditionPathExists=!/var/cache/fontconfig/CACHEDIR.TAG
+
+[Service]
+Type=simple
+ExecStart=fc-cache -frsv
+
+[Install]
+WantedBy=basic.target
