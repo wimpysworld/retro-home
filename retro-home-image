@@ -142,6 +142,14 @@ function stage_01_bootstrap() {
     # Disable cron; systemd timers have replaced cron
     nspawn systemctl disable cron
 
+    # Disable motd-news, Retro Home has a bespoke (static) motd
+    nspawn systemctl disable motd-news.service motd-news.timer
+
+    # I've grappled with this. Disable unattended-upgrades
+    nspawn systemctl disable apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
+
+    nspawn systemctl disable setvtrgb.service
+
     nspawn apt-get -y update
     nspawn apt-get -y upgrade
     nspawn apt-get -y dist-upgrade
@@ -470,9 +478,6 @@ function stage_05_config() {
         cp "root/usr/lib/systemd/system/ssh-regenerate-hostkeys.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable ssh-regenerate-hostkeys.service
     fi
-
-    # I've grappled with this. Disable unattended-upgrades
-    nspawn systemctl disable unattended-upgrades
 
     # Generate retro-home icons
     cp .github/logo.svg "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
