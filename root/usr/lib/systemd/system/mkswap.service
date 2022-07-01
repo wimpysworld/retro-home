@@ -1,3 +1,4 @@
+# Check for disk space: https://serverfault.com/a/832735
 [Unit]
 Description=Create the default swapfile
 DefaultDependencies=no
