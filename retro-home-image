@@ -485,6 +485,7 @@ function stage_05_config() {
     fi
 
     # Generate retro-home icons
+    mkdir -p "${R}/usr/share/icons/hicolor/scalable/apps"
     cp .github/logo.svg "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
     for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
         mkdir -p "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps"
