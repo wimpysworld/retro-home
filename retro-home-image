@@ -211,6 +211,7 @@ function stage_02_ludo() {
         mkdir -p "${R}/usr/share/splash"
         convert -size 1920x1080 xc:black /tmp/background.png
         composite -gravity center /tmp/logo.png /tmp/background.png "${R}/usr/share/splash/splash.png"
+        optipng -strip all -o7 "${R}/usr/share/splash/splash.png"
 
         # Make frame.png
         convert -size ${SIZE_FRAME}x${SIZE_FRAME} xc:black /tmp/frame.png
@@ -221,11 +222,11 @@ function stage_02_ludo() {
         for ((i = 1 ; i < 6 ; i++)); do
             composite -gravity south ".github/throbber-000${i}.png" /tmp/logo-framed.png "/tmp/logo-000${i}.png"
             composite -gravity center "/tmp/logo-000${i}.png" /tmp/background.png "${R}/usr/share/splash/splash-000${i}.png"
+            optipng -strip all -o7 "${R}/usr/share/splash/splash-000${i}.png"
             rm "/tmp/logo-000${i}.png"
         done
         rm /tmp/logo-framed.png
         rm /tmp/background.png
-        optipng -strip all -o7 "${R}/usr/share/splash/*.png"
 
         # LudOS requirements
         nspawn apt-get -y install --no-install-recommends bluez connman \
@@ -305,9 +306,6 @@ function stage_02_ludo() {
         # - https://unix.stackexchange.com/questions/504806/systemd-start-as-unprivileged-user-in-a-group/557634#557634
         cp root/etc/polkit-1/localauthority/50-local.d/service-auth.pkla "${R}/etc/polkit-1/localauthority/50-local.d/"
 
-        # Make an Ludo icon for the Greeter
-        convert -resize 80x80 -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/pixmaps/ludo.png"
-
         # Add intofy-tools for watch-ludo-settings so it can react to settings changes
         nspawn apt-get -y install --no-install-recommends inotify-tools
 
@@ -363,11 +361,29 @@ function stage_03_micro_desktop() {
         nspawn glib-compile-schemas /usr/share/glib-2.0/schemas/
 
         # Generate ludo icons
+        optipng -strip all -o7 "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png"
         for SIZE in 512 256 192 128 96 72 64 48 36 32 24 22 16; do
             mkdir -p "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps"
             convert -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/1024x1024/apps/ludo.png" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
+            optipng -strip all -o7 "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/ludo.png"
         done
+
+        # Generate retro-home icons
+        mkdir -p "${R}/usr/share/icons/hicolor/scalable/apps"
+        cp .github/logo.svg "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
+        for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
+            mkdir -p "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps"
+            convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/retro-home.png"
+            optipng -strip all -o7 "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/retro-home.png"
+        done
+
         nspawn gtk-update-icon-cache /usr/share/icons/hicolor/
+
+        # Composite the Retro Home wallpaper
+        mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
+        composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper.png"
+        cp root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper-blank.png"
+        optipng -strip all -o7 "${R}"/usr/share/backgrounds/*.png
 
         # Add Connman Settings menu entry and hide the TeXInfo menu entry
         mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
@@ -486,19 +502,6 @@ function stage_05_config() {
         cp "root/usr/lib/systemd/system/ssh-regenerate-hostkeys.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable ssh-regenerate-hostkeys.service
     fi
-
-    # Generate retro-home icons
-    mkdir -p "${R}/usr/share/icons/hicolor/scalable/apps"
-    cp .github/logo.svg "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg"
-    for SIZE in 1024 512 256 192 128 96 72 64 48 36 32 24 22 16; do
-        mkdir -p "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps"
-        convert -density 1200 -resize ${SIZE}x${SIZE} -background none "${R}/usr/share/icons/hicolor/scalable/apps/retro-home.svg" "${R}/usr/share/icons/hicolor/${SIZE}x${SIZE}/apps/retro-home.png"
-    done
-
-    # Composite the Retro Home wallpaper
-    mkdir -p "${R}/usr/share/backgrounds/" 2>/dev/null
-    composite -gravity center "${R}/usr/share/icons/hicolor/256x256/apps/retro-home.png" root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper.png"
-    cp root/usr/share/backgrounds/Jammy-Jellyfish_WP_1920x1080_Grey_blank.png "${R}/usr/share/backgrounds/Retro-Home-Wallpaper-blank.png"
 
     # Disable the existing motd scripts
     for MOTD in 00-header 10-help-text 50-motd-news 92-unattended-upgrades; do
