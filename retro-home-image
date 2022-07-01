@@ -389,6 +389,7 @@ function stage_03_micro_desktop() {
         mkdir -p "${R}/usr/share/gnome-flashback-metacity/applications"
         cp "root/usr/share/gnome-flashback-metacity/applications/connman-gtk.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
         cp "root/usr/share/gnome-flashback-metacity/applications/info.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
+        nspawn ln -s /usr/share/gnome-flashback-metacity /usr/share/retro-desktop
 
         # Create Retro Home xsession
         mkdir -p "${R}"/usr/share/xsessions
