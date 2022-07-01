@@ -1,5 +1,6 @@
 # https://vincent.bernat.ch/en/blog/2021-startx-systemd
 # https://unix.stackexchange.com/a/686360
+# https://coral.googlesource.com/weston-imx-debian/+/refs/heads/release-beaker/debian/lib/systemd/system/weston.service
 [Unit]
 Description=X11 session for ludo
 After=graphical.target systemd-user-sessions.service
