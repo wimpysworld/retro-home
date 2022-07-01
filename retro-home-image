@@ -188,6 +188,8 @@ function stage_02_ludo() {
             cp -v root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm-gtk-greeter.conf.d/
         else
             nspawn apt-get -y install --no-install-recommends xinit
+            cp "root/usr/lib/systemd/system/x11-autologin.service" "${R}/usr/lib/systemd/system/"
+            nspawn systemctl enable x11-autologin.service
         fi
 
         # Install Splash
@@ -196,8 +198,6 @@ function stage_02_ludo() {
         cp root/etc/udev/rules.d/30-fb0.rules "${R}/etc/udev/rules.d/30-fb0.rules"
         cp root/usr/lib/systemd/system/splash-fbi.service "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable splash-fbi.service
-        cp "root/usr/lib/systemd/system/x11-autologin.service" "${R}/usr/lib/systemd/system/"
-        nspawn systemctl enable x11-autologin.service
         cp "root/usr/lib/systemd/system/retro-maint-fc-cache.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable retro-maint-fc-cache.service
 
