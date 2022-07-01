@@ -328,9 +328,9 @@ function stage_03_micro_desktop() {
         nspawn apt-get -y install --no-install-recommends connman-gtk \
         file-roller fonts-mplus gedit gnome-bluetooth gnome-control-center \
         gnome-control-center-faces gnome-disk-utility gnome-session-flashback \
-        gnome-startup-applications libcanberra-pulse librsvg2-2 librsvg2-bin \
-        librsvg2-common sakura transmission-gtk yaru-theme-gtk yaru-theme-icon \
-        yaru-theme-sound yaru-theme-unity
+        gnome-startup-applications gnome-terminal libcanberra-pulse librsvg2-2 \
+        librsvg2-bin librsvg2-common transmission-gtk yaru-theme-gtk \
+        yaru-theme-icon yaru-theme-sound yaru-theme-unity
 
         # Disable tracker
         rm "${R}/etc/systemd/user/default.target.wants/tracker-extract-3.service"
