@@ -618,7 +618,7 @@ function stage_07_image() {
     local SIZE_ROOT=0
     local SIZE_IMG=0
     local SIZE_PAD=0
-    # Calcualte image size accounting for boot parition + 5%
+    # Calculate image size accounting for boot parition + 5%
     SIZE_ROOT=$(du -cs --block-size=MB "${R}" | tail -n1 | cut -d'M' -f1)
     SIZE_PAD=$(( (SIZE_ROOT / 10) / 2 ))
     SIZE_IMG=$((SIZE_BOOT + SIZE_ROOT + SIZE_PAD))
