@@ -577,6 +577,7 @@ function stage_06_clean() {
     nspawn apt-get -y clean
 
     rm -f "${B}"/{*.bak,*.old}
+    rm -f "${R}"/wget-log
     rm -f "${R}"/boot/{*.bak,*.old}
     rm -f "${R}"/etc/ssh/ssh_host_*_key*
     rm -f "${R}"/etc/apt/*.save
