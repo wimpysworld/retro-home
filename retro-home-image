@@ -145,8 +145,8 @@ function stage_01_bootstrap() {
     # Disable motd-news, Retro Home has a bespoke (static) motd
     nspawn systemctl disable motd-news.service motd-news.timer
 
-    # I've grappled with this. Disable unattended-upgrades
-    nspawn systemctl disable apt-daily.timer apt-daily-upgrade.timer unattended-upgrades
+    # I've grappled with this.
+    nspawn systemctl disable apt-daily.timer apt-daily-upgrade.timer
 
     nspawn systemctl disable setvtrgb.service
 
@@ -244,6 +244,9 @@ function stage_02_ludo() {
         nspawn wget -q "https://raw.githubusercontent.com/wimpysworld/deb-get/0.2.9/deb-get" -O /usr/bin/deb-get
         chmod 755 "${R}/usr/bin/deb-get"
         nspawn deb-get install deb-get
+
+        # Disable unattended-upgrades
+        nspawn systemctl disable unattended-upgrades
 
         # Ludo
         nspawn deb-get install ludo
