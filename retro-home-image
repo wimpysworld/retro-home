@@ -349,9 +349,9 @@ function stage_03_micro_desktop() {
         #nspawn apt-get -y install --no-install-recommends dconf-editor \
         #gcolor3 lightdm-gtk-greeter-settings pavucontrol
 
-        # Vivaldi Browser
-        #  - Widevine: https://gist.github.com/ruario/19a28d98d29d34ec9b184c42e5f8bf29
-        nspawn deb-get install vivaldi-stable
+        # Firefox ESR
+        nspawn apt-add-repository -y ppa:mozillateam/ppa
+        nspawn apt-get -y install firefox-esr
 
         # Create custom panel layout
         cp "root/usr/share/gnome-panel/layouts/retro-home.layout" "${R}/usr/share/gnome-panel/layouts/"
