@@ -483,7 +483,7 @@ function stage_05_config() {
     sync_from "${B_STAGE_4}" "${R_STAGE_4}"
 
     # Tweak skel before the user is created.
-    cp -rv "root/etc/skel" "${R}/etc/"
+    # cp -rv "root/etc/skel" "${R}/etc/"
 
     # Create user and groups
     local DATE=""
