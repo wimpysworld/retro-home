@@ -592,10 +592,10 @@ function stage_06_clean() {
     rm -f "${R}"/var/log/bootstrap.log
     rm -f "${R}"/var/log/dpkg.log
     rm -f "${R}"/var/log/fontconfig.log
-    rm -f "${R}"/var/crash/*
     rm -f "${R}"/var/cache/debconf/*-old
     rm -f "${R}"/var/cache/deb-get/*.json
     rm -f "${R}"/var/cache/fontconfig/CACHEDIR.TAG
+    rm -f "${R}"/var/crash/*
     rm -rf "${R}"/var/lib/apt/lists/*
     rm -f "${R}"/var/lib/dpkg/*-old
     [ -L "${R}"/var/lib/dbus/machine-id ] || rm -f "${R}"/var/lib/dbus/machine-id
