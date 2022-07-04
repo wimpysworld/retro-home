@@ -870,8 +870,14 @@ TMP_DIR="${SUDO_HOME}/Builds"
 for LOOP in 0 1 2 3 4 5 6 7 8 9; do
     case ${LOOP} in
       0)
-        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_cache"
-        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_cache" 2>/dev/null
+        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-home/${IMG_VER}/${LOOP}_cache"
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-home/${IMG_VER}/${LOOP}_cache" 2>/dev/null
+        ;;
+      1)
+        export B_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-home/${IMG_VER}/${LOOP}_boot"
+        export R_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-home/${IMG_VER}/${LOOP}_root"
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-home/${IMG_VER}/${LOOP}_boot" 2>/dev/null
+        mkdir -p "${TMP_DIR}/${IMG_ARCH}/retro-home/${IMG_VER}/${LOOP}_root/boot/firmware" 2>/dev/null
         ;;
       *)
         export B_STAGE_${LOOP}="${TMP_DIR}/${IMG_ARCH}/retro-home-${REMIX}/${IMG_VER}/${LOOP}_boot"
