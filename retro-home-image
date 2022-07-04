@@ -306,7 +306,7 @@ function stage_02_ludo() {
         # - https://unix.stackexchange.com/questions/504806/systemd-start-as-unprivileged-user-in-a-group/557634#557634
         cp root/etc/polkit-1/localauthority/50-local.d/service-auth.pkla "${R}/etc/polkit-1/localauthority/50-local.d/"
 
-        # Add intofy-tools for watch-ludo-settings so it can react to settings changes
+        # Add inotify-tools for watch-ludo-settings so it can react to settings changes
         nspawn apt-get -y install --no-install-recommends inotify-tools
 
         # Add the retro-home script that launch LudOs
@@ -448,10 +448,7 @@ dtoverlay=dwc2"
     rpi-eeprom ubuntu-raspi-settings
 
     # Disable raspi-config, which allows switching the cpu governor by holding
-    # shift during boot; but introduces 1.7sec delay reaching the graphical.target
-    #   systemd-analyze time
-    #   systemd-analyze blame
-    #   systemctl list-dependencies graphical.target
+    # shift during boot
     nspawn systemctl disable raspi-config
     nspawn systemctl disable systemctl disable getty@tty1
 
@@ -560,6 +557,7 @@ function stage_05_config() {
             nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil
             CASE_SUPPORT="retroflag.py"
             #NES PI 4
+            # https://forums.raspberrypi.com/viewtopic.php?f=28&t=245931
             # Add to cmdline.txt usb-storage.quirks=152D:0562:u
             ;;
     esac
