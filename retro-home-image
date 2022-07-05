@@ -408,30 +408,6 @@ function stage_04_kernel() {
     export R="${R_STAGE_4}"
     sync_from "${B_STAGE_3}" "${R_STAGE_3}"
 
-    # Append case specific cmdline.txt & config.txt
-    cp -v "boot/README" "${B}/"
-    if [ -f "case/${REMIX}/config.txt" ]; then
-        cp -v "case/${REMIX}/config.txt" "${B}/"
-    else
-        cp "boot/config.txt" "${B}/"
-    fi
-
-    if [ -f "case/${REMIX}/cmdline.txt" ]; then
-        cp -v "case/${REMIX}/cmdline.txt" "${B}/"
-    else
-        cp "boot/cmdline.txt" "${B}/"
-    fi
-
-    # Apply ARM64 tweaks
-    if [ "${IMG_ARCH}"  == "arm64" ]; then
-        ARM64="# Config settings specific to arm64
-arm_64bit=1
-dtoverlay=dwc2"
-    else
-        ARM64=""
-    fi
-    sed -i "s|ARM64|${ARM64}|" "${B}/config.txt"
-
     cp "root/etc/fstab" "${R}/etc/"
 
     # Adds lz4 and z3fold modules to initramfs.
@@ -487,8 +463,29 @@ function stage_05_config() {
     export R="${R_STAGE_5}"
     sync_from "${B_STAGE_4}" "${R_STAGE_4}"
 
-    # Tweak skel before the user is created.
-    # cp -rv "root/etc/skel" "${R}/etc/"
+    # Append case specific cmdline.txt & config.txt
+    cp -v "boot/README" "${B}/"
+    if [ -f "case/${REMIX}/config.txt" ]; then
+        cp -v "case/${REMIX}/config.txt" "${B}/"
+    else
+        cp "boot/config.txt" "${B}/"
+    fi
+
+    if [ -f "case/${REMIX}/cmdline.txt" ]; then
+        cp -v "case/${REMIX}/cmdline.txt" "${B}/"
+    else
+        cp "boot/cmdline.txt" "${B}/"
+    fi
+
+    # Apply ARM64 tweaks
+    if [ "${IMG_ARCH}"  == "arm64" ]; then
+        ARM64="# Config settings specific to arm64
+arm_64bit=1
+dtoverlay=dwc2"
+    else
+        ARM64=""
+    fi
+    sed -i "s|ARM64|${ARM64}|" "${B}/config.txt"
 
     # Create user and groups
     local DATE=""
