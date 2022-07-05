@@ -18,7 +18,9 @@ function usage () {
   echo "  gpi:              RetroFlag GPi Case"
   echo "  gpimate:          RetroFlag GPi Case with GPiMate for CM3+Lite"
   echo "  gpimateplus:      RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
-  echo "  gamepm280:        Waveshare GPM280"
+  echo "  gpi2:             RetroFlag GPi Case 2"
+  echo "  gamepm2803:       Waveshare GPM2803 with CM3"
+  echo "  gamepm2804:       Waveshare GPM2804 with CM4"
   echo "  nespi:            RetroFlag NESPi Case+"
   echo "  nespi4:           RetroFlag NESPi 4 Case"
   echo "  megapi:           RetroFlag MEGAPi Case"
@@ -29,7 +31,7 @@ function usage () {
   echo "  picadeconsole:    Pimoroni Picade Console"
   echo "  pistation         RetroFlag PiStation Case"
   echo "  pistationlcd      RetroFlag PiStation Case with LCD"
-  echo "  superpi:          RetroFlag SUPERPi Case"
+  echo "  superpi:          RetroFlag SUPERPi Case-U and Case-J"
   echo "  superpi4:         RetroFlag SUPERPi 4 Case"
 }
 
@@ -776,6 +778,11 @@ case "${REMIX}" in
         echo "[+] Specified RetroFlag GPi Case with Raspberry Pi Zero 2 W"
         REMIX="gpi"
         shift;;
+    gpi2)
+        INCLUDE_DESKTOP="false"
+        echo "[+] Specified RetroFlag GPi Case 2 with CM4+Lite"
+        REMIX="gpi"
+        shift;;
     gpimate)
         # https://retrogamerestore.com/store/gpimate/
         INCLUDE_DESKTOP="false"
@@ -789,10 +796,16 @@ case "${REMIX}" in
         echo "[+] Specified RetroFlag GPi Case with GPiMatePlus for CM4+Lite"
         REMIX="gpimateplus"
         shift;;
-    gpm280)
-        #https://www.waveshare.com/wiki/GPM280
+    gpm2803)
+        # https://www.waveshare.com/wiki/GPM280
         INCLUDE_DESKTOP="false"
-        echo "[+] Specified Waveshare GPM280"
+        echo "[+] Specified Waveshare GPM2803 with CM3+Lite"
+        not_implemented
+        shift;;
+    gpm2804)
+        # https://www.waveshare.com/wiki/GPM2804
+        INCLUDE_DESKTOP="false"
+        echo "[+] Specified Waveshare GPM2804 with CM4+Lite"
         not_implemented
         shift;;
     megapi)
