@@ -1,1 +1,0 @@
-zswap.enabled=1 zswap.zpool=z3fold zswap.compressor=lz4 dwc_otg.lpm_enable=0 console=tty2 root=LABEL=writable rootfstype=ext4 rootwait fixrtc quiet loglevel=0 rd.systemd.show_status=false udev.log_level=0 udev.log_priority=0 rd.plymouth=0 plymouth.enable=0 plymouth.ignore-serial-consoles logo.nologo consoleblank=0 vt.global_cursor_default=0
