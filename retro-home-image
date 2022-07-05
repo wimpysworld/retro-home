@@ -233,6 +233,8 @@ function stage_02_ludo() {
         # LudOS requirements
         nspawn apt-get -y install --no-install-recommends bluez connman \
         samba ssh wireless-regdb wpasupplicant xli
+        # Disable connman-wait-online; it prevent the graphical.target being reach with no network
+        nspawn systemctl disable connman-wait-online.service
 
         local AUDIO_SYSTEM="pipewire"
         case "${AUDIO_SYSTEM}" in
