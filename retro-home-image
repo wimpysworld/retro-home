@@ -172,8 +172,9 @@ function stage_02_ludo() {
         nspawn apt-get -y install --no-install-recommends unclutter-xfixes \
         xauth xdg-utils xserver-common
 
-        nspawn apt-get -y install libgl1-mesa-dri mesa-vulkan-drivers \
-        xserver-xorg-core xserver-xorg-input-all x11-utils x11-xserver-utils
+        nspawn apt-get -y install libgl1-mesa-dri mesa-va-drivers \
+        mesa-vdpau-drivers mesa-vulkan-drivers xserver-xorg-core \
+        xserver-xorg-input-all x11-utils x11-xserver-utils
 
         # GLFW; used by Ludo
         nspawn apt-get -y install --install-suggests libglfw3
