@@ -258,13 +258,12 @@ function stage_02_ludo() {
 
         # Add systemd drop-in units so bluetooth, ssh and samba honor Ludo preferences
         for SERVICE in bluetooth sshd smbd; do
-            case "${SERVICE}" in
-                bluetooth) CONF_NAME="bluez";;
-                smbd)      CONF_NAME="samba";;
-                *)         CONF_NAME="${SERVICE}";;
-            esac
             mkdir -p "${R}/etc/systemd/system/${SERVICE}.service.d"
-            echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/${CONF_NAME}.conf" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf"
+            case "${SERVICE}" in
+                bluetooth) echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/bluez.conf\nAfter=graphical.target" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf"
+                smbd)      echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/samba.conf" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf"
+                sshd)      echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/sshd.conf" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf";;
+            esac
         done
 
         cp "root/etc/ludo.toml" "${R}/etc/"
