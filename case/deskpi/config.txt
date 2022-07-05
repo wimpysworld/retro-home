@@ -31,7 +31,7 @@ dtoverlay=vc4-kms-v3d
 
 ARM64
 
-# config.txt additions for DeskPi Pro case
+# DeskPi Pro/Lite cases - https://deskpi.com/
 
 # Enable the USB2 outputs on the IO board and enable host mode
 dtoverlay=dwc2,dr_mode=host

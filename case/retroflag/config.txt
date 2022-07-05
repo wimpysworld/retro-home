@@ -53,7 +53,7 @@ display_auto_detect=1
 
 ARM64
 
-# config.txt additions for RetroFlag cases - https://www.retroflag.com/
+# RetroFlag cases - https://www.retroflag.com/
 
 enable_uart=1
 dtoverlay=RetroFlag_pw_io.dtbo
