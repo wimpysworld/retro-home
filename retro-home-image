@@ -190,6 +190,9 @@ function stage_02_ludo() {
             # Enable auto-login to run Retro Home via LightDM
             cp -v root/usr/share/lightdm/lightdm.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm.conf.d/
             cp -v root/usr/share/lightdm/lightdm-gtk-greeter.conf.d/*.conf "${R}"/usr/share/lightdm/lightdm-gtk-greeter.conf.d/
+
+            # Run watch-ludo-settings in the desktop session automatically
+            cp root/etc/xdg/autostart/watch-ludo-settings.desktop "${R}"/etc/xdg/autostart/
         else
             nspawn apt-get -y install --no-install-recommends xinit
             cp "root/usr/lib/systemd/system/x11-autologin.service" "${R}/usr/lib/systemd/system/"
