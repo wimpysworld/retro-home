@@ -26,3 +26,6 @@ watch-ludo-settings &
 hdmi-refresh &
 
 ludo -ludos -v &> "${HOME}/.ludo.log"
+
+# Clean up after Ludo exits
+killall inotifywait
