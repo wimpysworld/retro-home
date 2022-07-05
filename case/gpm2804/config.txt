@@ -1,0 +1,33 @@
+[all]
+kernel=vmlinuz
+cmdline=cmdline.txt
+initramfs initrd.img followkernel
+
+ARM64
+
+# Waveshare GPM2804 case
+
+# The screen requires the "Fake" KMS overlay
+dtoverlay=vc4-fkms-v3d
+
+[cm4]
+dtoverlay=dwc2,dr_mode=host
+overscan_scale=1
+dtparam=spi=off
+dtparam=i2c_arm=off
+gpio=0-9=a2
+gpio=12-17=a2
+gpio=20-25=a2
+enable_dpi_lcd=1
+display_default_lcd=1
+dpi_group=2
+dpi_mode=87
+dpi_output_format=0x7F016
+hdmi_timings=480 0 26 16 10 640 0 25 10 15 0 0 0 60 0 32000000 1
+dtoverlay=waveshare-4dpib-3b-4b
+disable_audio_dither=1
+dtoverlay=audremap,pins_18_19
+audio_pwm_mode=2
+extra_transpose_buffer=2
+boot_delay=0
+hdmi_ignore_edid=0xa5000080

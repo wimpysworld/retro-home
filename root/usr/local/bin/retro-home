@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+if [ -x /usr/local/bin/gpm2804-rotate ]; then
+  /usr/local/bin/gpm2804-rotate
+fi
+
 splash-xli &
 
 # Disable screen blanking, DPMS and screensaver

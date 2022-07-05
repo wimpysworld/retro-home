@@ -208,15 +208,12 @@ function stage_02_ludo() {
         cp "root/usr/lib/systemd/system/retro-maint-fc-cache.service" "${R}/usr/lib/systemd/system/"
         nspawn systemctl enable retro-maint-fc-cache.service
 
-        SIZE_LOGO=256
-        SIZE_FRAME=384
-
         # Make logo.png
         convert -density 1200 -resize ${SIZE_LOGO}x${SIZE_LOGO} -background none .github/logo.svg /tmp/logo.png
 
         # Make Retro Home background
         mkdir -p "${R}/usr/share/splash"
-        convert -size 1920x1080 xc:black /tmp/background.png
+        convert -size "${SIZE_FB}" xc:black /tmp/background.png
         composite -gravity center /tmp/logo.png /tmp/background.png "${R}/usr/share/splash/splash.png"
         optipng -strip all -o7 "${R}/usr/share/splash/splash.png"
 
@@ -732,6 +729,9 @@ fi
 
 INCLUDE_DESKTOP="true"
 INCLUDE_LUDO="true"
+SIZE_LOGO="256"
+SIZE_FRAME="384"
+SIZE_FB="1920x1080"
 
 # Set variables based on chosen desktop environment
 case "${REMIX}" in
@@ -805,8 +805,8 @@ case "${REMIX}" in
     gpm2804)
         # https://www.waveshare.com/wiki/GPM2804
         INCLUDE_DESKTOP="false"
+        SIZE_FB="640x480"
         echo "[+] Specified Waveshare GPM2804 with CM4+Lite"
-        not_implemented
         shift;;
     megapi)
         echo "[+] Specified RetroFlag MEGAPi Case"

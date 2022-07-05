@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+if [ -e /boot/firmware/overlays/waveshare-4dpib-3b-4b.dtbo ]; then
+    xrandr --output DSI-1 --rotate left
+fi
