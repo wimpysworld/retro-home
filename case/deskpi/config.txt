@@ -25,7 +25,6 @@ disable_overscan=1
 hdmi_drive=2
 
 [all]
-
 # Enable the KMS ("full" KMS) graphics overlay, leaving GPU memory as the
 # default (the kernel is in control of graphics memory with full KMS)
 dtoverlay=vc4-kms-v3d

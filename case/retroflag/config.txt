@@ -29,12 +29,22 @@ hdmi_drive=2
 # such a board)
 dtoverlay=dwc2,dr_mode=host
 
-[all]
-
+[pi4]
 # Enable the KMS ("full" KMS) graphics overlay, leaving GPU memory as the
 # default (the kernel is in control of graphics memory with full KMS)
 dtoverlay=vc4-kms-v3d
 
+[pi3]
+# For other models of Pi enable the "fake" KMS graphics overlay.
+dtoverlay=vc4-fkms-v3d
+gpu_mem=128
+
+[pi2]
+# For other models of Pi enable the "fake" KMS graphics overlay.
+dtoverlay=vc4-fkms-v3d
+gpu_mem=128
+
+[all]
 # Autoload overlays for any recognized cameras or displays that are attached
 # to the CSI/DSI ports. Please note this is for libcamera support, *not* for
 # the legacy camera stack
