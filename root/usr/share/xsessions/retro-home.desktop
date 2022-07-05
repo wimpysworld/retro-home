@@ -1,12 +1,7 @@
 [Desktop Entry]
 Name=Retro Home
-Icon=retro-home
-GenericName=A minimalist frontend for emulators
-Exec=retro-home
-Terminal=false
-StartupNotify=false
-StartupWMClass=Ludo
+Comment=Your home for retro gaming
+Exec=/usr/local/bin/retro-home
+TryExec=ludo
 Type=Application
-Categories=Game;Emulator;
-Keywords=libretro;emulator;
-PrefersNonDefaultGPU=true
+DesktopNames=Retro-Home;Ludo;

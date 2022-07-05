@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Retro Desktop
+Comment=This session logs you into GNOME Flashback with Metacity
+Exec=/usr/libexec/retro-desktop-metacity
+TryExec=metacity
+Type=Application
+DesktopNames=GNOME-Flashback;GNOME;
+X-Ubuntu-Gettext-Domain=gnome-flashback

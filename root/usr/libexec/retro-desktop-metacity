@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export XDG_CURRENT_DESKTOP="ubuntu:GNOME-Flashback:GNOME"
+export DESKTOP_SESSION="gnome-flashback-metacity"
+export XDG_SESSION_DESKTOP="gnome-flashback-metacity"
+
+exec gnome-session --systemd --session=gnome-flashback-metacity --disable-acceleration-check "$@"

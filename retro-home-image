@@ -396,9 +396,14 @@ function stage_03_micro_desktop() {
         cp "root/usr/share/gnome-flashback-metacity/applications/info.desktop" "${R}/usr/share/gnome-flashback-metacity/applications/"
         nspawn ln -s /usr/share/gnome-flashback-metacity /usr/share/retro-desktop
 
-        # Create Retro Home xsession
+        # Create Retro Home and Retro Desktop xsessions
         mkdir -p "${R}"/usr/share/xsessions
         cp root/usr/share/xsessions/retro-home.desktop "${R}"/usr/share/xsessions/
+        cp root/usr/share/xsessions/retro-desktop.desktop "${R}"/usr/share/xsessions/
+        #mkdir -p "${R}"/usr/libexec
+        #cp root/usr/libexec/retro-desktop-metacity "${R}"/usr/libexec/
+        # Disable GNOME Flashback sessions
+        chmod 600 "${R}"/usr/share/xsessions/gnome-flashback-*.desktop
         nspawn update-desktop-database
     fi
 }
