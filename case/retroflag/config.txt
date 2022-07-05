@@ -35,12 +35,12 @@ dtoverlay=dwc2,dr_mode=host
 dtoverlay=vc4-kms-v3d
 
 [pi3]
-# For other models of Pi enable the "fake" KMS graphics overlay.
+# The Full KMS driver doesn't work on armhf for Pi3 so use the "fake" KMS driver
 dtoverlay=vc4-fkms-v3d
 gpu_mem=128
 
 [pi2]
-# For other models of Pi enable the "fake" KMS graphics overlay.
+# The Full KMS driver doesn't work on armhf for Pi3 so use the "fake" KMS driver
 dtoverlay=vc4-fkms-v3d
 gpu_mem=128
 
