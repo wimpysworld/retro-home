@@ -400,8 +400,8 @@ function stage_03_micro_desktop() {
         mkdir -p "${R}"/usr/share/xsessions
         cp root/usr/share/xsessions/retro-home.desktop "${R}"/usr/share/xsessions/
         cp root/usr/share/xsessions/retro-desktop.desktop "${R}"/usr/share/xsessions/
-        #mkdir -p "${R}"/usr/libexec
-        #cp root/usr/libexec/retro-desktop-metacity "${R}"/usr/libexec/
+        mkdir -p "${R}"/usr/libexec
+        cp root/usr/libexec/retro-desktop-metacity "${R}"/usr/libexec/
         # Disable GNOME Flashback sessions
         chmod 600 "${R}"/usr/share/xsessions/gnome-flashback-*.desktop
         nspawn update-desktop-database
