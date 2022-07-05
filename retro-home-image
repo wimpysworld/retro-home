@@ -20,6 +20,7 @@ function usage () {
   echo "  gpimateplus:      RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
   echo "  gamepm280:        Waveshare GPM280"
   echo "  nespi:            RetroFlag NESPi Case+"
+  echo "  nespi4:           RetroFlag NESPi 4 Case"
   echo "  megapi:           RetroFlag MEGAPi Case"
   echo "  minin64           Megabit Mini N64"
   echo "  minips1           Megabit Mini PS1 (Non-NFC)"
@@ -554,11 +555,11 @@ function stage_05_config() {
             CASE_SUPPORT="megabit.py"
             ;;
         retroflag)
-            nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil
-            CASE_SUPPORT="retroflag.py"
-            #NES PI 4
+            nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil python3-setproctitle
+            nspawn systemctl enable retroflag-safeshutdown.service
+            #NES PI 4 - usb quirks enabled in cmdline.txt
+            # usb-storage.quirks=152D:0562:u
             # https://forums.raspberrypi.com/viewtopic.php?f=28&t=245931
-            # Add to cmdline.txt usb-storage.quirks=152D:0562:u
             ;;
     esac
 
@@ -813,6 +814,11 @@ case "${REMIX}" in
         shift;;
     nespi)
         echo "[+] Specified RetroFlag NESPi Case+"
+        REMIX="retroflag"
+        shift;;
+    nespi4)
+        echo "[+] Specified RetroFlag NESPi 4 Case"
+        INCLUDE_DESKTOP="false"
         REMIX="retroflag"
         shift;;
     picade)

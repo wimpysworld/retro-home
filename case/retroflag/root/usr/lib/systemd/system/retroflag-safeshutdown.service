@@ -1,0 +1,11 @@
+[Unit]
+Description=Retroflag safeshutdown support
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/retroflag-safeshutdown.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
