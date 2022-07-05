@@ -3,7 +3,7 @@
 while true; do
   if pidof -q ludo; then
     PID_SEC=$(expr "$(date +%s)" - "$(stat --format=%Y "/proc/$(pidof ludo)")")
-    if [ "${PID_SEC}" -ge 12 ]; then
+    if [ "${PID_SEC}" -ge 45 ]; then
       break
     fi
   fi
