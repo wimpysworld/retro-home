@@ -105,7 +105,7 @@ retro-gaming 🕹 fun and testing to provide your [feedback to the project](http
   * Clone the Retro Home project
     * `git clone https://github.com/wimpysworld/retro-home.git`
 
-It is best to run the `retro-home-image` on an Ubuntu 20.04 x86 64-bit
+It is best to run the `retro-home-image` on an Ubuntu 22.04 x86 64-bit
 workstation, ideally running in a VM via [Quickemu](https://github.com/quickemu-project/quickemu). If using a fresh [Quickemu](https://github.com/quickemu-project/quickemu) VM you will need to set the `disk_size` parameter large enough to complete the build (around 26G). This can be achieved by adding `disk_size="32G"` to `ubuntu-mate-focal.conf` before running `quickemu` to create the VM. Alternatively you could mount external storage into the container for the build area. You'll also need at least to `sudo apt install git`.
 
 The following incantation will build a Retro Home armhf image for Raspberry Pi.
@@ -119,8 +119,8 @@ However, **Ludo currently only publishes pre-built binaries for `armhf`**, so
 changing the target architecture is not recommended.
 
 ```bash
-IMG_VER="21.10"
-IMG_RELEASE="impish"
+IMG_VER="22.04"
+IMG_RELEASE="jammy"
 IMG_ARCH="armhf"
 ```
 
@@ -129,10 +129,9 @@ You can also create a build without the desktop environment by setting
 script.
 
 ```bash
-# Set to 1 to skip installing these components
-SKIP_LUDO=0
-SKIP_DESKTOP=1
-SKIP_UBUNTU_STANDARD=0
+# Set to "false" to skip installing these components
+INSTALL_LUDO=true
+INSTALL_DESKTOP=true
 ```
 
 ### Usage
