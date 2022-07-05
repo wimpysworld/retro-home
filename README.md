@@ -125,13 +125,13 @@ IMG_ARCH="armhf"
 ```
 
 You can also create a build without the desktop environment by setting
-`SKIP_DESKTOP` to `1` in the variables near the end of the `retro-home-image`
+`INCLUDE_DESKTOP` to `false` in the variables near the end of the `retro-home-image`
 script.
 
 ```bash
 # Set to "false" to skip installing these components
-INSTALL_LUDO=true
-INSTALL_DESKTOP=true
+INCLUDE_LUDO=true
+INCLUDE_DESKTOP=true
 ```
 
 ### Usage
