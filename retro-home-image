@@ -262,8 +262,8 @@ function stage_02_ludo() {
         for SERVICE in bluetooth sshd smbd; do
             mkdir -p "${R}/etc/systemd/system/${SERVICE}.service.d"
             case "${SERVICE}" in
-                bluetooth) echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/bluez.conf\nAfter=graphical.target" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf"
-                smbd)      echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/samba.conf" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf"
+                bluetooth) echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/bluez.conf\nAfter=graphical.target" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf";;
+                smbd)      echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/samba.conf" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf";;
                 sshd)      echo -e "[Unit]\nConditionPathExists=/storage/.cache/services/sshd.conf" > "${R}/etc/systemd/system/${SERVICE}.service.d/override.conf";;
             esac
         done
