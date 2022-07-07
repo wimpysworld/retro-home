@@ -24,12 +24,9 @@ disable_overscan=1
 # support audio output)
 hdmi_drive=2
 
-[all]
 # Enable the KMS ("full" KMS) graphics overlay, leaving GPU memory as the
 # default (the kernel is in control of graphics memory with full KMS)
 dtoverlay=vc4-kms-v3d
-
-ARM64
 
 # DeskPi Pro/Lite cases - https://deskpi.com/
 
@@ -38,3 +35,5 @@ dtoverlay=dwc2,dr_mode=host
 
 # Enable IR
 dtoverlay=gpio-ir,gpio_pin=17
+
+[all]

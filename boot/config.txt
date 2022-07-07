@@ -50,5 +50,3 @@ gpu_mem=128
 # the legacy camera stack
 camera_auto_detect=1
 display_auto_detect=1
-
-ARM64

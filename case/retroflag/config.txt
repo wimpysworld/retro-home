@@ -51,8 +51,6 @@ gpu_mem=128
 camera_auto_detect=1
 display_auto_detect=1
 
-ARM64
-
 # RetroFlag cases - https://www.retroflag.com/
 
 enable_uart=1

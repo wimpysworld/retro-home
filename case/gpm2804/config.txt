@@ -3,8 +3,6 @@ kernel=vmlinuz
 cmdline=cmdline.txt
 initramfs initrd.img followkernel
 
-ARM64
-
 # Waveshare GPM2804 case
 
 # The screen requires the "Fake" KMS overlay
@@ -31,3 +29,5 @@ audio_pwm_mode=2
 extra_transpose_buffer=2
 boot_delay=0
 hdmi_ignore_edid=0xa5000080
+
+[all]
