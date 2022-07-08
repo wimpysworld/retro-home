@@ -15,10 +15,10 @@ function usage () {
   echo "  gamehat:          Waveshare Game HAT"
   echo "  gamepi20:         Waveshare GamePi20"
   echo "  gamepi43:         Waveshare GamePi43"
-  echo "  gpi:              RetroFlag GPi Case"
+  echo "  gpicase:          RetroFlag GPi Case"
+  echo "  gpicase2:         RetroFlag GPi Case 2"
   echo "  gpimate:          RetroFlag GPi Case with GPiMate for CM3+Lite"
-  echo "  gpimateplus:      RetroFlag GPi Case with GPiMate Plus for CM4 Lite"
-  echo "  gpi2:             RetroFlag GPi Case 2"
+  echo "  gpimateplus:      RetroFlag GPi Case with GPiMate Plus for CM4+Lite"
   echo "  gamepm2803:       Waveshare GPM2803 with CM3"
   echo "  gamepm2804:       Waveshare GPM2804 with CM4"
   echo "  nespi:            RetroFlag NESPi Case+"
@@ -536,20 +536,27 @@ dtoverlay=dwc2" >> "${B}/config.txt"
             nspawn systemctl enable deskpi-fancontrol.service
             nspawn systemctl enable deskpi-poweroff.service
             ;;
-        gpi)
+        gpicase)
             nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil python3-setproctitle
             CASE_SUPPORT="gpi.py"
-            # https://github.com/tsoliman/Retroflag-GPi-case
-            # https://github.com/kristijandraca/GPi_Case_patch
             # https://support.retroflag.com/
+            # https://github.com/tsoliman/Retroflag-GPi-case
+            # https://github.com/CrashCortez/gpi-case/blob/master/config.txt
+            # .dts source from https://github.com/kristijandraca/GPi_Case_patch
+            #
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/dpi24-gpi.dtbo" case/${REMIX}/boot/overlays/dpi24-gpi-overlay.dts
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/pwm-audio-pi-zero-gpi.dtbo" case/${REMIX}/boot/overlays/pwm-audio-pi-zero-gpi-overlay.dts
+            ;;
+        gpimate)
+            nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil python3-setproctitle
+            CASE_SUPPORT="gpi.py"
+            # https://forum.batocera.org/d/4097-support-for-gpimate/5
             ;;
         gpimateplus)
             nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil python3-setproctitle
             CASE_SUPPORT="gpi.py"
             # https://github.com/martinx72/GPiMatePlusHowTo
-            # https://retropie.org.uk/forum/topic/31555/no-sound-retroflag-gpi-case-with-pi-zero-w-2-solved
+
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/dpi24-gpi.dtbo" case/${REMIX}/boot/overlays/dpi24-gpi-overlay.dts
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/disable-pcie.dtbo" case/${REMIX}/boot/overlays/disable-pcie-overlay.dts
             ;;
@@ -772,26 +779,32 @@ case "${REMIX}" in
         echo "[+] Specified Waveshare GamePi43"
         not_implemented
         shift;;
-    gpi)
-        INCLUDE_DESKTOP="false"
+    gpicase)
         echo "[+] Specified RetroFlag GPi Case with Raspberry Pi Zero 2 W"
-        REMIX="gpi"
+        SIZE_FB="320x240"
+        SIZE_LOGO="128"
+        SIZE_FRAME="192"
         shift;;
-    gpi2)
-        INCLUDE_DESKTOP="false"
+    gpicase2)
         echo "[+] Specified RetroFlag GPi Case 2 with CM4+Lite"
-        REMIX="gpi"
+        SIZE_FB="640x480"
+        not_implemented
         shift;;
     gpimate)
         # https://retrogamerestore.com/store/gpimate/
         echo "[+] Specified RetroFlag GPi Case with GPiMate for CM3+Lite"
-        REMIX="gpi"
+        SIZE_FB="320x240"
+        SIZE_LOGO="128"
+        SIZE_FRAME="192"
         shift;;
     gpimateplus)
         # https://retrogamerestore.com/store/gpimateplus/
         # https://github.com/martinx72/GPiMatePlusHowTo
         echo "[+] Specified RetroFlag GPi Case with GPiMatePlus for CM4+Lite"
-        REMIX="gpimateplus"
+        SIZE_FB="320x240"
+        SIZE_LOGO="128"
+        SIZE_FRAME="192"
+        REMIX="gpicase"
         shift;;
     gpm2803)
         # https://www.waveshare.com/wiki/GPM280
