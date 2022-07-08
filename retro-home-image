@@ -837,7 +837,7 @@ case "${REMIX}" in
         echo "[+] Specified Monster Arcade Controller Kit"
         not_implemented
         shift;;
-    nespi)
+    nespi|retroflag)
         echo "[+] Specified RetroFlag NESPi Case+"
         REMIX="retroflag"
         shift;;
