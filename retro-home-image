@@ -9,9 +9,9 @@ function usage () {
   echo
   echo "Supported (or planned) devices are:"
   echo "  raspi:            Rasberry Pi 2, 3 and 4"
-  echo "  raspi-mini:       Rasberry Pi 2, 3 and 4 (mini)"
+  echo "  raspi-desktop:    Rasberry Pi 2, 3 and 4 (with desktop)"
   echo "  deskpi:           DeskPi Pro/Lite for Rasberry Pi 4"
-  echo "  deskpi-mini:      DeskPi Pro/Lite for Rasberry Pi 4 (mini)"
+  echo "  deskpi-desktop:   DeskPi Pro/Lite for Rasberry Pi 4 (with desktop)"
   echo "  gamehat:          Waveshare Game HAT"
   echo "  gamepi20:         Waveshare GamePi20"
   echo "  gamepi43:         Waveshare GamePi43"
@@ -732,7 +732,7 @@ else
     done
 fi
 
-INCLUDE_DESKTOP="true"
+INCLUDE_DESKTOP="false"
 INCLUDE_LUDO="true"
 SIZE_LOGO="256"
 SIZE_FRAME="384"
@@ -743,38 +743,35 @@ case "${REMIX}" in
     raspi)
         echo "[+] Specified Rasberry Pi 2, 3, 4 or 400"
         shift;;
-    raspi-mini)
-        echo "[+] Specified Rasberry Pi 2, 3, 4 or 400 (mini)"
-        INCLUDE_DESKTOP="false"
+    raspi-desktop)
+        echo "[+] Specified Rasberry Pi 2, 3, 4 or 400 (with desktop)"
+        INCLUDE_DESKTOP="true"
         shift;;
     deskpi)
         # https://wiki.deskpi.com/deskpi/
         # https://github.com/DeskPi-Team/deskpi
         echo "[+] Specified DeskPi Pro/Lite for Raspberry Pi 4"
         shift;;
-    deskpi-mini)
-        echo "[+] Specified DeskPi Pro/Lite for Raspberry Pi 4 (mini)"
-        INCLUDE_DESKTOP="false"
+    deskpi-desktop)
+        echo "[+] Specified DeskPi Pro/Lite for Raspberry Pi 4 (with desktop)"
+        INCLUDE_DESKTOP="true"
         shift;;
     gamehat)
         #https://www.waveshare.com/wiki/Game_HAT
         #patched driver for > 4.15 kernel
         # https://github.com/cmitu/mk_arcade_joystick_rpi/tree/retropie
         # reffered by https://github.com/RetroPie/RetroPie-Setup/blob/master/scriptmodules/supplementary/mkarcadejoystick.sh
-        INCLUDE_DESKTOP="false"
         echo "[+] Specified Waveshare Game HAT"
         not_implemented
         shift;;
     gamepi20)
         #https://www.waveshare.com/wiki/GamePi20
         #SAME driver as above just additional SCREEN over i2c
-        INCLUDE_DESKTOP="false"
         echo "[+] Specified Waveshare GamePi20"
         not_implemented
         shift;;
     gamepi43)
         #https://www.waveshare.com/wiki/GamePi43
-        INCLUDE_DESKTOP="false"
         echo "[+] Specified Waveshare GamePi43"
         not_implemented
         shift;;
@@ -790,12 +787,10 @@ case "${REMIX}" in
         shift;;
     gpimate)
         # https://retrogamerestore.com/store/gpimate/
-        INCLUDE_DESKTOP="false"
         echo "[+] Specified RetroFlag GPi Case with GPiMate for CM3+Lite"
         REMIX="gpi"
         shift;;
     gpimateplus)
-        INCLUDE_DESKTOP="false"
         # https://retrogamerestore.com/store/gpimateplus/
         # https://github.com/martinx72/GPiMatePlusHowTo
         echo "[+] Specified RetroFlag GPi Case with GPiMatePlus for CM4+Lite"
@@ -803,13 +798,11 @@ case "${REMIX}" in
         shift;;
     gpm2803)
         # https://www.waveshare.com/wiki/GPM280
-        INCLUDE_DESKTOP="false"
         echo "[+] Specified Waveshare GPM2803 with CM3+Lite"
         not_implemented
         shift;;
     gpm2804)
         # https://www.waveshare.com/wiki/GPM2804
-        INCLUDE_DESKTOP="false"
         SIZE_FB="640x480"
         echo "[+] Specified Waveshare GPM2804 with CM4+Lite"
         shift;;
@@ -840,7 +833,6 @@ case "${REMIX}" in
         shift;;
     nespi4)
         echo "[+] Specified RetroFlag NESPi 4 Case"
-        INCLUDE_DESKTOP="false"
         REMIX="retroflag"
         shift;;
     picade)
