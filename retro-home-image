@@ -539,24 +539,16 @@ dtoverlay=dwc2" >> "${B}/config.txt"
         gpicase)
             nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil python3-setproctitle
             CASE_SUPPORT="gpi.py"
-            # https://support.retroflag.com/
-            # https://github.com/tsoliman/Retroflag-GPi-case
-            # https://github.com/CrashCortez/gpi-case/blob/master/config.txt
-            # .dts source from https://github.com/kristijandraca/GPi_Case_patch
-            #
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/dpi24-gpi.dtbo" case/${REMIX}/boot/overlays/dpi24-gpi-overlay.dts
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/pwm-audio-pi-zero-gpi.dtbo" case/${REMIX}/boot/overlays/pwm-audio-pi-zero-gpi-overlay.dts
             ;;
         gpimate)
             nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil python3-setproctitle
             CASE_SUPPORT="gpi.py"
-            # https://forum.batocera.org/d/4097-support-for-gpimate/5
             ;;
         gpimateplus)
             nspawn apt-get -y install --no-install-recommends python3-gpiozero python3-lgpio python3-psutil python3-setproctitle
             CASE_SUPPORT="gpi.py"
-            # https://github.com/martinx72/GPiMatePlusHowTo
-
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/dpi24-gpi.dtbo" case/${REMIX}/boot/overlays/dpi24-gpi-overlay.dts
             #dtc -W no-unit_address_vs_reg -I dts -O dtb -o "${B}/overlays/disable-pcie.dtbo" case/${REMIX}/boot/overlays/disable-pcie-overlay.dts
             ;;
@@ -779,8 +771,26 @@ case "${REMIX}" in
         echo "[+] Specified Waveshare GamePi43"
         not_implemented
         shift;;
-    gpicase)
-        echo "[+] Specified RetroFlag GPi Case with Raspberry Pi Zero 2 W"
+    gpicase|gpimate*)
+        # GPi Case
+        # https://support.retroflag.com/
+        # https://github.com/tsoliman/Retroflag-GPi-case
+        # https://github.com/kristijandraca/GPi_Case_patch - Re-eng device tree source
+        # https://gitlab.com/recalbox/recalbox/-/tree/master/projects/recalbox-hardware/case/installers/gpi
+
+        # GPi Mate
+        # https://retrogamerestore.com/store/gpimate/
+
+        # GPi Mate+
+        # https://retrogamerestore.com/store/gpimateplus/
+        # https://github.com/martinx72/GPiMatePlusHowTo
+
+        # KMS
+        # https://forums.raspberrypi.com/viewtopic.php?t=322556 - Possible device tree KMS overylay for the GPi Case screen
+        echo "[+] Specified RetroFlag GPi Case with:"
+        echo "      - Raspberry Pi Zero 2 W"
+        echo "      - GPiMatePlus and CM3+Lite"
+        echo "      - GPiMatePlus and CM4+Lite"
         SIZE_FB="320x240"
         SIZE_LOGO="128"
         SIZE_FRAME="192"
@@ -789,22 +799,6 @@ case "${REMIX}" in
         echo "[+] Specified RetroFlag GPi Case 2 with CM4+Lite"
         SIZE_FB="640x480"
         not_implemented
-        shift;;
-    gpimate)
-        # https://retrogamerestore.com/store/gpimate/
-        echo "[+] Specified RetroFlag GPi Case with GPiMate for CM3+Lite"
-        SIZE_FB="320x240"
-        SIZE_LOGO="128"
-        SIZE_FRAME="192"
-        shift;;
-    gpimateplus)
-        # https://retrogamerestore.com/store/gpimateplus/
-        # https://github.com/martinx72/GPiMatePlusHowTo
-        echo "[+] Specified RetroFlag GPi Case with GPiMatePlus for CM4+Lite"
-        SIZE_FB="320x240"
-        SIZE_LOGO="128"
-        SIZE_FRAME="192"
-        REMIX="gpicase"
         shift;;
     gpm2803)
         # https://www.waveshare.com/wiki/GPM280

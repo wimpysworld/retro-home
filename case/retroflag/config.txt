@@ -52,6 +52,8 @@ camera_auto_detect=1
 display_auto_detect=1
 
 # RetroFlag cases - https://www.retroflag.com/
+# https://gitlab.com/recalbox/recalbox/-/tree/master/projects/recalbox-hardware/case/installers/retroflags
+# https://github.com/kristijandraca/GPi_Case_patch
 
 enable_uart=1
 dtoverlay=RetroFlag_pw_io.dtbo

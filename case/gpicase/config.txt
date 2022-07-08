@@ -1,0 +1,76 @@
+[all]
+kernel=vmlinuz
+cmdline=cmdline.txt
+initramfs initrd.img followkernel
+
+[pi4]
+max_framebuffers=1
+arm_boost=1
+
+[all]
+# Enable the audio output, I2C and SPI interfaces on the GPIO header. As these
+# parameters related to the base device-tree they must appear *before* any
+# other dtoverlay= specification
+dtparam=audio=on
+dtparam=i2c_arm=on
+dtparam=spi=on
+
+# Enable the serial pins
+enable_uart=1
+
+# RetroFlag GPi Case with Pi Zero 2, GPi Mate and GPi Mate Plus
+
+# Video
+cec_osd_name=retrohome
+display_rotate=1
+dtoverlay=dpi24-gpi
+overscan_left=0
+overscan_right=0
+overscan_top=0
+overscan_bottom=0
+framebuffer_width=320
+framebuffer_height=240
+enable_dpi_lcd=1
+display_default_lcd=1
+dpi_group=2
+dpi_mode=87
+dpi_output_format=0x6016
+hdmi_timings=240 1 38 10 20 320 1 20 4 4 0 0 0 60 0 6400000 1
+disable_audio_dither=1
+
+[pi0]
+dtoverlay=pwm-2chan,pin=18,func=2,pin2=19,func2=2
+dtoverlay=pwm-audio-pi-zero
+audio_pwm_mode=2
+
+# Pi Zero 2 stabilization
+arm_freq=1000
+gpu_freq=500
+core_freq=500
+sdram_freq=500
+sdram_schmoo=0x02000020
+# 6 is default
+over_voltage=6
+sdram_over_voltage=2
+
+[cm3]
+dtoverlay=pwm-2chan,pin=18,func=2,pin2=19,func2=2
+dtoverlay=pwm-audio-pi-zero
+audio_pwm_mode=0
+
+[cm4]
+dtoverlay=disable-pcie
+dtoverlay=sdtweak,overclock_50=100
+dtoverlay=dwc2,dr_mode=host
+dtoverlay=audremap,pins_18_19
+audio_pwm_mode=2
+hdmi_ignore_hotplug=1
+hdmi_ignore_edid=0xa5000080
+hdmi_edid_file=1
+
+[all]
+camera_auto_detect=0
+
+# disable activity leds
+dtparam=act_led_trigger=none
+dtparam=act_led_activelow=on
