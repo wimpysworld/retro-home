@@ -30,6 +30,7 @@ dtoverlay=vc4-kms-v3d
 
 # DeskPi Pro/Lite cases - https://deskpi.com/
 
+[pi4]
 # Enable the USB2 outputs on the IO board and enable host mode
 dtoverlay=dwc2,dr_mode=host
 
@@ -37,3 +38,8 @@ dtoverlay=dwc2,dr_mode=host
 dtoverlay=gpio-ir,gpio_pin=17
 
 [all]
+
+# Try to work around capture card quirks
+[EDID=MGW-USB_Capture]
+hdmi_group=2
+hdmi_mode=82

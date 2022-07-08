@@ -40,7 +40,7 @@ dtoverlay=vc4-fkms-v3d
 gpu_mem=128
 
 [pi2]
-# The Full KMS driver doesn't work on armhf for Pi3 so use the "fake" KMS driver
+# The Full KMS driver doesn't work on armhf for Pi2 so use the "fake" KMS driver
 dtoverlay=vc4-fkms-v3d
 gpu_mem=128
 
