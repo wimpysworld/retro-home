@@ -484,13 +484,10 @@ function stage_05_config() {
 
     # Apply ARM64 tweaks
     if [ "${IMG_ARCH}"  == "arm64" ]; then
-        ARM64="# Config settings specific to arm64
+        echo -e "\n# Config settings specific to arm64
 arm_64bit=1
-dtoverlay=dwc2"
-    else
-        ARM64=""
+dtoverlay=dwc2" >> "${B}/config.txt"
     fi
-    sed -i "s|ARM64|${ARM64}|" "${B}/config.txt"
 
     # Create user and groups
     local DATE=""
