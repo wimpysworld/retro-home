@@ -35,12 +35,12 @@ display_default_lcd=1
 dpi_group=2
 dpi_mode=87
 dpi_output_format=0x6016
-hdmi_timings=240 1 38 10 20 320 1 20 4 4 0 0 0 60 0 6400000 1
+dpi_timings=240 1 38 10 20 320 1 20 4 4 0 0 0 60 0 6400000 1
 disable_audio_dither=1
 
 [pi0]
 dtoverlay=pwm-2chan,pin=18,func=2,pin2=19,func2=2
-dtoverlay=pwm-audio-pi-zero
+dtoverlay=pwm-audio-pi-zero-gpi
 audio_pwm_mode=2
 
 # Pi Zero 2 stabilization
@@ -55,7 +55,7 @@ sdram_over_voltage=2
 
 [cm3]
 dtoverlay=pwm-2chan,pin=18,func=2,pin2=19,func2=2
-dtoverlay=pwm-audio-pi-zero
+dtoverlay=pwm-audio-pi-zero-gpi
 audio_pwm_mode=0
 
 [cm4]
