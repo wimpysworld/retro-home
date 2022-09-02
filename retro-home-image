@@ -64,8 +64,17 @@ function nspawn() {
     # Create basic resolv.conf for bind mounting inside the container
     echo "nameserver 1.1.1.1" > "${R_STAGE_0}/resolv.conf"
 
-    if pidof apt-cacher-ng && [ -d "${R}/etc/apt/apt.conf.d" ]; then
+    #  apt-cacher-ng is running here or this is a VM guest and the host
+    #  is running it
+    if pidof apt-cacher-ng  && [ -d "${R}/etc/apt/apt.conf.d" ]; then
         echo "Acquire::http { Proxy \"http://${APT_CACHE_IP}:3142\"; }" > "${R}/etc/apt/apt.conf.d/90cache"
+    else
+    #or this is a VM guest and the host is running it
+        if nc -z 10.0.2.2 3142 && [ -d "${R}/etc/apt/apt.conf.d" ]; then
+            echo "Acquire::http { Proxy \"http://10.0.2.2:3142\"; }" > "${R}/etc/apt/apt.conf.d/90cache"
+        fi
+    # TODO ? handle a parameter for external/other apt proxy address if there is one
+    # in the environment other than the VM or the host it is running on
     fi
 
     # Make sure the container has a machine-id
@@ -90,8 +99,8 @@ function stage_01_bootstrap() {
     export B="${B_STAGE_1}"
     export R="${R_STAGE_1}"
 
-    rm -rf "${B_STAGE_1}"/*
-    rm -rf "${R_STAGE_1}"/*
+    rm -rf "${B_STAGE_1:?}"/*
+    rm -rf "${R_STAGE_1:?}"/*
 
     # Required tools on the host
     apt-get -y install binfmt-support debootstrap device-tree-compiler git \
@@ -598,9 +607,10 @@ function stage_06_clean() {
     echo '' > "${R}"/etc/machine-id
 
     # Only required if Connman has been made the default network renderer
-    cd "${R}/etc"
-    ln -sf ../run/connman/resolv.conf resolv.conf
-    cd -
+    #cd "${R}/etc"
+    #ln -sf ../run/connman/resolv.conf resolv.conf
+    #cd -
+    ( cd "${R}/etc" && ln -sf ../run/connman/resolv.conf resolv.conf)
 }
 
 function stage_07_image() {
