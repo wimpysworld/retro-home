@@ -4,6 +4,9 @@
   Retro Home
 </h1>
 
+> [!IMPORTANT]
+> Retro Home is now archived and no longer receives updates. This project continues as [Extra Life](https://extralife.wimpys.world/), a console operating system for handhelds, Raspberry Pi boards, retro cases, and 64-bit PCs. Extra Life boots straight into the Ludo menu with 33 built-in emulators across 40+ classic systems, automatic controller setup, Samba file sharing, and over-the-air updates.
+
 <p align="center"><b>Your Home for Retro Gaming 🕹</b></p>
 <div align="center"><img src=".github/screenshot.png" alt="Retro Home Screenshot" width="960" height="540" /></div>
 <p align="center">Made with 💝 for <img src=".github/ubuntu.png" align="top" width="18" /></p>
@@ -15,14 +18,9 @@ thanks to [Ubuntu](https://ubuntu.com/raspberry-pi) and [Ludo](https://ludo.libr
 
 > Ludo is a minimalist frontend for emulators
 
-  * Ask questions and provide **[feedback via our Discord](https://discord.gg/GeHJGD9)** 💬
-  * Submit **[bug reports via GitHub](https://github.com/wimpysworld/retro-home/issues)** 🐛
-
 This repository hosts downloadable images of Retro Home and the script that
 builds Retro Home images for Raspberry Pi devices along with the associated
 documentation to get you retro-gaming in style.
-
-We have a Discord for this project: [![Discord](https://img.shields.io/discord/712850672223125565?color=0C306A&label=WimpysWorld%20Discord&logo=Discord&logoColor=ffffff&style=flat-square)](https://discord.gg/GeHJGD9)
 
 ### Features
 
@@ -88,7 +86,7 @@ We have a Discord for this project: [![Discord](https://img.shields.io/discord/7
 Alpha images of Retro Home are [available for download from the GitHub releases](https://github.com/wimpysworld/retro-home/releases).
 
 The alpha images work for most emulators and are suitable for having
-retro-gaming 🕹 fun and testing to provide your [feedback to the project](https://discord.gg/GeHJGD9).
+retro-gaming 🕹 fun.
 
 ### Putting Retro Home on a Raspberry Pi
 
@@ -135,9 +133,6 @@ INCLUDE_DESKTOP=true
 ```
 
 ### Usage
-
-We will be adding hardware support for various retro themed Raspberry Pi cases
-in the future.
 
 ```
 Usage
@@ -197,13 +192,6 @@ or the desktop.
 
 Having a small desktop environment is helpful during the early stages of
 development and debugging.
-
-We will continue to include the desktop environment in most of the Retro Home
-images we make available as it is useful for downloading and installing your
-ROMs if you don't have another computer available.
-
-We won't be including the desktop on Retro Home images targeting handheld
-devices.
 
 ### What is included in the desktop environment?
 
